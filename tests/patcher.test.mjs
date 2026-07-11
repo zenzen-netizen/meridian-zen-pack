@@ -1,4 +1,4 @@
-import { applyPatch, replaceLine, restore, verifyRestored, backupWithHash } from "../lib/patcher.js";
+import { applyPatch, appendPatch, replaceLine, restore, verifyRestored, backupWithHash } from "../lib/patcher.js";
 import { readFileSync, writeFileSync, copyFileSync, rmSync, mkdirSync } from "node:fs";
 import assert from "node:assert";
 
@@ -98,6 +98,28 @@ t("replace: OLD ganda -> old-not-unique, file utuh", () => {
 t("replace: NEW bikin syntax rusak -> AUTO-ROLLBACK ke asli", () => {
   const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
   const r = replaceLine({ ...cfg(), oldLine: 'console.log("vanilla boot");', newLine: "const x = ;" });
+  assert.strictEqual(r.status, "node-check-failed-rolled-back");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
+});
+
+t("append: blok nempel di EOF dgn marker", () => {
+  const r = appendPatch({ ...cfg(), inject: "export function extra() { return 1; }", marker: "ZENPACK:03a" });
+  assert.strictEqual(r.status, "appended");
+  const out = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  assert.ok(out.trimEnd().endsWith("// <<< ZENPACK:03a <<<"));
+  assert.ok(out.includes("function extra()"));
+});
+
+t("append: idempotent -> kedua kali skipped", () => {
+  const c = cfg();
+  appendPatch({ ...c, inject: "export function extra() { return 1; }", marker: "ZENPACK:03a" });
+  const r2 = appendPatch({ ...c, inject: "export function extra() { return 1; }", marker: "ZENPACK:03a" });
+  assert.strictEqual(r2.status, "skipped-idempotent");
+});
+
+t("append: syntax rusak -> AUTO-ROLLBACK ke asli", () => {
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = appendPatch({ ...cfg(), inject: "const x = ;", marker: "ZENPACK:bad" });
   assert.strictEqual(r.status, "node-check-failed-rolled-back");
   assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
 });

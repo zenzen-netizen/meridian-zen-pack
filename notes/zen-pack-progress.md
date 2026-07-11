@@ -49,3 +49,4 @@
 # Stage 3.3 — wiring Telegram batch 1 (/addprofil + /export)
 
 ✅ Fase 0: HEAD 3a1ea57; vanilla-test di-uninstall (15 clean, porcelain 0). Anchor `/briefing` UNIK (index.js:1415 vanilla). load() vanilla return {lessons:[],performance:[]} ✓. Binding hooks patch 01 = `__zenpackHooks` (namespace import, punya .run). Sumber fork: lessons.js getPerformanceForRacikan+listRacikanInPerformance (~:937-954), wrapper index.js exportUsageText:2788 runExportCommand:2803 runAddProfilCommand:2853, dispatch :3242-3252 — cocok kutipan brief.
+✅ Fase 1 patch 03a: op appendPatch di patcher (marker EOF, idempotent, rollback; test 14/14) + core-patches/03a (2 fungsi VERBATIM fork lessons.js:931-954, byte-identik terverifikasi). FIX: regex runner ^\d\d- tak kenal "03a-" -> ^\d\d[a-z]?- (apply+revert). Boot: errors 0 + 401 baseline. Install 2x idempotent. INSIDEN 2x: commit sempat nyasar ke repo vanilla-test (cwd salah) -> git reset 5ab14b4, nol jejak, tak pernah ter-push.

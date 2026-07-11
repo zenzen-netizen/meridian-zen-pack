@@ -13,7 +13,7 @@ const patchesDir = dirname(fileURLToPath(import.meta.url));
 const backupsDir = join(targetRoot, ".zenpack", "backups");
 const hashDbPath = join(targetRoot, ".zenpack", "pre-install-hashes.json");
 
-const defs = readdirSync(patchesDir).filter((f) => /^\d\d-.*\.mjs$/.test(f)).sort();
+const defs = readdirSync(patchesDir).filter((f) => /^\d\d[a-z]?-.*\.mjs$/.test(f)).sort();
 let failed = 0;
 const seen = new Set(); // file bisa disentuh >1 patch (mis. index.js oleh 01 + 02) -> restore sekali
 for (const f of defs) {

@@ -4,7 +4,7 @@
 import { readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { applyPatch, replaceLine } from "../lib/patcher.js";
+import { applyPatch, appendPatch, replaceLine } from "../lib/patcher.js";
 
 const targetRoot = process.argv[2];
 if (!targetRoot) { console.error("pakai: node core-patches/apply.mjs <path-target>"); process.exit(1); }
@@ -13,8 +13,8 @@ const patchesDir = dirname(fileURLToPath(import.meta.url));
 const backupsDir = join(targetRoot, ".zenpack", "backups");
 const hashDbPath = join(targetRoot, ".zenpack", "pre-install-hashes.json");
 
-const OK = new Set(["patched", "skipped-idempotent", "replaced"]);
-const defs = readdirSync(patchesDir).filter((f) => /^\d\d-.*\.mjs$/.test(f)).sort();
+const OK = new Set(["patched", "skipped-idempotent", "replaced", "appended"]);
+const defs = readdirSync(patchesDir).filter((f) => /^\d\d[a-z]?-.*\.mjs$/.test(f)).sort();
 let failed = 0;
 for (const f of defs) {
   const { default: p } = await import(pathToFileURL(join(patchesDir, f)).href);
@@ -24,6 +24,11 @@ for (const f of defs) {
     if (item.anchor) {
       const r = applyPatch({ targetRoot, backupsDir, hashDbPath, ...item });
       console.log(`[zen-pack patch] ${f} ${item.file} inject: ${r.status}`);
+      if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); continue; }
+    }
+    if (item.append) {
+      const r = appendPatch({ targetRoot, backupsDir, hashDbPath, file: item.file, marker: item.marker, inject: item.append });
+      console.log(`[zen-pack patch] ${f} ${item.file} append: ${r.status}`);
       if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); continue; }
     }
     for (const rep of item.replaces ?? []) {
