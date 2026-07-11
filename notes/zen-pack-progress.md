@@ -13,5 +13,5 @@
 ✅ 2.1 salin 18 top-level → plugins/ (18 file, node --check nol fail)
 ✅ 2.2 salin 12 views → views/ (12 file, node --check nol fail)
 ✅ 2.3 salin 1 tools + 3 scripts (node --check nol fail)
-⬜ 2.4 salin docs pure-add + update manifest.json
+✅ 2.4 docs/SETTINGS-GUIDE.md + manifest stage:2 + drop_ins
 ⬜ 2.5 adaptasi smoke-test + install/uninstall ke vanilla-test
