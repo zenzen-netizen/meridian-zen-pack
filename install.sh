@@ -23,22 +23,29 @@ if [[ ! -f "$HASHDB" ]]; then
 fi
 
 # 3. Salin file pack -> target, catat tiap file ke manifest (path relatif target)
+# Layout A+ (Stage 3.1b): drop-in mencerminkan layout fork -> import relatif mereka jalan.
+# PURE-ADD WAJIB: kalau file tujuan sudah ada di target (punya vanilla) -> STOP, jangan timpa.
 copy_dir() {
   local src="$1" dstrel="$2"
   [[ -d "$PACK_DIR/$src" ]] || return 0
-  mkdir -p "$TARGET/$dstrel"
   ( cd "$PACK_DIR/$src" && find . -type f ! -name '.gitkeep' ) | while read -r f; do
     f="${f#./}"
-    mkdir -p "$TARGET/$dstrel/$(dirname "$f")"
-    cp "$PACK_DIR/$src/$f" "$TARGET/$dstrel/$f"
-    echo "$dstrel/$f" >> "$MANIFEST"
+    local rel="$dstrel/$f"; rel="${rel#./}"
+    if [[ -e "$TARGET/$rel" ]] && ! cmp -s "$PACK_DIR/$src/$f" "$TARGET/$rel"; then
+      echo "TABRAKAN: $rel sudah ada di target dgn isi beda (bukan pure-add) — STOP"
+      exit 1
+    fi
+    mkdir -p "$TARGET/$(dirname "$rel")"
+    cp "$PACK_DIR/$src/$f" "$TARGET/$rel"
+    echo "$rel" >> "$MANIFEST"
   done
 }
 
 copy_dir lib zenpack-lib
-copy_dir plugins plugins
+copy_dir zenpack-plugins zenpack-plugins  # hook-plugin betulan (dibaca loader)
+copy_dir plugins .            # drop-in top-level fork -> ROOT target (mirror fork)
 copy_dir views views          # vanilla tak punya views/ -> aman, dibuat baru
-copy_dir tools-extra tools-extra
+copy_dir tools-extra tools    # smi.js -> tools/smi.js (posisi fork)
 copy_dir scripts scripts      # HATI-HATI: scripts/ vanilla ADA & berisi file vanilla.
                               # copy_dir salin per-file & catat per-file -> uninstall hapus HANYA yang tercatat.
 

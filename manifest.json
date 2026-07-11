@@ -2,12 +2,13 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 2,
-  "patches": [],
-  "plugins": [],
+  "stage": 3.1,
+  "patches": ["01-hook-bus"],
+  "plugins": ["00-zenpack-hello"],
   "drop_ins": {
-    "plugins": 18, "views": 12, "tools_extra": 1, "scripts": 3, "docs": 1,
+    "root": 18, "views": 12, "tools": 1, "scripts": 3, "docs": 1,
+    "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": ["CLAUDE.md", ".env.example", "gmgn-config.example.json", "user-config.example.json"]
   },
-  "notes": "infra + drop-in pure-add; wiring belum (Stage 3)"
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/"
 }
