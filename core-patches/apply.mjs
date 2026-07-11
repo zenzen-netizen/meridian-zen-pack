@@ -4,7 +4,7 @@
 import { readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { applyPatch } from "../lib/patcher.js";
+import { applyPatch, replaceLine } from "../lib/patcher.js";
 
 const targetRoot = process.argv[2];
 if (!targetRoot) { console.error("pakai: node core-patches/apply.mjs <path-target>"); process.exit(1); }
@@ -13,12 +13,24 @@ const patchesDir = dirname(fileURLToPath(import.meta.url));
 const backupsDir = join(targetRoot, ".zenpack", "backups");
 const hashDbPath = join(targetRoot, ".zenpack", "pre-install-hashes.json");
 
+const OK = new Set(["patched", "skipped-idempotent", "replaced"]);
 const defs = readdirSync(patchesDir).filter((f) => /^\d\d-.*\.mjs$/.test(f)).sort();
 let failed = 0;
 for (const f of defs) {
   const { default: p } = await import(pathToFileURL(join(patchesDir, f)).href);
-  const r = applyPatch({ targetRoot, backupsDir, hashDbPath, ...p });
-  console.log(`[zen-pack patch] ${f}: ${r.status}`);
-  if (r.status !== "patched" && r.status !== "skipped-idempotent") { failed++; if (r.err) console.error(r.err); }
+  // Format lama: satu objek {file,anchor,inject,marker}. Format baru: array per-file
+  // dgn opsional replaces[] (exact-line lewat replaceLine).
+  for (const item of Array.isArray(p) ? p : [p]) {
+    if (item.anchor) {
+      const r = applyPatch({ targetRoot, backupsDir, hashDbPath, ...item });
+      console.log(`[zen-pack patch] ${f} ${item.file} inject: ${r.status}`);
+      if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); continue; }
+    }
+    for (const rep of item.replaces ?? []) {
+      const r = replaceLine({ targetRoot, backupsDir, hashDbPath, file: item.file, oldLine: rep.old, newLine: rep.new });
+      console.log(`[zen-pack patch] ${f} ${item.file} replace: ${r.status}`);
+      if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); }
+    }
+  }
 }
 process.exit(failed ? 1 : 0);
