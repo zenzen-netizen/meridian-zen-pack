@@ -15,3 +15,10 @@
 ✅ 2.3 salin 1 tools + 3 scripts (node --check nol fail)
 ✅ 2.4 docs/SETTINGS-GUIDE.md + manifest stage:2 + drop_ins
 ✅ 2.5 smoke v0.2 PASS + install/uninstall vanilla-test (0 modified, 9 entri baru; uninstall porcelain 0)
+
+# Stage 3.1 — 01-hook-bus.patch + boot DRY_RUN
+
+✅ Fase 0 verifikasi: pack HEAD 2a915fb, vanilla 5ab14b4, anchor baris 1 persis.
+   DEVIASI: vanilla-test/ hilang (sesi lalu tak persist) → direkonstruksi via cp -a dari vanilla pristine (SHA sama, porcelain 0, anchor cocok).
+   Temuan: install.sh SUDAH salin lib/ → zenpack-lib/ (bukan zenpack/lib/ spt sketsa brief) → Fase 2 tinggal verifikasi siklus; patch import pakai ./zenpack-lib/loader.js.
+   Kontrak loader: loadPlugins(pluginsDir, hooks) async → {loaded,skipped,errors}; hooks = namespace import lib/hooks.js.
