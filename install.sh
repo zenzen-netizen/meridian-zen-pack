@@ -14,7 +14,9 @@ fi
 
 mkdir -p "$TARGET/.zenpack"
 MANIFEST="$TARGET/.zenpack/install-manifest.txt"
-: > "$MANIFEST"
+# JANGAN truncate: manifest lama = daftar file milik kita (jalur upgrade/reinstall).
+# Truncate di sini pernah bikin uninstall buta pasca-install-gagal (insiden 3.3).
+touch "$MANIFEST"
 
 # 2. Pre-install hash groundwork (§1.2). v0: belum ada file yang dipatch -> {}
 HASHDB="$TARGET/.zenpack/pre-install-hashes.json"
@@ -31,13 +33,16 @@ copy_dir() {
   ( cd "$PACK_DIR/$src" && find . -type f ! -name '.gitkeep' ) | while read -r f; do
     f="${f#./}"
     local rel="$dstrel/$f"; rel="${rel#./}"
-    if [[ -e "$TARGET/$rel" ]] && ! cmp -s "$PACK_DIR/$src/$f" "$TARGET/$rel"; then
+    # Milik kita = tercatat di manifest ATAU isi identik -> boleh timpa (upgrade/reinstall).
+    # File asing beda isi = punya vanilla -> STOP, jangan timpa.
+    if [[ -e "$TARGET/$rel" ]] && ! cmp -s "$PACK_DIR/$src/$f" "$TARGET/$rel" \
+       && ! grep -qxF "$rel" "$MANIFEST"; then
       echo "TABRAKAN: $rel sudah ada di target dgn isi beda (bukan pure-add) — STOP"
       exit 1
     fi
     mkdir -p "$TARGET/$(dirname "$rel")"
     cp "$PACK_DIR/$src/$f" "$TARGET/$rel"
-    echo "$rel" >> "$MANIFEST"
+    grep -qxF "$rel" "$MANIFEST" || echo "$rel" >> "$MANIFEST"
   done
 }
 
@@ -52,7 +57,7 @@ copy_dir scripts scripts      # HATI-HATI: scripts/ vanilla ADA & berisi file va
 # Docs pure-add: SETTINGS-GUIDE.md -> root target
 if [[ -f "$PACK_DIR/docs/SETTINGS-GUIDE.md" ]]; then
   cp "$PACK_DIR/docs/SETTINGS-GUIDE.md" "$TARGET/SETTINGS-GUIDE.md"
-  echo "SETTINGS-GUIDE.md" >> "$MANIFEST"
+  grep -qxF "SETTINGS-GUIDE.md" "$MANIFEST" || echo "SETTINGS-GUIDE.md" >> "$MANIFEST"
 fi
 
 # 4. Apply patch anchor (Stage 3) — idempotent via marker, auto-rollback kalau syntax rusak
