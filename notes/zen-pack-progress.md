@@ -37,3 +37,7 @@
 ✅ Fase 1 mapping A+: plugins/->root, views/->views/, tools-extra/->tools/, +zenpack-plugins/; cek pure-add via cmp (identik=milik kita/idempotent, beda=STOP); uninstall dir-cleanup ikut; manifest.json stage 3.1. bash -n + json OK.
 ✅ Fase 2: zenpack-plugins/ (git mv hello), install.sh sudah salin (Fase 1), patch 01-hook-bus tunjuk ./zenpack-plugins. loader.test hijau.
 ✅ Fase 3 gerbang: boot "[zen-pack] loaded 1 plugins (skipped 0, errors 0)" + hello SEBELUM baseline 401 (identik 3.1). Fisik: 18 root + 12 views/ + tools/smi.js + zenpack-plugins/hello (manifest 39 entri). Uninstall: restore verify clean + porcelain 0 (root/views/tools bersih). Install 2x idempotent (skipped-idempotent, cmp lolos). smoke-test disesuaikan key A+ -> SMOKE v0.2 PASS. Nol isi drop-in diedit (diff stat: hanya install/uninstall/manifest/patch/smoke + rename hello).
+
+# Stage 3.2 — 02-paths-routing
+
+✅ Fase 0: HEAD 332246f; vanilla-test masih terpasang → uninstall (verify clean, porcelain 0). Recon live: 19 titik [A] + [B] persis peta brief, NOL titik baru. paths.js drop-in punya SEMUA key [A] (userConfigPath..logDir). lib/patcher.js belum punya replace-op → Fase 1 dibuat.
