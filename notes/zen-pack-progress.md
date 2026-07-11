@@ -35,3 +35,4 @@
 
 ✅ Fase 0: HEAD da9c1fe, branch main, vanilla-test ada (masih terpasang → uninstall dulu, porcelain 0). Tabrakan: NOL (18 drop-in vs root, views/ tak ada di vanilla, tools/smi.js kosong). Mapping lama install.sh:38-48 tercatat.
 ✅ Fase 1 mapping A+: plugins/->root, views/->views/, tools-extra/->tools/, +zenpack-plugins/; cek pure-add via cmp (identik=milik kita/idempotent, beda=STOP); uninstall dir-cleanup ikut; manifest.json stage 3.1. bash -n + json OK.
+✅ Fase 2: zenpack-plugins/ (git mv hello), install.sh sudah salin (Fase 1), patch 01-hook-bus tunjuk ./zenpack-plugins. loader.test hijau.

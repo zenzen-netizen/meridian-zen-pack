@@ -11,7 +11,7 @@ export default {
     `import { loadPlugins as __zenpackLoadPlugins } from "./zenpack-lib/loader.js";`,
     `import { fileURLToPath as __zenpackFileURLToPath } from "node:url";`,
     `const __zenpackResult = await __zenpackLoadPlugins(`,
-    `  __zenpackFileURLToPath(new URL("./plugins", import.meta.url)),`,
+    `  __zenpackFileURLToPath(new URL("./zenpack-plugins", import.meta.url)),`,
     `  __zenpackHooks,`,
     `);`,
     `console.log(\`[zen-pack] loaded \${__zenpackResult.loaded.length} plugins (skipped \${__zenpackResult.skipped.length}, errors \${__zenpackResult.errors.length})\`);`,
