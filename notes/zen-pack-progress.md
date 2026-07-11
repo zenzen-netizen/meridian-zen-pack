@@ -14,4 +14,4 @@
 ✅ 2.2 salin 12 views → views/ (12 file, node --check nol fail)
 ✅ 2.3 salin 1 tools + 3 scripts (node --check nol fail)
 ✅ 2.4 docs/SETTINGS-GUIDE.md + manifest stage:2 + drop_ins
-⬜ 2.5 adaptasi smoke-test + install/uninstall ke vanilla-test
+✅ 2.5 smoke v0.2 PASS + install/uninstall vanilla-test (0 modified, 9 entri baru; uninstall porcelain 0)

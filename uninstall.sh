@@ -17,7 +17,7 @@ while read -r f; do
 done < "$MANIFEST"
 
 # Hapus folder yang jadi kosong setelah file dihapus
-for d in zenpack-lib plugins views tools-extra; do
+for d in zenpack-lib plugins views tools-extra scripts; do
   [[ -d "$TARGET/$d" ]] && find "$TARGET/$d" -type d -empty -delete
 done
 
