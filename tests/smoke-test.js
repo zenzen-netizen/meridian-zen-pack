@@ -31,11 +31,13 @@ for (const t of ["hooks.test.mjs", "patcher.test.mjs", "loader.test.mjs"]) {
 // 3. Inventaris drop-in vs manifest.json.drop_ins (tanpa import; syntax-only)
 const manifest = JSON.parse(readFileSync(join(ROOT, "manifest.json"), "utf8"));
 const expect = manifest.drop_ins ?? {};
+// Key manifest layout A+ (Stage 3.1b): plugins/ pack -> root target, tools-extra/ -> tools/
 const dirs = [
-  ["plugins", "plugins"],
+  ["plugins", "root"],
   ["views", "views"],
-  ["tools-extra", "tools_extra"],
+  ["tools-extra", "tools"],
   ["scripts", "scripts"],
+  ["zenpack-plugins", "zenpack_plugins"],
 ];
 for (const [dir, key] of dirs) {
   const files = readdirSync(join(ROOT, dir)).filter((x) => x.endsWith(".js"));
