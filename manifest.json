@@ -14,7 +14,8 @@
   "plugins": [
     "00-zenpack-hello",
     "10-telegram-cmds",
-    "20-profile-tools"
+    "20-profile-tools",
+    "30-render-views"
   ],
   "drop_ins": {
     "root": 18,
@@ -22,7 +23,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 3,
+    "zenpack_plugins": 4,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",

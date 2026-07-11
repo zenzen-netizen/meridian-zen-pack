@@ -53,8 +53,14 @@ await t("/export racikan (kosong) -> handled + daftar kosong graceful (jalur 03a
   assert.ok(r.reply.includes("Belum ada racikan"), `reply: ${r.reply.slice(0, 120)}`);
 });
 
-await t("/status -> TIDAK handled (jatuh ke vanilla)", async () => {
+// Stage 3.6: /status kini di-intercept plugin 30-render-views (views HTML), bukan vanilla.
+await t("/status -> handled oleh 30-render-views (views HTML)", async () => {
   const r = await fire("/status");
+  assert.strictEqual(r.handled, true);
+});
+// /wallet TETAP jatuh ke vanilla (diluar scope batch 1 — view walletView terpisah).
+await t("/wallet -> TIDAK handled (jatuh ke vanilla, diluar scope 3.6)", async () => {
+  const r = await fire("/wallet");
   assert.strictEqual(r.handled, false);
 });
 
