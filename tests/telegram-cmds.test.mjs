@@ -1,6 +1,8 @@
-// Gerbang 3.3: sandbox tanpa token Telegram -> invoke hook "telegram:command"
+// Gerbang 3.3 + 3.4: sandbox tanpa token Telegram -> invoke hook "telegram:command"
 // langsung terhadap TARGET ter-install, assert handled + efek file nyata.
 //   node tests/telegram-cmds.test.mjs <path-target>
+// CATATAN: /preset save/use MENULIS user-config.json (stamp activeSetup) —
+// caller wajib backup/restore user-config.json di sekitar run (lihat gerbang bash).
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { existsSync, readdirSync } from "node:fs";
@@ -55,6 +57,56 @@ await t("/status -> TIDAK handled (jatuh ke vanilla)", async () => {
   const r = await fire("/status");
   assert.strictEqual(r.handled, false);
 });
+
+// ─── Gerbang 3.4: /preset family ──────────────────────────────────
+await t("/preset (list kosong) -> handled + graceful", async () => {
+  const r = await fire("/preset");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes("Belum ada racikan"), `reply: ${r.reply.slice(0, 120)}`);
+});
+
+await t("/preset save sandboxset -> handled + presets/sandboxset.json tercipta", async () => {
+  const r = await fire("/preset save sandboxset");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes('preset "sandboxset"'), `reply: ${r.reply.slice(0, 120)}`);
+  assert.ok(existsSync(join(target, "presets/sandboxset.json")), "file preset tercipta");
+});
+
+await t('/preset show sandboxset -> handled + "identik dengan config saat ini"', async () => {
+  const r = await fire("/preset show sandboxset");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes("identik dengan config saat ini"), `reply: ${r.reply.slice(0, 120)}`);
+});
+
+await t("/preset use sandboxset -> handled + _backup tercipta + instruksi restart manual (non-pm2, TIDAK exit)", async () => {
+  const r = await fire("/preset use sandboxset");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes('Preset "sandboxset" di-load'), `reply: ${r.reply.slice(0, 160)}`);
+  assert.ok(existsSync(join(target, "presets/_backup.json")), "backup _backup.json tercipta");
+  assert.ok(r.reply.includes("Restart proses untuk apply penuh"), "jalur non-pm2: instruksi restart manual");
+  assert.ok(r.reply.includes("pm2 restart meridian"), "reply sebut contoh pm2 restart");
+});
+
+await t("/preset rm sandboxset -> handled + terhapus", async () => {
+  const r = await fire("/preset rm sandboxset");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes("dihapus"), `reply: ${r.reply.slice(0, 120)}`);
+  assert.ok(!existsSync(join(target, "presets/sandboxset.json")), "file preset terhapus");
+});
+
+await t("/preset xyz (sub tak dikenal) -> handled + usage", async () => {
+  const r = await fire("/preset xyz");
+  assert.ok(r.handled);
+  assert.ok(r.reply.includes("/preset save <nama>"), `reply: ${r.reply.slice(0, 120)}`);
+});
+
+await t("/screen -> TIDAK handled (jatuh ke vanilla)", async () => {
+  const r = await fire("/screen");
+  assert.strictEqual(r.handled, false);
+});
+
+// Bukti "TIDAK exit": proses masih hidup sampai sini (finishPresetApply non-pm2
+// tidak memanggil process.exit) — kalau exit, baris ringkasan di bawah tak tercetak.
 
 console.log(`\nTELEGRAM-CMDS: ${pass}/${pass + fail} lolos`);
 process.exit(fail ? 1 : 0);
