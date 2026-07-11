@@ -21,8 +21,10 @@ for d in zenpack-lib plugins views tools-extra scripts; do
   [[ -d "$TARGET/$d" ]] && find "$TARGET/$d" -type d -empty -delete
 done
 
-# 2. TODO Stage 3: restore patched files (restore + verifyRestored dari lib/patcher.js).
-#    v0: belum ada patch, skip.
+# 2. Restore file yang dipatch + verifikasi hash asli (Stage 3).
+#    MISMATCH -> berhenti SEBELUM hapus .zenpack (backup masih ada buat investigasi).
+PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+node "$PACK_DIR/core-patches/revert.mjs" "$TARGET"
 
 # Bersihkan metadata pack
 rm -rf "$TARGET/.zenpack"

@@ -48,4 +48,7 @@ if [[ -f "$PACK_DIR/docs/SETTINGS-GUIDE.md" ]]; then
   echo "SETTINGS-GUIDE.md" >> "$MANIFEST"
 fi
 
-echo "INSTALL v0 OK (copy-only, no patch)"
+# 4. Apply patch anchor (Stage 3) — idempotent via marker, auto-rollback kalau syntax rusak
+node "$PACK_DIR/core-patches/apply.mjs" "$TARGET"
+
+echo "INSTALL OK (copy + patches)"

@@ -27,3 +27,4 @@
    Catatan: package-lock.json vanilla desync upstream → npm ci gagal; pakai npm install + git checkout package-lock.json (porcelain 0).
 ✅ Fase 2 zenpack-lib/: SUDAH dikirim install.sh sejak Stage 2 (copy_dir lib zenpack-lib). Siklus install→uninstall(porcelain 0)→install terbukti. Nol perubahan kode.
 ✅ Fase 3 plugins/00-zenpack-hello.js: register(hooks) + manifest.priority 10. node --check OK, loader.test.mjs fail 0.
+✅ Fase 4 patch 01-hook-bus: core-patches/{01-hook-bus.mjs,apply.mjs,revert.mjs} + integrasi install.sh/uninstall.sh. Apply via lib/patcher.js (backup+hash+auto-rollback). Install 2x = skipped-idempotent. node --check OK. Backup .zenpack/backups/index.js.orig + hash tercatat.
