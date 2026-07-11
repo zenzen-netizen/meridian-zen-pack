@@ -1,0 +1,5 @@
+export function boot() {
+  console.log("vanilla boot");
+  // ANCHOR:INIT
+  return true;
+}

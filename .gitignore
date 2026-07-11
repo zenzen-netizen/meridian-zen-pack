@@ -1,4 +1,6 @@
 node_modules/
 backups/*.orig
 *.log
+work/
+sandbox-target/core.js
 .DS_Store
