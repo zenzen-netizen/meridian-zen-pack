@@ -46,4 +46,19 @@ export default [
   { file: "logger.js", marker: M, anchor: ANCHOR, inject: IMP, replaces: [
     { old: `const LOG_DIR = repoPath("logs");`, new: `const LOG_DIR = paths.logDir;` },
   ]},
+
+  // ── Batch 2 (file panas) ──
+  { file: "config.js", marker: M, anchor: `import { REPO_ROOT, repoPath } from "./repo-root.js";`, inject: IMP, replaces: [
+    { old: `const USER_CONFIG_PATH = repoPath("user-config.json");`, new: `const USER_CONFIG_PATH = paths.userConfigPath;` },
+    { old: `const GMGN_CONFIG_PATH = repoPath("gmgn-config.json");`, new: `const GMGN_CONFIG_PATH = paths.gmgnConfigPath;` },
+  ]},
+  { file: "telegram.js", marker: M, anchor: ANCHOR, inject: IMP, replaces: [
+    { old: `const USER_CONFIG_PATH = repoPath("user-config.json");`, new: `const USER_CONFIG_PATH = paths.userConfigPath;` },
+  ]},
+  { file: "tools/executor.js", marker: M, anchor: `import { REPO_ROOT, repoPath } from "../repo-root.js";`, inject: `import { paths } from "../paths.js";`, replaces: [
+    { old: `const USER_CONFIG_PATH = repoPath("user-config.json");`, new: `const USER_CONFIG_PATH = paths.userConfigPath;` },
+  ]},
+  { file: "index.js", marker: M, anchor: `import { REPO_ROOT, repoPath } from "./repo-root.js";`, inject: IMP, replaces: [
+    { old: `JSON.parse(fs.default.readFileSync(repoPath("lessons.json"), "utf8"))`, new: `JSON.parse(fs.default.readFileSync(paths.lessonsPath, "utf8"))` },
+  ]},
 ];

@@ -43,3 +43,4 @@
 ✅ Fase 0: HEAD 332246f; vanilla-test masih terpasang → uninstall (verify clean, porcelain 0). Recon live: 19 titik [A] + [B] persis peta brief, NOL titik baru. paths.js drop-in punya SEMUA key [A] (userConfigPath..logDir). lib/patcher.js belum punya replace-op → Fase 1 dibuat.
 ✅ Fase 1 replaceLine di lib/patcher.js: exact-match OLD (unik: 0=old-not-found, >1=old-not-unique), idempotent (NEW ada+OLD hilang=skipped), backup+hash, node --check auto-rollback. Test patcher 11/11.
 ✅ Fase 2 batch 1 (11 file data murni, 15 replace + 11 inject import): apply via replaceLine/applyPatch, semua replaced/patched, node --check 11/11, boot: loader errors 0 + baseline 401 identik. apply.mjs diperluas (format array + replaces[]).
+✅ Fase 3 batch 2 (config.js x2, telegram.js, tools/executor.js, index.js:1992 inline): replaced semua, node --check OK, boot loader errors 0 + baseline 401 identik. Install 2x = full skipped-idempotent.
