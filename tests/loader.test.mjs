@@ -1,0 +1,11 @@
+import { loadPlugins } from "../lib/loader.js";
+import { on, run, _reset } from "../lib/hooks.js";
+import assert from "node:assert";
+_reset(); globalThis.__order = [];
+const hooks = { on };
+const res = await loadPlugins("/home/ubuntu/meridian-zen-pack/testplugins", hooks);
+assert.deepStrictEqual(res.loaded, ["a-first.js", "b-second.js"], "urut by prioritas");
+assert.deepStrictEqual(res.skipped, ["notaplugin.js"], "non-plugin di-skip");
+await run("boot", {});
+assert.deepStrictEqual(globalThis.__order, ["first", "second"], "handler jalan sesuai prioritas");
+console.log("✅ loader: load", res.loaded, "| skip", res.skipped, "| errors", res.errors.length);
