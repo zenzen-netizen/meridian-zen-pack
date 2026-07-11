@@ -28,5 +28,5 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/"
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. DITUNDA ke Stage 5.8: wiring tools/smi.js chart-indicators (pemakainya file core MODIFIED, bukan materi patch tipis)."
 }
