@@ -30,3 +30,7 @@
 ✅ Fase 4 patch 01-hook-bus: core-patches/{01-hook-bus.mjs,apply.mjs,revert.mjs} + integrasi install.sh/uninstall.sh. Apply via lib/patcher.js (backup+hash+auto-rollback). Install 2x = skipped-idempotent. node --check OK. Backup .zenpack/backups/index.js.orig + hash tercatat.
 ✅ Fase 5 boot terpatch: "[zen-pack] loaded 1 plugins (skipped 2, errors 16)" + "hello plugin registered" SEBELUM baseline 401. Siklus uninstall (restore+verify clean, hash cocok, porcelain 0) → reinstall → boot ulang OK.
    ⚠️ DEVIASI TERBUKA: 16 drop-in Stage 2 error saat di-import loader — relative import mereka ("./repo-root.js" dll) mengira file di repo root, padahal drop-in di plugins/. Non-fatal (loader catch per-file), boot & baseline tak berubah. Butuh keputusan Zen: pisahkan dir hook-plugin dari dir drop-in (mis. patch tunjuk zenpack-plugins/), ATAU tulis ulang import drop-in saat Stage berikutnya (wiring). 2 skipped = paths.js? (import OK tanpa register).
+
+# Stage 3.1b — layout A+ (mirror fork + dir loader terpisah)
+
+✅ Fase 0: HEAD da9c1fe, branch main, vanilla-test ada (masih terpasang → uninstall dulu, porcelain 0). Tabrakan: NOL (18 drop-in vs root, views/ tak ada di vanilla, tools/smi.js kosong). Mapping lama install.sh:38-48 tercatat.
