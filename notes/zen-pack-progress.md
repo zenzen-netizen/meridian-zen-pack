@@ -45,3 +45,7 @@
 ✅ Fase 2 batch 1 (11 file data murni, 15 replace + 11 inject import): apply via replaceLine/applyPatch, semua replaced/patched, node --check 11/11, boot: loader errors 0 + baseline 401 identik. apply.mjs diperluas (format array + replaces[]).
 ✅ Fase 3 batch 2 (config.js x2, telegram.js, tools/executor.js, index.js:1992 inline): replaced semua, node --check OK, boot loader errors 0 + baseline 401 identik. Install 2x = full skipped-idempotent.
 ✅ Fase 4 gerbang: PARITAS 12/12 (paths.* == repoPath lama tanpa env). ISOLASI: MERIDIAN_DATA_DIR=profiles/testprofil -> state/decision-log/strategy-library/hivemind-cache/logs tercipta di profil, root mtime TAK berubah; .env root tetap dibaca (DRY RUN aktif); model ganti krn user-config profil terbaca = bukti routing. Boot normal: baseline 401 identik, errors 0. FIX: revert.mjs diajari format array multi-file (file ganda 01+02 restore sekali via seen-set). Siklus: uninstall 15 file restored+clean, porcelain 0, reinstall+boot OK. npm test PASS.
+
+# Stage 3.3 — wiring Telegram batch 1 (/addprofil + /export)
+
+✅ Fase 0: HEAD 3a1ea57; vanilla-test di-uninstall (15 clean, porcelain 0). Anchor `/briefing` UNIK (index.js:1415 vanilla). load() vanilla return {lessons:[],performance:[]} ✓. Binding hooks patch 01 = `__zenpackHooks` (namespace import, punya .run). Sumber fork: lessons.js getPerformanceForRacikan+listRacikanInPerformance (~:937-954), wrapper index.js exportUsageText:2788 runExportCommand:2803 runAddProfilCommand:2853, dispatch :3242-3252 — cocok kutipan brief.
