@@ -15,12 +15,17 @@ const hashDbPath = join(targetRoot, ".zenpack", "pre-install-hashes.json");
 
 const defs = readdirSync(patchesDir).filter((f) => /^\d\d-.*\.mjs$/.test(f)).sort();
 let failed = 0;
+const seen = new Set(); // file bisa disentuh >1 patch (mis. index.js oleh 01 + 02) -> restore sekali
 for (const f of defs) {
   const { default: p } = await import(pathToFileURL(join(patchesDir, f)).href);
-  const r = restore({ targetRoot, file: p.file, backupsDir, hashDbPath });
-  if (r.status === "no-backup") { console.log(`[zen-pack revert] ${f}: no-backup (belum pernah dipatch)`); continue; }
-  const v = verifyRestored({ targetRoot, file: p.file, hashDbPath });
-  console.log(`[zen-pack revert] ${f}: ${r.status}, verify: ${v.status}`);
-  if (v.status !== "clean") failed++;
+  for (const item of Array.isArray(p) ? p : [p]) {
+    if (seen.has(item.file)) continue;
+    seen.add(item.file);
+    const r = restore({ targetRoot, file: item.file, backupsDir, hashDbPath });
+    if (r.status === "no-backup") { console.log(`[zen-pack revert] ${f} ${item.file}: no-backup (belum pernah dipatch)`); continue; }
+    const v = verifyRestored({ targetRoot, file: item.file, hashDbPath });
+    console.log(`[zen-pack revert] ${f} ${item.file}: ${r.status}, verify: ${v.status}`);
+    if (v.status !== "clean") failed++;
+  }
 }
 process.exit(failed ? 1 : 0);
