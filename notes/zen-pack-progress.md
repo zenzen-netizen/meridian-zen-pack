@@ -22,3 +22,6 @@
    DEVIASI: vanilla-test/ hilang (sesi lalu tak persist) → direkonstruksi via cp -a dari vanilla pristine (SHA sama, porcelain 0, anchor cocok).
    Temuan: install.sh SUDAH salin lib/ → zenpack-lib/ (bukan zenpack/lib/ spt sketsa brief) → Fase 2 tinggal verifikasi siklus; patch import pakai ./zenpack-lib/loader.js.
    Kontrak loader: loadPlugins(pluginsDir, hooks) async → {loaded,skipped,errors}; hooks = namespace import lib/hooks.js.
+✅ Fase 1 .env dummy: boot DRY_RUN lolos config load; cron start; baseline error = "401 Missing Authentication header" (LLM call, wajar). Fixture: tests/fixtures/env.dummy.
+   Var final: DRY_RUN, WALLET_PRIVATE_KEY (palsu base58 64-byte), RPC_URL (publik), OPENROUTER_API_KEY (dummy), TELEGRAM_* kosong, LOG_LEVEL.
+   Catatan: package-lock.json vanilla desync upstream → npm ci gagal; pakai npm install + git checkout package-lock.json (porcelain 0).
