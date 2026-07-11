@@ -1,4 +1,4 @@
-import { applyPatch, restore, verifyRestored, backupWithHash } from "../lib/patcher.js";
+import { applyPatch, replaceLine, restore, verifyRestored, backupWithHash } from "../lib/patcher.js";
 import { readFileSync, writeFileSync, copyFileSync, rmSync, mkdirSync } from "node:fs";
 import assert from "node:assert";
 
@@ -63,6 +63,43 @@ t("verify MENDETEKSI file yang diubah tangan (MISMATCH)", () => {
   writeFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "// diubah manual\n");
   const v = verifyRestored(c);
   assert.strictEqual(v.status, "MISMATCH");
+});
+
+t("replace: OLD unik -> replaced", () => {
+  const r = replaceLine({ ...cfg(), oldLine: 'console.log("vanilla boot");', newLine: 'console.log("routed boot");' });
+  assert.strictEqual(r.status, "replaced");
+  const out = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  assert.ok(out.includes("routed boot"));
+  assert.ok(!out.includes("vanilla boot"));
+});
+
+t("replace: OLD tak ketemu (dan NEW belum ada) -> old-not-found, file utuh", () => {
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = replaceLine({ ...cfg(), oldLine: 'console.log("TIDAK ADA");', newLine: 'console.log("JUGA TIDAK ADA");' });
+  assert.strictEqual(r.status, "old-not-found");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
+});
+
+t("replace: idempotent -> kedua kali skipped", () => {
+  const c = cfg();
+  replaceLine({ ...c, oldLine: 'console.log("vanilla boot");', newLine: 'console.log("routed boot");' });
+  const r2 = replaceLine({ ...c, oldLine: 'console.log("vanilla boot");', newLine: 'console.log("routed boot");' });
+  assert.strictEqual(r2.status, "skipped-idempotent");
+});
+
+t("replace: OLD ganda -> old-not-unique, file utuh", () => {
+  writeFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "const a = 1;\nconst a2 = 1;\n// const a = 1;\n");
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = replaceLine({ ...cfg(), oldLine: "const a = 1;", newLine: "const a = 2;" });
+  assert.strictEqual(r.status, "old-not-unique");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
+});
+
+t("replace: NEW bikin syntax rusak -> AUTO-ROLLBACK ke asli", () => {
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = replaceLine({ ...cfg(), oldLine: 'console.log("vanilla boot");', newLine: "const x = ;" });
+  assert.strictEqual(r.status, "node-check-failed-rolled-back");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
 });
 
 console.log(`\n  HASIL: ${pass} lulus, ${fail} gagal`);

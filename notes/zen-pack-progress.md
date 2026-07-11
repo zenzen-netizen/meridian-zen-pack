@@ -41,3 +41,4 @@
 # Stage 3.2 — 02-paths-routing
 
 ✅ Fase 0: HEAD 332246f; vanilla-test masih terpasang → uninstall (verify clean, porcelain 0). Recon live: 19 titik [A] + [B] persis peta brief, NOL titik baru. paths.js drop-in punya SEMUA key [A] (userConfigPath..logDir). lib/patcher.js belum punya replace-op → Fase 1 dibuat.
+✅ Fase 1 replaceLine di lib/patcher.js: exact-match OLD (unik: 0=old-not-found, >1=old-not-unique), idempotent (NEW ada+OLD hilang=skipped), backup+hash, node --check auto-rollback. Test patcher 11/11.
