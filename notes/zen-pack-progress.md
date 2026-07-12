@@ -93,6 +93,9 @@
 | timeProfile+narrativeProfile prompt (screener) | 4.2 (prompt.js) | dep getTimeProfileForPrompt/getNarrativeProfileForPrompt (fork lessons.js:1123/1215) ABSEN vanilla lessons | Stage 6.4/6.5 |
 | /settings menu machine + cfg: callbacks | 3.7 (batch 2 exclusion) | money-adjacent (settings ubah config); butuh state machine + callback wiring | Stage 7.2 |
 | docs modified (CLAUDE.md, .env.example, gmgn/user-config.example.json) | 2 | ada di vanilla, bukan pure-add | TBD |
+| state.js: milestone + periodic-briefing helpers | 4.3 | additive tapi konsumen (index/briefing custom) belum diport | 6.7 / 7.x |
+| state.js: record-shape refactor (makePositionRecord/ensureDeployedAt/recordRebalance + field racikan/trough/price) | 4.3 | konsumen dlmm.js+index.js fork; atribusi racikan nyambung lessons | 6.2/6.3 |
+| state.js: mesin peak/exit fork (queue/resolve 15s) vs vanilla 2-tick | 4.3 | money-logic poller. ⚠️ KEPUTUSAN DESAIN 6.2: vanilla e559081 "2-tick confirm" = perbaikan upstream LEBIH BARU dari desain fork — pilih port-fork vs adopsi-vanilla+port-fitur-unik SAAT 6.2, jangan diputus sekarang | 6.2 + 7.8/7.9 |
 
 # Stage 3.6 — render views batch 1: /status + /positions (plugin-only, nol patch baru)
 
@@ -139,3 +142,6 @@
    TEMUAN: T7 anchor "instruction IS the confirmation." general-only (manager lean
    early-return tak punya); brief bilang manager/general → fork ground-truth
    general-only, cocok diff, bukan STOP. `else if MANAGER` block bawah = dead code.
+
+✅ 4.3 state.js — verdict-only. A: STATE_FILE covered by patch 02.
+   B/C/D deferred (see debt table). No patch, no plugin.
