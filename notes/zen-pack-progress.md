@@ -96,6 +96,7 @@
 | state.js: milestone + periodic-briefing helpers | 4.3 | additive tapi konsumen (index/briefing custom) belum diport | 6.7 / 7.x |
 | state.js: record-shape refactor (makePositionRecord/ensureDeployedAt/recordRebalance + field racikan/trough/price) | 4.3 | konsumen dlmm.js+index.js fork; atribusi racikan nyambung lessons | 6.2/6.3 |
 | state.js: mesin peak/exit fork (queue/resolve 15s) vs vanilla 2-tick | 4.3 | money-logic poller. ⚠️ KEPUTUSAN DESAIN 6.2: vanilla e559081 "2-tick confirm" = perbaikan upstream LEBIH BARU dari desain fork — pilih port-fork vs adopsi-vanilla+port-fitur-unik SAAT 6.2, jangan diputus sekarang | 6.2 + 7.8/7.9 |
+| pool-memory: getDeployedPoolAddresses | 4.4 | additive; consumer = briefing.js counterfactual skip-review, belum diport | 6.5/6.6 |
 
 # Stage 3.6 — render views batch 1: /status + /positions (plugin-only, nol patch baru)
 
@@ -145,3 +146,8 @@
 
 ✅ 4.3 state.js — verdict-only. A: STATE_FILE covered by patch 02.
    B/C/D deferred (see debt table). No patch, no plugin.
+
+✅ 4.4 pool-memory.js — verdict-only. Routing covered patch 02;
+   getDeployedPoolAddresses additive, consumer briefing.js only → DEFER 6.5/6.6.
+
+✅ 4.5 smart-wallets.js — verdict-only. Routing-only, covered patch 02. No debt.
