@@ -17,7 +17,13 @@ Repo pack HEAD saat mulai: 27fdff9. Sandbox vanilla-test HEAD 5ab14b4
       boot hook-idle = loaded 4 plugins errors 0 + baseline 401 (identik vanilla,
       prompt tak berubah tanpa plugin), install 2x=skipped-idempotent, uninstall
       agent.js restore hash-verify clean (target porcelain 0), reinstall=replaced.
-- [ ] F3 — plugin 40-prompt-racikan + golden parity
+- [x] F3 — plugin 40-prompt-racikan + golden parity: 8/8 lolos (parity
+      SCREENER/MANAGER/GENERAL × {notesFull+convOff, notesEmpty+convOn} byte-identik
+      pasca-normalisasi + anchor-miss degrade + non-string guard). Boot loaded 5
+      plugins errors 0, 0 anchor-miss on real screener build. TEMUAN parity: blok
+      `Config: {…}` di general basePrompt = JSON.stringify(config) penuh, beda skema
+      fork↔vanilla (fork punya source/categories/loneCandidateMinDegen) → DI LUAR
+      scope 4.2 (config.js schema, bukan prompt template) → dinormalisasi di test.
 - [ ] F4 — gate penuh + dokumentasi + push
 
 ## F1 — Inventaris transform (diff fork-ref/prompt.js vs vanilla/prompt.js)
