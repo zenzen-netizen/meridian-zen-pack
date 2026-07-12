@@ -2,20 +2,22 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 3.7,
+  "stage": 4.2,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
     "03a-lessons-racikan-helpers",
     "03b-telegram-hook",
     "04a-lessons-profile-helpers",
-    "04b-tool-registrars"
+    "04b-tool-registrars",
+    "05-prompt-hook"
   ],
   "plugins": [
     "00-zenpack-hello",
     "10-telegram-cmds",
     "20-profile-tools",
-    "30-render-views"
+    "30-render-views",
+    "40-prompt-racikan"
   ],
   "drop_ins": {
     "root": 18,
@@ -23,7 +25,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 4,
+    "zenpack_plugins": 5,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",

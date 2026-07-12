@@ -24,7 +24,13 @@ Repo pack HEAD saat mulai: 27fdff9. Sandbox vanilla-test HEAD 5ab14b4
       `Config: {…}` di general basePrompt = JSON.stringify(config) penuh, beda skema
       fork↔vanilla (fork punya source/categories/loneCandidateMinDegen) → DI LUAR
       scope 4.2 (config.js schema, bukan prompt template) → dinormalisasi di test.
-- [ ] F4 — gate penuh + dokumentasi + push
+- [x] F4 — gate penuh + dokumentasi + push. Full cycle: install→boot(loaded 5
+      errors 0)→tests semua lolos (standalone hooks/patcher/loader, smoke v0.2
+      zenpack-plugins 5/5, paths-parity 12/12, profile-tools 10/10 [assert 4→5],
+      telegram-cmds 19/19, prompt-racikan 8/8)→uninstall(agent.js hash-verify
+      clean, porcelain 0)→reinstall→boot(loaded 5, 0 anchor-miss, baseline 401).
+      manifest stage 4.2 (patch 05, plugin 40, zenpack_plugins 5). Debt table
+      +timeProfile/narrativeProfile→6.4/6.5. zen-pack-progress.md ✅ 4.2.
 
 ## F1 — Inventaris transform (diff fork-ref/prompt.js vs vanilla/prompt.js)
 

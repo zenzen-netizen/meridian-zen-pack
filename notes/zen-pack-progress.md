@@ -90,6 +90,7 @@
 | racikanScopeDisclosure (disclosure) | 3.6,3.7 (/status,/wallet) | briefing.js-local, tak di-export | TBD |
 | condenseRule (lastGood/Bad Insight) | 3.6 (/status) | index.js-local fork:1696 | TBD |
 | buildRangeEfficiencyLines (/pool rangeEff) | 3.7 (/pool) | index.js-local fork:1633 | TBD |
+| timeProfile+narrativeProfile prompt (screener) | 4.2 (prompt.js) | dep getTimeProfileForPrompt/getNarrativeProfileForPrompt (fork lessons.js:1123/1215) ABSEN vanilla lessons | Stage 6.4/6.5 |
 | /settings menu machine + cfg: callbacks | 3.7 (batch 2 exclusion) | money-adjacent (settings ubah config); butuh state machine + callback wiring | Stage 7.2 |
 | docs modified (CLAUDE.md, .env.example, gmgn/user-config.example.json) | 2 | ada di vanilla, bukan pure-add | TBD |
 
@@ -120,3 +121,21 @@
 ✅ 4.1 logger.js — vonis-only. paths-routing covered by patch 02; logSnapshot
    (fork logger.js:79-93) = dead code (0 call sites), DROPPED by owner
    decision. No patch, no plugin.
+
+✅ 4.2 prompt.js → plugin (POLA A post-transform). prompt.js vanilla NOL sentuh.
+   Patch 05-prompt-hook: 1 titik agent.js:173 (const→let systemPrompt + emitSync
+   "prompt:build" via `await import("./zenpack-lib/hooks.js")` — bukan globalThis;
+   __zenpackHooks module-local index.js, agent.js modul beda; hooks.js ESM
+   singleton = registry sama; degrade-safe try/catch). Plugin 40-prompt-racikan:
+   transform T1-T8 per agentType atas STRING RENDER vanilla, FAIL-LOUD mustReplace
+   (anchor miss→warn+prompt utuh). racikanRules port VERBATIM fork prompt.js:21-38.
+   GOLDEN PARITY tests/prompt-racikan.test.mjs 8/8 — SCREENER/MANAGER/GENERAL ×
+   {notesFull+convOff, notesEmpty+convOn} byte-identik vs fork-ref pasca-normalisasi
+   (Timestamp + blok `Config:{}` JSON = skema config.js beda fork↔vanilla, di luar
+   scope 4.2) + anchor-miss degrade + non-string guard. Boot loaded 5 plugins
+   errors 0, 0 anchor-miss on real screener build. Full cycle install→boot→tests→
+   uninstall(porcelain 0)→reinstall→boot OK. manifest stage 4.2 (patch 05, plugin
+   40, zenpack_plugins 5). DEFER timeProfile/narrativeProfile → 6.4/6.5 (tabel).
+   TEMUAN: T7 anchor "instruction IS the confirmation." general-only (manager lean
+   early-return tak punya); brief bilang manager/general → fork ground-truth
+   general-only, cocok diff, bukan STOP. `else if MANAGER` block bawah = dead code.
