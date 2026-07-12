@@ -114,3 +114,9 @@
 ✅ Fase 2 patch 04b: registrar via appendPatch EOF (BUKAN inject anchor `};` — tak unik; function declaration EOF jangkau module scope). executor.js: zenpackRegisterTool. definitions.js: zenpackRegisterToolDef push ke toolDefinitions DAN tools (mirror transform :1116-1124, temuan 0.4). Additive terbukti byte-level (definitions: head -n-15 == .orig persis; executor appendPatch by construction). Boot loaded 2 errors 0 + 401 ×2. Revert 6 patch (17 file, index+lessons shared): semua restored+verify clean, porcelain M=0 → re-apply OK.
 ✅ Fase 3 plugin zenpack-plugins/20-profile-tools.js: import statis registrar+lessons (aman — plugin di-import dinamis loader saat runtime), registrasi DALAM register(). Schema VERBATIM fork definitions.js:995-1021, handler pola fork executor.js:258-259. node --check + loader test hijau.
 ✅ Fase 4 gerbang: tests/profile-tools.test.mjs 10/10 — loader 3/0/0; bukti registrasi runtime (pra-load 2 tool absen); executeTool get_time_profile/get_narrative_profile graceful data kosong (timezone WIB, 5 sesi, min_samples 8); tools runtime +2 schema (mirror transform additionalProperties:false); regresi vanilla list_strategies + get_recent_decisions (read-only, tanpa network) tetap resolve; paritas kunci statis 45 + 2 runtime = 47 cocok fork; guard Unknown tool utuh. Test telegram 12/12 tetap hijau (user-config di-backup/restore, artefak profiles/exports dibersihkan). Boot penuh: loaded 3 plugins (skipped 0, errors 0) + baseline 401 only (jenis identik). Siklus: uninstall 6 patch revert hash-verify clean + porcelain 0 → reinstall → boot OK. manifest stage 3.5 (+patches 04a/04b, plugins 3, catatan smi ditunda 5.8). npm test SMOKE PASS + unit fail 0.
+
+# Stage 4
+
+✅ 4.1 logger.js — vonis-only. paths-routing covered by patch 02; logSnapshot
+   (fork logger.js:79-93) = dead code (0 call sites), DROPPED by owner
+   decision. No patch, no plugin.
