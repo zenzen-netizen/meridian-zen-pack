@@ -13,7 +13,10 @@ Repo pack HEAD saat mulai: 27fdff9. Sandbox vanilla-test HEAD 5ab14b4
 ## Fase
 
 - [x] F1 — recon lokal (bukti file:line) + commit
-- [ ] F2 — patch 05-prompt-hook (agent.js:173)
+- [x] F2 — patch 05-prompt-hook (agent.js:173): apply=replaced, node --check OK,
+      boot hook-idle = loaded 4 plugins errors 0 + baseline 401 (identik vanilla,
+      prompt tak berubah tanpa plugin), install 2x=skipped-idempotent, uninstall
+      agent.js restore hash-verify clean (target porcelain 0), reinstall=replaced.
 - [ ] F3 — plugin 40-prompt-racikan + golden parity
 - [ ] F4 — gate penuh + dokumentasi + push
 
