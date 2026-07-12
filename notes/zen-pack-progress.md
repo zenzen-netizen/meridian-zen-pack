@@ -151,3 +151,27 @@
    getDeployedPoolAddresses additive, consumer briefing.js only → DEFER 6.5/6.6.
 
 ✅ 4.5 smart-wallets.js — verdict-only. Routing-only, covered patch 02. No debt.
+
+✅ 4.6 strategy-library.js — patch 06-strategy-no-autoseed. Vanilla-main
+   auto-seed 5 strategi default + set active saat modul load (top-level
+   `ensureDefaultStrategies();` @L115). Fork + yunus-experimental: blok DIHAPUS.
+   Patch 06 = 1 replaceLine: call → comment `[zen-pack:06]`; definisi
+   DEFAULT_STRATEGIES + function dibiarkan (dead code, setia byte). Bukti
+   perilaku: modul load di data-dir isolasi TAK bikin strategy-library.json,
+   active tetap null (nol auto-pick = fork). Routing STRATEGY_FILE sudah patch 02.
+
+✅ 4.7 token-blacklist.js — patch 07-blacklist-failopen. Vanilla-main load()
+   FAIL-CLOSED (JSON korup → log + throw "Safety blacklist is unreadable" → bot
+   berhenti). Fork + yunus-experimental FAIL-OPEN (`catch { return {}; }`). Patch
+   07 = 1 replaceLine blok catch multi-baris (replaceLine = exact-substring
+   src.replace, multiline-safe → patcher TAK di-extend); marker `[zen-pack:07]`.
+   Bukti: blacklist korup ("{bad json") → isBlacklisted() return false, NO throw
+   (bot jalan = fork). Routing BLACKLIST_FILE sudah patch 02.
+
+   GATE PENUH 4.6+4.7: install (06+07 replaced, runner ^\d\d[a-z]?- kena) →
+   boot loaded 5 plugins errors 0 → tests hijau (hooks 8, loader 0-err, patcher
+   14, paths 12/12, profile 10/10, telegram 19/19, prompt-racikan 8/0) →
+   uninstall (semua patched file restore hash-verify clean, porcelain 0) →
+   reinstall (06+07 replaced) → boot 5 plugins errors 0. manifest stage 4.7
+   (+patches 06/07). CATATAN: patcher.js TIDAK diubah — replaceLine sudah cukup
+   untuk ganti-blok multi-baris.

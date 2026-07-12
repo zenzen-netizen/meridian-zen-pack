@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 4.2,
+  "stage": 4.7,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -10,7 +10,9 @@
     "03b-telegram-hook",
     "04a-lessons-profile-helpers",
     "04b-tool-registrars",
-    "05-prompt-hook"
+    "05-prompt-hook",
+    "06-strategy-no-autoseed",
+    "07-blacklist-failopen"
   ],
   "plugins": [
     "00-zenpack-hello",
