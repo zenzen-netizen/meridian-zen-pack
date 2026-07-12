@@ -53,14 +53,40 @@ await t("/export racikan (kosong) -> handled + daftar kosong graceful (jalur 03a
   assert.ok(r.reply.includes("Belum ada racikan"), `reply: ${r.reply.slice(0, 120)}`);
 });
 
-// Stage 3.6: /status kini di-intercept plugin 30-render-views (views HTML), bukan vanilla.
+// Stage 3.6: /status di-intercept plugin 30-render-views (views HTML).
 await t("/status -> handled oleh 30-render-views (views HTML)", async () => {
   const r = await fire("/status");
   assert.strictEqual(r.handled, true);
 });
-// /wallet TETAP jatuh ke vanilla (diluar scope batch 1 — view walletView terpisah).
-await t("/wallet -> TIDAK handled (jatuh ke vanilla, diluar scope 3.6)", async () => {
+// Stage 3.7 batch 2: /wallet /config /pool kini di-intercept juga.
+await t("/wallet -> handled oleh 30-render-views (batch 2)", async () => {
   const r = await fire("/wallet");
+  assert.strictEqual(r.handled, true);
+});
+await t("/config -> handled oleh 30-render-views (batch 2)", async () => {
+  const r = await fire("/config");
+  assert.strictEqual(r.handled, true);
+});
+await t("/config core -> handled (sub-cmd plugin-additive)", async () => {
+  const r = await fire("/config core");
+  assert.strictEqual(r.handled, true);
+});
+await t("/config origin -> handled (sub-cmd plugin-additive)", async () => {
+  const r = await fire("/config origin");
+  assert.strictEqual(r.handled, true);
+});
+await t("/pool 1 -> handled (no positions -> Invalid number, graceful)", async () => {
+  const r = await fire("/pool 1");
+  assert.strictEqual(r.handled, true);
+});
+// /settings TETAP jatuh ke vanilla (money-adjacent, ditunda ke Stage 7.2).
+await t("/settings -> TIDAK handled (jatuh ke vanilla, ditunda 7.2)", async () => {
+  const r = await fire("/settings");
+  assert.strictEqual(r.handled, false);
+});
+// /config bogus (bukan core|origin) TETAP jatuh ke vanilla (tak match 3 bentuk eksak).
+await t("/config bogus -> TIDAK handled (jatuh ke vanilla)", async () => {
+  const r = await fire("/config bogus");
   assert.strictEqual(r.handled, false);
 });
 
