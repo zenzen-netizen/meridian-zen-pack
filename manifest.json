@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "5.4",
+  "stage": "5.5",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -16,7 +16,8 @@
     "08-config-reload-hook",
     "09-dryrun-userconfig-wins",
     "10-agent-constants",
-    "11-agentloop-fallback-salvage"
+    "11-agentloop-fallback-salvage",
+    "12-executor-money-blocks"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -96,5 +97,21 @@
       "blok_6_generalMaxTokens+allowNoToolFinal": "config.llm.generalMaxTokens absen di vanilla-test/config.js + call-site allowNoToolFinal:true belum diport"
     },
     "note_task_D": "per-role fallback (bukan hanya model -free) = workstream terpisah pasca Stage 7, JANGAN ekstraksi di zen-pack."
+  },
+  "stage_5_5": {
+    "summary": "tools/executor.js: patch 12 ekstrak 5 blok money/display custom fork (VERBATIM) + zenpack-lib/sizing.js. Semua replaceLine exact (6), NEW berbacktick via snip12/*.txt.",
+    "scope_owner_locked": "5 item: import sizing + blok 2 strategyLock override + blok 3 applyConvictionSizing + blok 4 minDeploy(floor 0.03)/rentReserve + blok 7 notify peakPnl. EKSTRAKSI SAJA — hook veto position:beforeOpen/afterClose TIDAK dibuat (keputusan owner, workstream terpisah pasca 5-7).",
+    "sizing_js": "zenpack-lib/sizing.js (pack lib/ -> target zenpack-lib/) = minDeployAmount() floor 0.03 + applyConvictionSizing() clamp [deployAmountSol,maxDeployAmount], VERBATIM fork config.js:498/572. config binding hidup. MIN_SAFE_BINS_BELOW TIDAK diport (sudah ada vanilla config.js:16).",
+    "sizing_debt": "LUNAS 5.5: minDeployAmount + applyConvictionSizing (konsumen executor). SISA DEFER 7.x: computeDeployAmount(mode maximize) + persistConfigChange (konsumen index.js, executor tak import — terbukti import L23 cuma 2 fn).",
+    "blok_2_strategyLock": "lock terkunci (spot/bid_ask/curve) hard-override args.strategy sebelum validateDeployPoolThresholds; lock=default TAK sentuh. Sisip di atas anchor poolThresholds.",
+    "blok_3_conviction": "applyConvictionSizing mutasi args.amount_y/amount_sol; sisip di atas anchor komentar bin_step, MENDAHULUI const deployAmountY (urutan diverifikasi).",
+    "blok_4_minDeploy_rent": "4a minDeploy inline Math.max(0.1,...) -> minDeployAmount() (floor 0.03, PERUBAHAN PERILAKU verbatim fork, keputusan owner). 4b + rentPerPositionSol reserve (minRequired = amount+gas+rent, rentNote). Blok 4b DI DALAM guard DRY_RUN!=='true' -> paper mode SKIP (match fork).",
+    "blok_7_notify": "notifyClose + peakPnlPct + recorded_pnl fallback + reason + lesson + feesUsd (display).",
+    "defer_5_7_wallet_dep": {
+      "blok_5_exitLiquidityCheck": "quoteSellPriceImpact absen di vanilla-test/tools/wallet.js",
+      "blok_6_autoSwap_baseToSOL": "swapBaseToSolWithRetry (wallet.js sig fork) absen; vanilla PUNYA versi lokal executor.js -> tunda = nol rugi fungsi"
+    },
+    "defer_blok_1_update_config": "fork update_config verbatim SERET out-of-scope: import paths.js (executor.js migration Batch-2 DITUNDA di patch 02) + gmgn-config.json split-persistence (paths.gmgnConfigPath, fitur gmgn belum diport). BUKAN unit self-contained (recon FASE A salah kira). DEFER ke stage executor-paths-Batch-2 / update_config khusus. Keputusan owner 2026-07-13. Enforcement strategyLock yang MONEY = blok 2 (sudah diport); blok 1 cuma validasi nilai lock (guard).",
+    "gate": "isolation 6 replaceLine + node --check + idempotent (PASS2 6 skip). Install target 6 replaced + sizing.js landed. Boot loaded 6 plugins errors 0. Tests: executor-sizing 14/14 (clamp fuzz 200x tak tembus rail; floor 0.03), executor-ext 13/13 (5 blok hadir + 5/6 absent + urutan + strategyLock override fungsional 4 kasus). Regresi: config-ext 15, agentloop-ext 14, patcher 14, telegram-cmds 19 (golden /config parity), profile-tools 10, smoke 6/6. Paper-drive money terintegrasi (DRY_RUN, blok asli+sizing asli, network/SDK stub): strategyLock curve->spot, conviction 1.0->1.3 clamp[0.5,2], lock=default untouched, clamp ceil 2.0 tahan, sub-min ditolak; getWalletBalances guard NOL dipanggil = balance/rent skip = ZERO TX. Siklus install->uninstall(executor.js restore byte-identik HEAD, marker 0, porcelain 0)->reinstall(6 replaced)->boot 6->tests hijau. Sandbox pulih pristine 5ab14b4."
   }
 }

@@ -407,3 +407,15 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
    (swapBaseToSolWithRetry wallet.js absen; vanilla punya versi lokal L607 → nol rugi).
    DEFER 7.x: computeDeployAmount + persistConfigChange (executor tak import).
    ⬜ FASE B/C/D — TAHAN: brief STOP A.3 (blok 5/6 wallet.js absen) terpenuhi, lapor owner.
+
+✅ FASE B/C/D (5.5) SELESAI — 5 blok bersih diport, blok 1 DEFER (keputusan owner).
+   Commit f2752e6 (FASE B). FASE C gate: isolation 6 replaceLine + idempotent; install
+   target 6 replaced + sizing.js landed; boot loaded 6 plugins errors 0; executor-sizing
+   14/14 + executor-ext 13/13; regresi config-ext 15/agentloop 14/patcher 14/telegram 19
+   (golden /config parity)/profile 10/smoke 6. Paper-drive money terintegrasi (DRY_RUN,
+   blok+sizing asli, network/SDK stub): strategyLock curve->spot, conviction 1.0->1.3
+   clamp[0.5,2], lock=default untouched, clamp ceil tahan, sub-min ditolak; getWalletBalances
+   guard NOL dipanggil = ZERO TX. Siklus install->uninstall(executor byte-identik HEAD,
+   marker 0, porcelain 0)->reinstall->boot 6->tests hijau. Pristine 5ab14b4. manifest 5.5.
+   DEFER 5.7: blok 5/6 (wallet.js). DEFER (paths-Batch-2/gmgn stage): blok 1 update_config.
+   DEFER 7.x: computeDeployAmount + persistConfigChange. Hook veto TIDAK dibuat (owner).
