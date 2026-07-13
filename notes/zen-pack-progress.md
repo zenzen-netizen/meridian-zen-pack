@@ -175,3 +175,33 @@
    reinstall (06+07 replaced) → boot 5 plugins errors 0. manifest stage 4.7
    (+patches 06/07). CATATAN: patcher.js TIDAK diubah — replaceLine sudah cukup
    untuk ganti-blok multi-baris.
+
+# FASE 5.1 — config.js bag 1 (key custom → plugin 50-config-ext)
+
+✅ FASE A recon (read-only, bukti file:line):
+   A.1 anchor vanilla-test/config.js (335 baris):
+     - dryRun L41: `if (u.dryRun !== undefined) process.env.DRY_RUN ||= String(u.dryRun);`
+       (brief ±47, aktual 41 — `||=` = ENV menang; fork mau USER menang → patch 09).
+     - `export const config = {` L66, penutup `};` L265.
+     - `export function reloadScreeningThresholds()` L295 → NOT async (body dibungkus
+       satu try/catch L296-334, `}` L335). Titik hook = akhir badan try, sesudah blok
+       `config.strategy.defaultBinsBelow = Math.max(...)` L330-333, sebelum `} catch` L334.
+       KEPUTUSAN patch 08: bentuk SYNC (import statis emitSync + panggil langsung) —
+       fungsi non-async, tak bisa `await import`. hooks.js dijamin ada pasca-install
+       (install.sh copy lib→zenpack-lib); call di-wrap try/catch = fail-open runtime.
+   A.2 urutan-import (KRITIS): grep fork-ref konsumen config.experiments/promptNotes/
+     strategy.dualSide/management.sizingMode/strategyLock/profile/activeSetup — SEMUA
+     dibaca DALAM fungsi (call-time), semua pakai `?.`+`??` default. NOL pembacaan
+     top-level saat import. Desain mutasi-config-di-register() AMAN. TIDAK STOP.
+   A.3 diff fork-ref vs vanilla-test config.js — delta key custom (fork punya, vanilla
+     tak punya) yg PUNYA konsumen = persis daftar brief FASE C item 1,3,4,5,6,7,8,9,10,
+     11,12. Key fork DI LUAR daftar brief: `screening.source` (screeningSource) + gmgn
+     SUPERSET ~40 key (minSmartDegenCount/requireKol/indicatorRules/maxRugRatio/dst).
+     VONIS: keduanya ORPHAN/no-op di vanilla — grep vanilla NOL konsumen
+     (tools/gmgn.js cuma baca 5 key gmgn yg vanilla sudah punya: apiKey/baseUrl/
+     requestDelayMs/maxRetries/feeSource; `config.screening.source` tak dibaca). Sama
+     perlakuan brief item-2 orphan maxBundlePct/athFilterPct (cuma di-`delete` setup.js
+     :730-731, tak ada read-path). → TIDAK ditambah, dicatat vonis no-op. BUKAN STOP
+     (aturan orphan brief item-2 diterapkan konsisten). Brief FASE C lengkap+akurat
+     utk key ber-konsumen. reload fork L638-647 custom delta = persis brief item-13.
+   Commit: recon-only (no code). ⬜ FASE B/C/D/E berikut.
