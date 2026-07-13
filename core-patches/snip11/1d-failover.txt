@@ -1,0 +1,7 @@
+          // [zen-pack:11] failover to fallback API (blok 1d)
+          if (attempt === 1 && fallbackClient && activeClient !== fallbackClient) {
+            // Fail over to fallback API (OpenCode Zen or custom)
+            activeClient = fallbackClient;
+            usedModel = process.env.LLM_FALLBACK_MODEL || "deepseek-v4-flash-free";
+            log("agent", `API error ${errCode}, failing over to ${usedModel} via ${process.env.LLM_FALLBACK_BASE_URL}`);
+          } else if (attempt === 1 && usedModel !== FALLBACK_MODEL) {

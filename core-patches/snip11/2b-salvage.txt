@@ -1,0 +1,22 @@
+      messages.push(msg);
+      // [zen-pack:11] salvage text-dumped tool calls (blok 2b)
+
+      // Salvage: some models emit their intended tool calls as plain-text JSON in
+      // `content` instead of using the function-calling channel. Convert read-only
+      // dumps into real tool calls so the loop can proceed. Writes / state mutators
+      // are deliberately NOT salvaged — they fall through to the reject-and-retry
+      // path below (never act on an un-vetted plan that could move real capital).
+      if ((!msg.tool_calls || msg.tool_calls.length === 0) && msg.content) {
+        const dumped = parseContentToolCalls(msg.content);
+        if (dumped && contentSalvageCount < MAX_CONTENT_SALVAGE
+            && !dumped.some((c) => NO_SALVAGE_TOOLS.has(c.name))) {
+          contentSalvageCount += 1;
+          msg.tool_calls = dumped.map((c, i) => ({
+            id: `salvage_${step}_${i}`,
+            type: "function",
+            function: { name: c.name, arguments: JSON.stringify(c.arguments) },
+          }));
+          msg.content = ""; // drop the raw dump so the model doesn't echo it next turn
+          log("agent", `Salvaged ${dumped.length} text-dumped tool call(s): ${dumped.map((c) => c.name).join(", ")}`);
+        }
+      }

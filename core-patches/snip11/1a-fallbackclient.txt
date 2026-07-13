@@ -1,0 +1,12 @@
+// [zen-pack:11] fallbackClient decl (blok 1a) — fail-open: env absen = null.
+// Fallback client for OpenCode Zen (or any OpenAI-compatible fallback API)
+// Set LLM_FALLBACK_BASE_URL in .env to enable; model defaults to deepseek-v4-flash-free
+const fallbackClient = process.env.LLM_FALLBACK_BASE_URL
+  ? new OpenAI({
+      baseURL: process.env.LLM_FALLBACK_BASE_URL,
+      apiKey: process.env.LLM_FALLBACK_API_KEY || process.env.OPENCODE_ZEN_API_KEY,
+      timeout: 5 * 60 * 1000,
+    })
+  : null;
+
+const DEFAULT_MODEL = process.env.LLM_MODEL || "openrouter/healer-alpha";

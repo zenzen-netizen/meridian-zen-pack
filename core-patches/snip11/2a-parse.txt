@@ -1,0 +1,40 @@
+// [zen-pack:11] blok 2a — parseContentToolCalls + Set konstanta (top-level, di-append).
+// Some models (esp. weaker / non-native function-callers like minimax-m2) emit their
+// intended tool calls as plain-text JSON in `content` instead of using the function-
+// calling channel — e.g. `[{"name":"get_top_candidates","parameters":{"limit":3}}]`.
+// Left unhandled, an allowNoToolFinal caller (the screening cron) posts this raw JSON
+// straight to Telegram as if it were a report. parseContentToolCalls recognizes such
+// dumps so the loop can either salvage them (read-only) or reject-and-retry.
+const VALID_TOOL_NAMES = new Set(tools.map((t) => t.function.name));
+// Never auto-execute these from a text dump: a dump is an un-vetted "plan", not a
+// deliberate call — acting on it could move real capital or mutate persistent state.
+const ONCHAIN_WRITE_TOOLS = new Set(["deploy_position", "claim_fees", "close_position", "swap_token"]);
+const NO_SALVAGE_TOOLS = new Set([...ONCHAIN_WRITE_TOOLS, ...GENERAL_INTENT_ONLY_TOOLS]);
+
+function parseContentToolCalls(content) {
+  if (!content || typeof content !== "string") return null;
+  let text = content.trim();
+  if (!text) return null;
+  // Strip a single surrounding markdown code fence if present
+  const fence = text.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (fence) text = fence[1].trim();
+  if (!/^[[{]/.test(text)) return null; // a real report never starts with [ or {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    try { parsed = JSON.parse(jsonrepair(text)); } catch { return null; }
+  }
+  const arr = Array.isArray(parsed) ? parsed : [parsed];
+  if (arr.length === 0) return null;
+  const calls = [];
+  for (const item of arr) {
+    if (!item || typeof item !== "object") return null;
+    const name = item.name || item.tool || item.function;
+    if (typeof name !== "string" || !VALID_TOOL_NAMES.has(name)) return null; // all entries must be real tools
+    const raw = item.parameters ?? item.arguments ?? item.args ?? {};
+    if (raw != null && typeof raw !== "object") return null;
+    calls.push({ name, arguments: raw && typeof raw === "object" ? raw : {} });
+  }
+  return calls.length ? calls : null;
+}

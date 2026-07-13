@@ -1,0 +1,7 @@
+  let noToolRetryCount = 0;
+  // [zen-pack:11] salvage recovery budgets (blok 2c)
+  // Recovery budgets for models that dump tool calls as plain text (see parseContentToolCalls)
+  let contentSalvageCount = 0;
+  let toolDumpRetryCount = 0;
+  const MAX_CONTENT_SALVAGE = 4;
+  const MAX_TOOL_DUMP_RETRY = 2;

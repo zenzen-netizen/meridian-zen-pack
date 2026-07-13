@@ -1,0 +1,7 @@
+      let usedModel = activeModel;
+      // [zen-pack:11] fallback client routing (blok 1b)
+      // Route through fallback client (OpenCode Zen) only when the model
+      // name ends with "-free" — regardless of agent role. This lets each
+      // role independently choose free (Zen) or paid (OpenRouter) models.
+      const useFallbackForModel = fallbackClient && model && model.endsWith("-free");
+      let activeClient = useFallbackForModel ? fallbackClient : client;

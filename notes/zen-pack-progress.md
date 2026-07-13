@@ -348,3 +348,26 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
    DEP: GENERAL_INTENT_ONLY_TOOLS ada vanilla L9; ONCHAIN_WRITE_TOOLS/VALID_TOOL_NAMES/
      NO_SALVAGE_TOOLS = top-level baru (blok 2a); jsonrepair sudah import L2.
    Nol anchor ganda/absen. Nol STOP. ⬜ FASE B/C/D.
+
+✅ FASE B patch 11-agentloop-fallback-salvage.mjs (1 append + 7 replaceLine, marker
+   [zen-pack:11]). NEW-content verbatim-fork di snip11/*.txt via readFileSync (blok
+   punya backtick+backslash bareng → String.raw & double-quote dua-duanya pecah;
+   snippet file = nol escaping, jaminan verbatim):
+   BLOK 1 fallbackClient:
+   - 1a decl fallbackClient (replace anchor DEFAULT_MODEL) — fail-open env absen=null.
+   - 1b useFallbackForModel + let activeClient (replace anchor `let usedModel`).
+   - 1c `client`→`activeClient` di create call (inline).
+   - 1d failover elif (replace anchor `if (attempt===1 && usedModel!==FALLBACK_MODEL)`),
+     original if jadi else-if.
+   BLOK 2 salvage:
+   - 2a parseContentToolCalls + VALID_TOOL_NAMES/ONCHAIN_WRITE_TOOLS/NO_SALVAGE_TOOLS
+     (APPEND akhir file; fn hoisted, const dipakai runtime → aman).
+   - 2c counters (replace anchor `let noToolRetryCount`).
+   - 2b salvage block (replace anchor `messages.push(msg)`).
+   - 2d reject-dump (replace anchor `if (mustUseRealTool && !sawToolCall)`); blok 6
+     allowNoToolFinal DEFER → ternary dilepas, cabang non-allowNoToolFinal saja.
+   Uji isolasi (scratch copy vanilla-test/agent.js): PASS1 = 1 appended + 7 replaced,
+   node --check OK; PASS2 = semua skipped-idempotent. Verifikasi hasil: fallbackClient/
+   activeClient/parseContentToolCalls/NO_SALVAGE_TOOLS wired; DEFER blocks
+   (allowNoToolFinal-kode/recordLlmCost/CHAT_CONFIRM/runToolCall/execCache/
+   generalMaxTokens) = 0 (allowNoToolFinal 3× = komentar saja). ⬜ FASE C/D.

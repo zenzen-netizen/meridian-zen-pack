@@ -1,0 +1,24 @@
+        // [zen-pack:11] reject tool-dump-as-final (blok 2b). allowNoToolFinal (blok 6) DEFER 7.x:
+        // ternary dilepas, hanya cabang non-allowNoToolFinal dipertahankan.
+        // A content that is actually a tool-call/schema dump (contains a write tool, or
+        // read-only but past the salvage budget) is NEVER a valid final answer — never let
+        // it reach the user/Telegram. Nudge the model to call the tool properly or report
+        // in prose; if it keeps dumping, return a clean skip / failure instead of the JSON.
+        if (parseContentToolCalls(msg.content)) {
+          toolDumpRetryCount += 1;
+          messages.pop();
+          log("agent", `Rejected tool-dump-as-text final answer (${toolDumpRetryCount}/${MAX_TOOL_DUMP_RETRY})`);
+          if (toolDumpRetryCount >= MAX_TOOL_DUMP_RETRY) {
+            return {
+              content: "I couldn't complete that reliably — the model emitted tool definitions as text instead of calling them. Please retry.",
+              userMessage: goal,
+            };
+          }
+          const reminder = "Your previous reply pasted tool definitions/calls as plain JSON text instead of using them. Do NOT output tool schemas or example arguments as text. Either (a) actually CALL the tool through the function-calling interface, or (b) if you are finished, write your final answer as plain prose in the required format. Never paste the tool list.";
+          messages.push({
+            role: providerMode === "system" ? "system" : "user",
+            content: providerMode === "system" ? reminder : `[SYSTEM REMINDER]\n${reminder}`,
+          });
+          continue;
+        }
+        if (mustUseRealTool && !sawToolCall) {
