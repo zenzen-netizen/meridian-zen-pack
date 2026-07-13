@@ -419,3 +419,8 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
    marker 0, porcelain 0)->reinstall->boot 6->tests hijau. Pristine 5ab14b4. manifest 5.5.
    DEFER 5.7: blok 5/6 (wallet.js). DEFER (paths-Batch-2/gmgn stage): blok 1 update_config.
    DEFER 7.x: computeDeployAmount + persistConfigChange. Hook veto TIDAK dibuat (owner).
+
+## Stage 5.6 FASE A ✅ (recon, 2026-07-13)
+- Hunk 1-2 (get_time_profile/get_narrative_profile schema): **SKIP** — sudah full schema (name+description+parameters) via zenpack-plugins/20-profile-tools.js:18-44, registrar patch 04b. Nol kerja tambahan.
+- Hunk 3 (deploy_position: narrative_category+conviction): **PORT**. Anchor unik vanilla-test/tools/definitions.js:195 `initial_value_usd: { type: "number", description: "Estimated USD value being deployed" }` (count=1). Konsumen terbukti: executor.js:885 `applyConvictionSizing(originalAmt, args.conviction)` (diport 5.5 blok 3, core-patches/snip12/3-conviction-NEW.txt) — tanpa field schema ini args.conviction selalu undefined, conviction sizing mati diam-diam.
+- Hunk 4 (update_config docs, fork L395 / vanilla L383): **DEFER** bareng blok 1 update_config (5.5). Jauh dari hunk 3 (L197), TAK jalin — konfirmasi posisi terpisah.
