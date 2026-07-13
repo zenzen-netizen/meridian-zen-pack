@@ -250,3 +250,17 @@
 ✅ FASE E manifest + progress: stage 5.1, patches +08/09, plugins +50,
    zenpack_plugins 6, blok stage_5_1 (deviasi opportunity 8.4, orphan source/gmgn,
    defer 5.2 sizing fn, reload sync-form). manifest valid JSON.
+
+# FASE 5.2 (vonis-only, tutup config.js) + 5.3 (agent.js bag 1)
+
+✅ FASE 0 — 5.2 vonis-only:
+   0.1 VONIS: 4 fungsi sizing export fork config.js (minDeployAmount,
+       computeDeployAmount mode maximize, applyConvictionSizing,
+       persistConfigChange) = DEFER. Konsumen: executor.js → 5.5, index.js → 7.x.
+       Nol kode fase ini.
+   0.2 drop-in config-schema.js + config-origin.js (pack sejak Stage 2, root):
+       KEDUA self-contained — NOL import (grep `^import`/`from` = kosong),
+       node --check OK, tak ada dependensi absen dari config.js vanilla.
+       Konsumen sudah wired (plugin 30-render-views, views/config.js,
+       views/settings.js). Isolate-import LOLOS, TIDAK perlu build/DEFER.
+   Commit vonis. ⬜ FASE A/B/C/D 5.3 berikut.

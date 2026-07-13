@@ -49,5 +49,15 @@
     ],
     "defer_5_2": "fungsi sizing export fork (minDeployAmount, computeDeployAmount mode maximize, applyConvictionSizing, persistConfigChange) — konsumen index.js/executor.js belum diport.",
     "reload_hook_form": "reloadScreeningThresholds NON-async -> patch 08 pakai bentuk SYNC (import statis emitSync + panggil langsung), bukan await import."
+  },
+  "stage_5_2": {
+    "summary": "config.js DITUTUP (vonis-only, nol kode). 4 fungsi sizing export fork DEFER.",
+    "defer_sizing_fn": {
+      "minDeployAmount": "5.5 (konsumen executor.js) + 7.x (index.js)",
+      "computeDeployAmount_mode_maximize": "5.5 + 7.x",
+      "applyConvictionSizing": "5.5 (konsumen executor.js)",
+      "persistConfigChange": "7.x (konsumen index.js)"
+    },
+    "config_drop_ins_verdict": "config-schema.js + config-origin.js (root drop-in sejak Stage 2) self-contained (nol import), isolate-import lolos, konsumen wired (plugin 30, views/config+settings). Tak perlu build."
   }
 }
