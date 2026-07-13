@@ -395,3 +395,15 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
    DEFER 7.x: 3 dedup(struktural+muat blok4+arg-repair), 4 CHAT_CONFIRM(call-site
    belum kirim onConfirmRequired), 5 recordLlmCost(modul+pembaca belum diport),
    6 generalMaxTokens+allowNoToolFinal(config key+call-site absen).
+
+## FASE 5.5 executor.js (money-adjacent) — 7 blok custom
+✅ FASE A recon (detail: notes/executor-5.5-recon.md). Config surface SIAP (5.1 config-ext
+   punya strategyLock/rentPerPositionSol/experiments.*). Deploy case byte-identik fork vs
+   vanilla kecuali sisipan → blok 2/3/4 dipisah bersih, semua anchor count=1 (nol ganda/absen).
+   PORT 5.5: sizing.js (minDeployAmount+applyConvictionSizing verbatim fork) + blok 1
+   (update_config rewrite, 1 replaceLine besar) + blok 2 strategyLock + blok 3 conviction +
+   blok 4 minDeploy/rent (floor 0.1→0.03 + rentReserve, verbatim fork) + blok 7 peakPnl notify.
+   DEFER 5.7: blok 5 exitLiquidityCheck (quoteSellPriceImpact absen) + blok 6 auto-swap
+   (swapBaseToSolWithRetry wallet.js absen; vanilla punya versi lokal L607 → nol rugi).
+   DEFER 7.x: computeDeployAmount + persistConfigChange (executor tak import).
+   ⬜ FASE B/C/D — TAHAN: brief STOP A.3 (blok 5/6 wallet.js absen) terpenuhi, lapor owner.
