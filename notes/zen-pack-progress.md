@@ -317,3 +317,34 @@
 ✅ FASE D manifest + progress: stage 5.3, patch +10, blok stage_5_2 (config.js
    ditutup, defer 4 sizing fn, config drop-in verdict) + stage_5_3 (perubahan,
    debt_paid exposure LUNAS, defer_5_4 CHAT_CONFIRM + blok loop). manifest valid JSON.
+
+# Stage 5.4 — agentLoop blok 1 (fallbackClient) + blok 2 (salvage)
+
+Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes/agentloop-recon.md (e76cd1c).
+
+✅ FASE A recon anchor presisi (vanilla-test/agent.js, main 417 baris; semua count=1):
+   BLOK 1 fallbackClient:
+   A1.1 `const client = new OpenAI({` L96 → sisip decl fallbackClient sebelum
+        `const DEFAULT_MODEL` L102.
+   A1.2 `let usedModel = activeModel;` L200 → sisip useFallbackForModel + `let
+        activeClient` sesudahnya (activeClient WAJIB let, failover reassign).
+   A1.3 `response = await client.chat.completions.create` L215 → `client`→`activeClient`.
+   A1.4 `if (attempt === 1 && usedModel !== FALLBACK_MODEL)` L242 → sisip failover
+        elif fork (fallbackClient) SEBELUM baris ini (jadi else-if pertama).
+   BLOK 2 salvage:
+   A2.1 top-level fn parseContentToolCalls + VALID_TOOL_NAMES + ONCHAIN_WRITE_TOOLS +
+        NO_SALVAGE_TOOLS: sesudah isThinkingModeToolChoiceError L148, sebelum agentLoop
+        jsdoc L157.
+   A2.2 counters (contentSalvageCount/toolDumpRetryCount/MAX_*): sesudah `let
+        noToolRetryCount = 0;` L186.
+   A2.3 salvage block: sesudah `messages.push(msg);` L280.
+   A2.4 reject-dump-final: dalam blok no-tool L282-311.
+   FAIL-OPEN blok 1 TERBUKTI: fallbackClient = env LLM_FALLBACK_BASE_URL ? new : null.
+     vanilla-test/.env + .env.example NOL var fallback → runtime null = perilaku vanilla
+     persis. Failover elif dijaga `fallbackClient && activeClient !== fallbackClient`.
+   BLOK 2b SEPARABLE dari blok 6 (BUKAN STOP): allowNoToolFinal cuma di ternary return
+     content fork L404-405. Port cabang false saja ("I couldn't complete..."), buang
+     ternary. Stage 7 re-add. Split bersih.
+   DEP: GENERAL_INTENT_ONLY_TOOLS ada vanilla L9; ONCHAIN_WRITE_TOOLS/VALID_TOOL_NAMES/
+     NO_SALVAGE_TOOLS = top-level baru (blok 2a); jsonrepair sudah import L2.
+   Nol anchor ganda/absen. Nol STOP. ⬜ FASE B/C/D.
