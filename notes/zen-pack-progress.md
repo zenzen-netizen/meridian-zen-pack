@@ -204,4 +204,49 @@
      :730-731, tak ada read-path). → TIDAK ditambah, dicatat vonis no-op. BUKAN STOP
      (aturan orphan brief item-2 diterapkan konsisten). Brief FASE C lengkap+akurat
      utk key ber-konsumen. reload fork L638-647 custom delta = persis brief item-13.
-   Commit: recon-only (no code). ⬜ FASE B/C/D/E berikut.
+   Commit: recon-only (no code). HEAD 5717946.
+
+✅ FASE B patch 08 + 09 (via lib/patcher.js existing, patcher TAK di-extend):
+   - 08-config-reload-hook.mjs: 2 item applyPatch (config.js). itemA marker
+     `zen-pack:08-config-reload-import` anchor=import screening-scales, inject
+     `import { emitSync } from "./zenpack-lib/hooks.js"`. itemB marker
+     `zen-pack:08-config-reload-hook` anchor=blok multiline `config.strategy.
+     defaultBinsBelow = Math.max(...)` (unik, count 1), inject
+     `try { emitSync("config:reload", { config, fresh }); } catch {}` di akhir
+     badan try (sebelum `} catch`). BENTUK SYNC (reload non-async). Fail-open.
+   - 09-dryrun-userconfig-wins.mjs: replaceLine `||=`→`=` (OLD unik count 1).
+   node --check via patcher auto (apply sukses). Commit 3417ef3 (08) + 3be072c (09).
+
+✅ FASE C plugin zenpack-plugins/50-config-ext.js (register() mutasi config live):
+   - injectCustomKeys(readUserConfig()) — baca user-config via paths.userConfigPath
+     (fail-loud: unreadable → warn + u={} degrade default, tak crash).
+   - normalizePromptNotes port VERBATIM fork:77-86. Semua default port VERBATIM
+     fork config.js (top-level 115-118, screening.categories 145, management
+     240-253, strategy 269+277-280, schedule 292-293, llm 300, learning 312-314,
+     jupiter 365, indicators 375+388+394-396, experiments 404-479 [16 flag],
+     reports 485-487).
+   - handler config:reload (onConfigReload) port fork reload delta 638-647
+     (screeningCategories/promptNotes/activeSetup/evolveEnabled/sizingMode/
+     rentPerPositionSol) dari ctx.fresh. manifest priority 50.
+   - orphan source + gmgn-superset TIDAK diport (vonis FASE A.3).
+
+✅ FASE D test + gate penuh (target vanilla-test, HEAD 5ab14b4 pristine):
+   - tests/config-ext.test.mjs 15/15: tabel key→default fork per blok; DEVIASI
+     opportunity.enabled===true; reload sizingMode/categories/promptNotes/
+     evolveEnabled/rentPerPositionSol via hook; patch 09 subprocess (env
+     DRY_RUN=true + user-config dryRun:false → process.env.DRY_RUN==="false").
+   - profile-tools bumped 5→6 plugin.
+   - Harness: hooks 8/0, loader OK, patcher 14/0, paths 12/12, profile 10/0,
+     telegram 19/19 (fresh; CATATAN pre-existing: telegram test tinggalkan
+     presets/_backup.json → non-idempotent antar-run, BUKAN regresi 5.1),
+     prompt-racikan 8/0 (butuh arg fork-ref), config-ext 15/0.
+   - Boot DRY_RUN: `loaded 6 plugins (skipped 0, errors 0)` + baseline 401 only,
+     nol stacktrace/TypeError.
+   - Siklus: install (08×2 patched + 09 replaced) → boot 6 → tests → uninstall
+     (config.js restore hash-verify CLEAN, porcelain KOSONG pasca git clean -fd +
+     checkout; residu cuma exports/+profiles/ = artefak boot, bukan pack) →
+     reinstall → boot 6 errors 0 → config-ext 15/15. Sandbox pulih pristine 5ab14b4.
+
+✅ FASE E manifest + progress: stage 5.1, patches +08/09, plugins +50,
+   zenpack_plugins 6, blok stage_5_1 (deviasi opportunity 8.4, orphan source/gmgn,
+   defer 5.2 sizing fn, reload sync-form). manifest valid JSON.

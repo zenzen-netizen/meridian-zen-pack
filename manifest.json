@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 4.7,
+  "stage": 5.1,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -12,14 +12,17 @@
     "04b-tool-registrars",
     "05-prompt-hook",
     "06-strategy-no-autoseed",
-    "07-blacklist-failopen"
+    "07-blacklist-failopen",
+    "08-config-reload-hook",
+    "09-dryrun-userconfig-wins"
   ],
   "plugins": [
     "00-zenpack-hello",
     "10-telegram-cmds",
     "20-profile-tools",
     "30-render-views",
-    "40-prompt-racikan"
+    "40-prompt-racikan",
+    "50-config-ext"
   ],
   "drop_ins": {
     "root": 18,
@@ -27,7 +30,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 5,
+    "zenpack_plugins": 6,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",
@@ -36,5 +39,15 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. DITUNDA ke Stage 5.8: wiring tools/smi.js chart-indicators (pemakainya file core MODIFIED, bukan materi patch tipis)."
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. DITUNDA ke Stage 5.8: wiring tools/smi.js chart-indicators (pemakainya file core MODIFIED, bukan materi patch tipis).",
+  "stage_5_1": {
+    "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
+    "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
+    "orphan_no-op_di_vanilla_TIDAK_diport": [
+      "screening.source (screeningSource) — nol konsumen vanilla",
+      "gmgn SUPERSET ~40 key fork (minSmartDegenCount/requireKol/indicatorRules/dst) — vanilla tools/gmgn.js cuma baca 5 key yg vanilla config.js sudah punya"
+    ],
+    "defer_5_2": "fungsi sizing export fork (minDeployAmount, computeDeployAmount mode maximize, applyConvictionSizing, persistConfigChange) — konsumen index.js/executor.js belum diport.",
+    "reload_hook_form": "reloadScreeningThresholds NON-async -> patch 08 pakai bentuk SYNC (import statis emitSync + panggil langsung), bukan await import."
+  }
 }
