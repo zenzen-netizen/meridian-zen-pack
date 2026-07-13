@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.3,
+  "stage": "5.4",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -15,7 +15,8 @@
     "07-blacklist-failopen",
     "08-config-reload-hook",
     "09-dryrun-userconfig-wins",
-    "10-agent-constants"
+    "10-agent-constants",
+    "11-agentloop-fallback-salvage"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -70,5 +71,30 @@
     ],
     "debt_paid": "exposure role 2 profile-tools (get_time_profile + get_narrative_profile) LUNAS — masuk SCREENER_TOOLS; terdaftar runtime via patch 04b (dibuktikan pre-load false/post-load true).",
     "defer_5_4": "CHAT_CONFIRM_TOOLS (konsumen tunggal runToolCall) + blok loop agent.js (fallback/salvage/dedup/confirm/allowNoToolFinal/recordLlmCost/generalMaxTokens) — belum diport."
+  },
+  "stage_5_4": {
+    "summary": "agent.js bag 2: patch 11 blok 1 fallbackClient + blok 2 salvage tool-dump (1 append + 7 replaceLine). NEW verbatim-fork via snip11/*.txt.",
+    "scope": "owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER 7.x.",
+    "blok_1_fallbackClient": [
+      "1a decl fallbackClient top-level (fail-open: env LLM_FALLBACK_BASE_URL absen = null = perilaku vanilla)",
+      "1b useFallbackForModel + let activeClient (route model -free ke fallback)",
+      "1c client -> activeClient di chat.completions.create",
+      "1d failover elif ke fallbackClient dalam retry-block 502/503/529"
+    ],
+    "blok_2_salvage": [
+      "2a parseContentToolCalls + VALID_TOOL_NAMES/ONCHAIN_WRITE_TOOLS/NO_SALVAGE_TOOLS (append top-level)",
+      "2c recovery counters (contentSalvageCount/toolDumpRetryCount/MAX_*)",
+      "2b salvage read-only tool-dump -> tool call; mutating (NO_SALVAGE) TIDAK di-salvage",
+      "2d reject tool-dump-as-final (blok 6 allowNoToolFinal ternary DILEPAS, cabang non-allowNoToolFinal saja)"
+    ],
+    "security": "reject mutating-dump TERUJI HIJAU: parseContentToolCalls + guard NO_SALVAGE_TOOLS (deploy/close/claim/swap + intent-only) — deploy/close/swap dump ditolak, tak dieksekusi (agentloop-ext 14/14).",
+    "gate": "boot loaded 6 plugins errors 0 + baseline 401; harness 10 suite + smoke PASS; siklus install->uninstall(agent.js restore byte-identik HEAD, porcelain 0)->reinstall hijau.",
+    "defer_7x": {
+      "blok_3_dedup_Promise.all->runToolCall": "struktural + muat blok 4 CHAT_CONFIRM + kopel arg-repair upstream (invalidToolArgErrors)",
+      "blok_4_CHAT_CONFIRM_TOOLS": "call-site index.js belum kirim onConfirmRequired (grep vanilla-test = 0)",
+      "blok_5_recordLlmCost": "modul llm-cost-tracker.js belum diport + pembaca briefing/pnl/index belum diport",
+      "blok_6_generalMaxTokens+allowNoToolFinal": "config.llm.generalMaxTokens absen di vanilla-test/config.js + call-site allowNoToolFinal:true belum diport"
+    },
+    "note_task_D": "per-role fallback (bukan hanya model -free) = workstream terpisah pasca Stage 7, JANGAN ekstraksi di zen-pack."
   }
 }

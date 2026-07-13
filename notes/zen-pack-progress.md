@@ -371,3 +371,27 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
    activeClient/parseContentToolCalls/NO_SALVAGE_TOOLS wired; DEFER blocks
    (allowNoToolFinal-kode/recordLlmCost/CHAT_CONFIRM/runToolCall/execCache/
    generalMaxTokens) = 0 (allowNoToolFinal 3× = komentar saja). ⬜ FASE C/D.
+
+✅ FASE C test + gate:
+   - tests/agentloop-ext.test.mjs 14/14: blok1 struktural (fallbackClient fail-open
+     env=null, activeClient routing, client->activeClient, failover elif); blok6/3/4/5
+     DEFER absen (kode); blok2 FUNGSIONAL (eval parseContentToolCalls + salvage-guard
+     dgn VALID_TOOL_NAMES/jsonrepair terkontrol). KEAMANAN HIJAU: read-only dump
+     salvageable; deploy/close/swap dump + campuran DITOLAK (NO_SALVAGE_TOOLS).
+   - Harness penuh: hooks 8/0, loader OK, patcher 14/0, paths 12/12, profile 10/0,
+     prompt-racikan 8/0, config-ext 15/0, agent-constants 8/0, agentloop-ext 14/0,
+     telegram 19/19. smoke PASS (6/6).
+   - Boot DRY_RUN: `loaded 6 plugins (skipped 0, errors 0)` + baseline 401. agentLoop
+     patched jalan step 0 (activeClient=client, fallbackClient=null) → nol crash =
+     fail-open runtime terbukti.
+   - Siklus: install (patch 11 = 1 appended + 7 replaced, co-exist patch 10) → boot 6
+     → tests → uninstall (agent.js restore byte-identik HEAD: git diff --stat kosong,
+     marker 0, porcelain source 0) → reinstall (1+7) → agentloop-ext 14/14 + boot 6.
+     Sandbox pulih pristine 5ab14b4.
+
+✅ FASE D manifest + progress: stage 5.4, patches +11 (13 total), blok stage_5_4
+   (blok 1 4-titik + blok 2 4-titik + security reject-dump + gate + defer_7x tabel
+   blok 3/4/5/6 + note_task_D per-role terpisah). manifest valid JSON.
+   DEFER 7.x: 3 dedup(struktural+muat blok4+arg-repair), 4 CHAT_CONFIRM(call-site
+   belum kirim onConfirmRequired), 5 recordLlmCost(modul+pembaca belum diport),
+   6 generalMaxTokens+allowNoToolFinal(config key+call-site absen).
