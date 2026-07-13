@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "5.5",
+  "stage": "5.6",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -17,7 +17,8 @@
     "09-dryrun-userconfig-wins",
     "10-agent-constants",
     "11-agentloop-fallback-salvage",
-    "12-executor-money-blocks"
+    "12-executor-money-blocks",
+    "13-deploy-schema-conviction"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -113,5 +114,12 @@
     },
     "defer_blok_1_update_config": "fork update_config verbatim SERET out-of-scope: import paths.js (executor.js migration Batch-2 DITUNDA di patch 02) + gmgn-config.json split-persistence (paths.gmgnConfigPath, fitur gmgn belum diport). BUKAN unit self-contained (recon FASE A salah kira). DEFER ke stage executor-paths-Batch-2 / update_config khusus. Keputusan owner 2026-07-13. Enforcement strategyLock yang MONEY = blok 2 (sudah diport); blok 1 cuma validasi nilai lock (guard).",
     "gate": "isolation 6 replaceLine + node --check + idempotent (PASS2 6 skip). Install target 6 replaced + sizing.js landed. Boot loaded 6 plugins errors 0. Tests: executor-sizing 14/14 (clamp fuzz 200x tak tembus rail; floor 0.03), executor-ext 13/13 (5 blok hadir + 5/6 absent + urutan + strategyLock override fungsional 4 kasus). Regresi: config-ext 15, agentloop-ext 14, patcher 14, telegram-cmds 19 (golden /config parity), profile-tools 10, smoke 6/6. Paper-drive money terintegrasi (DRY_RUN, blok asli+sizing asli, network/SDK stub): strategyLock curve->spot, conviction 1.0->1.3 clamp[0.5,2], lock=default untouched, clamp ceil 2.0 tahan, sub-min ditolak; getWalletBalances guard NOL dipanggil = balance/rent skip = ZERO TX. Siklus install->uninstall(executor.js restore byte-identik HEAD, marker 0, porcelain 0)->reinstall(6 replaced)->boot 6->tests hijau. Sandbox pulih pristine 5ab14b4."
+  },
+  "stage_5_6": {
+    "summary": "tools/definitions.js: patch 13 schema deploy_position -> narrative_category (enum 8 kategori) + conviction (enum low/medium/high). 1 replaceLine, verbatim fork.",
+    "hunk_1_2_get_time_narrative_profile_schema": "SKIP (bukan PORT) -- schema sudah full (name+description+parameters) via zenpack-plugins/20-profile-tools.js (registrar patch 04b zenpackRegisterToolDef). Nol kerja tambahan, nol duplikasi.",
+    "hunk_3_conviction_narrative": "PORT. Anchor unik vanilla-test/tools/definitions.js:195 `initial_value_usd: { type: \"number\", description: \"Estimated USD value being deployed\" }` (count=1). Konsumen dibuktikan: executor.js:885 applyConvictionSizing(originalAmt, args.conviction) (diport 5.5 blok 3) -- tanpa field schema ini args.conviction selalu undefined, conviction-sizing experiment mati diam-diam meski kode sizing sudah ada.",
+    "hunk_4_update_config_docs": "DEFER bareng blok 1 update_config (5.5, defer_blok_1_update_config) -- dokumentasi param schema untuk handler yang belum diport. Posisi fork L395/vanilla L383, jauh dari hunk 3 (L197), terbukti TAK jalin.",
+    "gate": "definitions-ext 4/4 (narrative_category enum 8, conviction enum 3, idempotent 1x, registrar 04b hidup). Harness penuh 13 suite hijau + smoke v0.2 PASS. Boot loaded 6 plugins errors 0 + baseline 401. Siklus install->uninstall(definitions.js hash-verify clean, porcelain sisa exports/+presets/ pre-existing test artifact bukan regresi)->reinstall->boot 6. Nol sentuh bot live."
   }
 }

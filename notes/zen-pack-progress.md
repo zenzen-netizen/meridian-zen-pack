@@ -425,3 +425,15 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
 - Hunk 3 (deploy_position: narrative_category+conviction): **PORT**. Anchor unik vanilla-test/tools/definitions.js:195 `initial_value_usd: { type: "number", description: "Estimated USD value being deployed" }` (count=1). Konsumen terbukti: executor.js:885 `applyConvictionSizing(originalAmt, args.conviction)` (diport 5.5 blok 3, core-patches/snip12/3-conviction-NEW.txt) — tanpa field schema ini args.conviction selalu undefined, conviction sizing mati diam-diam.
 - Hunk 4 (update_config docs, fork L395 / vanilla L383): **DEFER** bareng blok 1 update_config (5.5). Jauh dari hunk 3 (L197), TAK jalin — konfirmasi posisi terpisah.
 - FASE C ✅ tests/definitions-ext.test.mjs 4/4 (narrative_category enum 8, conviction enum 3, idempotent 1x, registrar 04b hidup). Gate penuh 13 suite hijau (hooks 8/loader/patcher 14/paths 12/profile 10/config-ext 15/agent-const 8/agentloop-ext 14/executor-sizing 14/executor-ext 13/telegram 19/definitions-ext 4), smoke v0.2 PASS. Boot loaded 6 plugins errors 0 + baseline 401 (fixture env dummy). Siklus install→uninstall(definitions.js hash-verify clean, porcelain sisa exports/+presets/ = pre-existing test artifact, bukan regresi)→reinstall→boot 6. Sandbox pristine, nol `-x`.
+✅ FASE D manifest + progress: stage 5.6, patch +13 (14 total), blok stage_5_6 (hunk 1-2 SKIP verdict, hunk 3 PORT+anchor+konsumen, hunk 4 DEFER bareng blok 1 update_config). manifest valid JSON.
+
+## Stage 5.6 laporan final
+
+| Fase | Isi | Status |
+|---|---|---|
+| A | Recon: 04b/plugin 20 verdict, anchor, konsumen conviction | ✅ |
+| B | Patch 13 (1 replaceLine, definitions.js) | ✅ |
+| C | Test definitions-ext 4/4 + gate 13 suite + smoke + boot + siklus | ✅ |
+| D | Manifest stage_5_6 + laporan | ✅ |
+
+Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — schema penuh sudah ada via zenpack-plugins/20-profile-tools.js, registrar patch 04b. Anchor hunk 3 aktual: vanilla-test/tools/definitions.js:195 (`initial_value_usd`), count=1. Hasil gate: definitions-ext 4/4, harness 13 suite hijau, smoke PASS, boot loaded 6 errors 0 + baseline 401, siklus install→uninstall(hash-verify clean)→reinstall→boot 6 lolos. Commit: 787068c (patch 13), fdcbf4d (test), + commit manifest berikut. Nol sentuh bot live.
