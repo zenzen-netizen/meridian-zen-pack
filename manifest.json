@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.1,
+  "stage": 5.3,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -14,7 +14,8 @@
     "06-strategy-no-autoseed",
     "07-blacklist-failopen",
     "08-config-reload-hook",
-    "09-dryrun-userconfig-wins"
+    "09-dryrun-userconfig-wins",
+    "10-agent-constants"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -59,5 +60,15 @@
       "persistConfigChange": "7.x (konsumen index.js)"
     },
     "config_drop_ins_verdict": "config-schema.js + config-origin.js (root drop-in sejak Stage 2) self-contained (nol import), isolate-import lolos, konsumen wired (plugin 30, views/config+settings). Tak perlu build."
+  },
+  "stage_5_3": {
+    "summary": "agent.js bag 1: patch 10 penyamaan konstanta role/intent vanilla-main -> fork (6 replaceLine).",
+    "changes": [
+      "SCREENER_TOOLS 11 tool -> 7 tool slim fork (+ komentar efficiency)",
+      "INTENT_PATTERNS 17 entri EN -> 17 entri bilingual EN+ID",
+      "4 regex: MUTATING/LIVE_DATA/CONFIG_READ_ONLY/DECISION_EXPLANATION -> bilingual fork"
+    ],
+    "debt_paid": "exposure role 2 profile-tools (get_time_profile + get_narrative_profile) LUNAS — masuk SCREENER_TOOLS; terdaftar runtime via patch 04b (dibuktikan pre-load false/post-load true).",
+    "defer_5_4": "CHAT_CONFIRM_TOOLS (konsumen tunggal runToolCall) + blok loop agent.js (fallback/salvage/dedup/confirm/allowNoToolFinal/recordLlmCost/generalMaxTokens) — belum diport."
   }
 }

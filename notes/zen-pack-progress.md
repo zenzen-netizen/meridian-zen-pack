@@ -287,4 +287,33 @@
        L470 interactive/onConfirmRequired). Konsumen TUNGGAL = runToolCall (belum
        diport, 5.4). VONIS: CHAT_CONFIRM_TOOLS DEFER → 5.4, patch 10 TIDAK
        menyisipkannya (konstanta tanpa konsumen = kode tidur).
-   Commit recon-only. ⬜ FASE B/C/D.
+   Commit recon-only 357aa82. ⬜ FASE B/C/D.
+
+✅ FASE B patch 10-agent-constants.mjs (6 replaceLine, marker [zen-pack:10],
+   String.raw jaga backslash regex literal — nol backtick/${} di blok):
+   1. SCREENER_TOOLS 11→7 tool slim fork + komentar efficiency 6-baris (tutup utang
+      exposure 2 profile-tools).
+   2. INTENT_PATTERNS blok 17 entri EN → 17 bilingual EN+ID (verifikasi: body L1-18
+      BYTE-IDENTIK fork, cuma marker di L0).
+   3-6. MUTATING/LIVE_DATA/CONFIG_READ_ONLY/DECISION_EXPLANATION regex → fork
+      bilingual verbatim. Validasi: 6 OLD unik count 1, 6 NEW verbatim fork.
+   CHAT_CONFIRM_TOOLS TIDAK disisipkan (vonis A.6, DEFER 5.4). node --check OK,
+   install 6 replaced. Commit e9bfdb8.
+
+✅ FASE C test + gate:
+   - tests/agent-constants.test.mjs 8/8 (regex-extract string file, BUKAN import —
+     konstanta module-local tak ter-export): SCREENER memuat 2 profile-tool +
+     TIDAK memuat 6 tool pre-loaded; intent bilingual decisions"kenapa kamu skip"/
+     close"tutup posisi"/balance"saldo" + EN"why did you skip"; fungsional executor
+     get_time_profile/get_narrative_profile graceful (jalur 04b).
+   - Harness penuh: hooks 8/0, loader OK, patcher 14/0, paths 12/12, profile 10/0,
+     prompt-racikan 8/0, config-ext 15/0, agent-constants 8/0, telegram 19/19
+     (fresh). smoke PASS (zenpack-plugins 6/6).
+   - Boot DRY_RUN: `loaded 6 plugins (skipped 0, errors 0)` + nol stacktrace.
+   - Siklus: install (10 = 6 replaced) → boot 6 → tests → uninstall (agent.js
+     restore hash-verify CLEAN, porcelain 0 pasca git clean -fd) → reinstall → boot
+     6 + agent-const 8/8. Sandbox pulih pristine 5ab14b4.
+
+✅ FASE D manifest + progress: stage 5.3, patch +10, blok stage_5_2 (config.js
+   ditutup, defer 4 sizing fn, config drop-in verdict) + stage_5_3 (perubahan,
+   debt_paid exposure LUNAS, defer_5_4 CHAT_CONFIRM + blok loop). manifest valid JSON.
