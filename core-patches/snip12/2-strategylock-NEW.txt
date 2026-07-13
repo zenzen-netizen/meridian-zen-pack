@@ -1,0 +1,13 @@
+      // ─── Strategy lock ────────────────────────────────────────
+      // strategyLock=default (factory) → args.strategy untouched (LLM/user choice,
+      // dlmm.js falls back to config.strategy.strategy when omitted). When locked
+      // (spot/bid_ask/curve), hard-overwrite whatever was requested so the lock is
+      // mechanical — prompt drift, library context, or manual chat deploys can't
+      // bypass it. To deviate, set strategyLock=default first.
+      const stratLock = config.strategy?.strategyLock ?? "default";
+      if (stratLock !== "default" && args.strategy !== stratLock) {
+        if (args.strategy) log("safety", `strategyLock: requested strategy "${args.strategy}" overridden → "${stratLock}"`);
+        args.strategy = stratLock;
+      }
+
+      const poolThresholds = await validateDeployPoolThresholds(args);
