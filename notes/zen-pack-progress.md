@@ -263,4 +263,28 @@
        node --check OK, tak ada dependensi absen dari config.js vanilla.
        Konsumen sudah wired (plugin 30-render-views, views/config.js,
        views/settings.js). Isolate-import LOLOS, TIDAK perlu build/DEFER.
-   Commit vonis. ⬜ FASE A/B/C/D 5.3 berikut.
+   Commit vonis b402484. ⬜ FASE A/B/C/D 5.3 berikut.
+
+✅ FASE A recon 5.3 (vanilla-test/agent.js 416 baris; fork-ref 535 baris):
+   A.1 SCREENER_TOOLS vanilla L8 (unik count 1) = 11 tool [deploy_position,
+       get_active_bin, get_top_candidates, check_smart_wallets_on_pool,
+       get_token_holders, get_token_narrative, get_token_info, search_pools,
+       get_pool_memory, get_wallet_balance, get_my_positions]. Fork L15 = 7 tool
+       (slim) + komentar 6-baris efficiency (fork agent.js:9-14).
+   A.2 INTENT_PATTERNS vanilla blok L50-68 (17 entri + `];`), unik. Fork L64-82
+       = 17 entri BILINGUAL (EN+ID).
+   A.3 4 regex: MUTATING_TOOL_INTENTS vanilla L104 (fork L129 +ID+enable/disable/
+       toggle), LIVE_DATA_TOOL_INTENTS L105 (fork L130 +ID), CONFIG_READ_ONLY_INTENTS
+       L106 (fork L131 +ID), DECISION_EXPLANATION_INTENTS L107 (fork L132 +ID). Semua
+       unik count 1.
+   A.4 CHAT_CONFIRM_TOOLS titik sisip fork = setelah SCREENER_TOOLS (L15), sebelum
+       GENERAL_INTENT_ONLY_TOOLS (fork L21).
+   A.5 PRASYARAT UTANG: install pack → loadPlugins → tools/definitions.js `tools`:
+       pre-load get_time_profile=false, POST-load get_time_profile=true +
+       get_narrative_profile=true. Tool TERDAFTAR runtime (plugin 20 / patch 04b).
+       SCREENER exposure sah, BUKAN tool hantu. TIDAK STOP.
+   A.6 CHAT_CONFIRM_TOOLS konsumen fork: grep = 2 ref saja (def L21 + runToolCall
+       L470 interactive/onConfirmRequired). Konsumen TUNGGAL = runToolCall (belum
+       diport, 5.4). VONIS: CHAT_CONFIRM_TOOLS DEFER → 5.4, patch 10 TIDAK
+       menyisipkannya (konstanta tanpa konsumen = kode tidur).
+   Commit recon-only. ⬜ FASE B/C/D.
