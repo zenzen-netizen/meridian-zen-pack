@@ -1,0 +1,4 @@
+
+    // Calendar-day SOL growth tracker (/wallet): set today's WIB opening
+    // baseline on the first successful read of the day. Fail-open.
+    recordSolBalance(Math.round(solBalance * 1e6) / 1e6);

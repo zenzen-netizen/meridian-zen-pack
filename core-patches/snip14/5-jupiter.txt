@@ -1,0 +1,81 @@
+const JUPITER_QUOTE_API = "https://api.jup.ag/swap/v1/quote";
+
+// Read-only Jupiter quote — no signing, no tx. Returns the raw quote object.
+async function jupiterQuote({ inputMint, outputMint, amount }) {
+  const search = new URLSearchParams({
+    inputMint,
+    outputMint,
+    amount: String(amount),
+    slippageBps: "50",
+    restrictIntermediateTokens: "true",
+  });
+  const key = getJupiterApiKey();
+  const res = await fetch(`${JUPITER_QUOTE_API}?${search.toString()}`, {
+    headers: key ? { "x-api-key": key } : {},
+  });
+  if (!res.ok) throw new Error(`quote ${res.status}`);
+  const q = await res.json();
+  if (q.error || !q.outAmount) throw new Error(q.error || "no route");
+  return q;
+}
+
+/**
+ * Probe exit liquidity: how costly is it, right now, to round-trip `solNotional`
+ * SOL through `baseMint` and back to SOL? Two read-only quotes — size in
+ * (SOL→base) then sell back (base→SOL). The realized round-trip loss is
+ * interpretation-free (no reliance on priceImpactPct semantics) and captures
+ * impact in BOTH directions plus fees/spread — exactly the "easy in, hard out"
+ * cost for thin memecoins.
+ *
+ * Returns { roundTripLossPct, impactPct, baseAmount, outSol }. Throws on no
+ * route / bad input so callers can fail-open.
+ */
+export async function quoteSellPriceImpact({ baseMint, solNotional }) {
+  if (!baseMint || normalizeMint(baseMint) === SOL_MINT) throw new Error("no base mint to probe");
+  const solLamports = Math.floor(Number(solNotional) * 1e9);
+  if (!Number.isFinite(solLamports) || solLamports <= 0) throw new Error("bad notional");
+
+  // 1) Size: how much base does solNotional SOL buy?
+  const buy = await jupiterQuote({ inputMint: SOL_MINT, outputMint: baseMint, amount: solLamports });
+  const baseAmount = Number(buy.outAmount);
+  if (!Number.isFinite(baseAmount) || baseAmount <= 0) throw new Error("zero base out");
+
+  // 2) Sell that base straight back to SOL.
+  const sell = await jupiterQuote({ inputMint: baseMint, outputMint: SOL_MINT, amount: baseAmount });
+  const outLamports = Number(sell.outAmount);
+  const roundTripLossPct = ((solLamports - outLamports) / solLamports) * 100;
+  const impactPct = Math.abs(Number(sell.priceImpactPct ?? 0)) * 100; // Jupiter returns a fraction
+
+  return { roundTripLossPct, impactPct, baseAmount, outSol: outLamports / 1e9 };
+}
+
+/**
+ * Read SOL's current price and 24h change from Jupiter Price v3 (read-only,
+ * single GET). Used by the 🧪 market-regime gate to decide whether the market
+ * is "risk-off" before screening for new positions. No history is stored —
+ * the 24h change comes straight from the API.
+ *
+ * Returns { usdPrice, change24hPct, liquidity } on success, or null on any
+ * error / missing field so callers can fail-open (never block on a hiccup).
+ */
+export async function getSolMarketRegime() {
+  try {
+    const key = getJupiterApiKey();
+    const res = await fetch(`${JUPITER_PRICE_API}?ids=${SOL_MINT}`, {
+      headers: key ? { "x-api-key": key } : {},
+    });
+    if (!res.ok) throw new Error(`price ${res.status}`);
+    const data = await res.json();
+    const entry = data?.[SOL_MINT];
+    const change24hPct = Number(entry?.priceChange24h);
+    if (!entry || !Number.isFinite(change24hPct)) return null;
+    return {
+      usdPrice: Number(entry.usdPrice) || null,
+      change24hPct,
+      liquidity: Number(entry.liquidity) || null,
+    };
+  } catch (e) {
+    log("wallet_error", `getSolMarketRegime failed: ${e.message}`);
+    return null;
+  }
+}
