@@ -41,12 +41,13 @@ t("blok 7 notifyClose bawa peakPnlPct + recorded_pnl fallback + feesUsd", () => 
   assert.ok(/feesUsd: result\.fees_earned_usd \?\? null/.test(src));
 });
 
-// ── STRUKTURAL negatif: blok DEFER absen ────────────────────────────────────
-t("blok 5 exitLiquidityCheck ABSENT (DEFER 5.7)", () => {
-  assert.ok(!/exitLiquidityCheck/.test(src), "blok 5 bocor");
-  assert.ok(!/quoteSellPriceImpact/.test(src), "dep blok 5 bocor");
+// ── STRUKTURAL: blok 5 AKTIF sejak 5.7 (detail di executor-exit.test.mjs) ─────
+t("blok 5 exitLiquidityCheck HADIR (aktif 5.7 patch 15)", () => {
+  assert.ok(/config\.experiments\?\.exitLiquidityCheck/.test(src), "blok 5 tak aktif");
+  assert.ok(/quoteSellPriceImpact/.test(src), "dep blok 5 absen");
 });
-t("blok 6 auto-swap fork-variant ABSENT (DEFER 5.7)", () => {
+// ── STRUKTURAL negatif: blok 6 masih DEFER ───────────────────────────────────
+t("blok 6 auto-swap fork-variant ABSENT (DEFER — vanilla punya lokal)", () => {
   assert.ok(!/swapBaseToSolWithRetry\(\{ base_mint/.test(src), "blok 6 fork-variant bocor");
 });
 
