@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "5.6",
+  "stage": 5.7,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -18,7 +18,9 @@
     "10-agent-constants",
     "11-agentloop-fallback-salvage",
     "12-executor-money-blocks",
-    "13-deploy-schema-conviction"
+    "13-deploy-schema-conviction",
+    "14-wallet-ext",
+    "15-executor-exit"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -121,5 +123,20 @@
     "hunk_3_conviction_narrative": "PORT. Anchor unik vanilla-test/tools/definitions.js:195 `initial_value_usd: { type: \"number\", description: \"Estimated USD value being deployed\" }` (count=1). Konsumen dibuktikan: executor.js:885 applyConvictionSizing(originalAmt, args.conviction) (diport 5.5 blok 3) -- tanpa field schema ini args.conviction selalu undefined, conviction-sizing experiment mati diam-diam meski kode sizing sudah ada.",
     "hunk_4_update_config_docs": "DEFER bareng blok 1 update_config (5.5, defer_blok_1_update_config) -- dokumentasi param schema untuk handler yang belum diport. Posisi fork L395/vanilla L383, jauh dari hunk 3 (L197), terbukti TAK jalin.",
     "gate": "definitions-ext 4/4 (narrative_category enum 8, conviction enum 3, idempotent 1x, registrar 04b hidup). Harness penuh 13 suite hijau + smoke v0.2 PASS. Boot loaded 6 plugins errors 0 + baseline 401. Siklus install->uninstall(definitions.js hash-verify clean, porcelain sisa exports/+presets/ pre-existing test artifact bukan regresi)->reinstall->boot 6. Nol sentuh bot live."
+  },
+  "stage_5_7": {
+    "summary": "FASE 5.7 gabungan (owner-locked 1 fase): (langkah1) patch 14 wallet.js FULL-PARITY port fork; (langkah2) patch 15 executor blok 5 exitLiquidityCheck. Blok 6 auto-swap DEFER (owner).",
+    "recon_STOP_lapor": "Brief premis 'wallet.js pure-additive 4 fungsi/nol baris diubah' TAK cocok fork. STOP-lapor 3 temuan; owner putuskan scope: (T1) wallet full-parity, (T2/T3) blok 6 DEFER.",
+    "patch_14_wallet": "tools/wallet.js dijadikan sama-kode fork VERBATIM: 4 fungsi additive (jupiterQuote local + quoteSellPriceImpact + getSolMarketRegime + swapBaseToSolWithRetry) + 4 sisipan in-body fork (referralEnabled early-return getJupiterReferralParams; DRY_RUN paper virtual-balance getWalletBalances; recordSolBalance call; trackTxGas call swapToken) + import gas-tracker/sol-tracker. 6 replaceLine + 1 appendPatch (marker [zen-pack:14]), snip14/*.txt readFileSync RAW. Installed wallet.js == fork byte-exact (diff = 2 marker line saja). Idempotent, node --check, smoke import 4 funcs.",
+    "patch_15_executor_blok5": "tools/executor.js blok 5 exit-liquidity probe di deploy validation (runSafetyChecks), VERBATIM fork (region byte-verbatim). GATED default-OFF config.experiments.exitLiquidityCheck (config-ext 50 L103=false) + guard DRY_RUN sendiri (paper skip) + fail-open (probe throw -> deploy lanjut). 2 replaceLine (import quoteSellPriceImpact + blok 5 anchor junction close-brace+blank+return count=1). Deviasi-sadar import: HANYA quoteSellPriceImpact (fork punya + swapBaseToSolWithRetry) — dilepas krn blok 6 DEFER + bentrok fungsi lokal executor.js:612.",
+    "utang_LUNAS": "blok 5 exitLiquidity (dep quoteSellPriceImpact) + getSolMarketRegime (dari tabel DEFER regime, tutup utang 3.6/render). Dari DEFER 5.5.",
+    "DEFER": {
+      "blok_6_autoswap": "Vanilla executor SUDAH punya swapBaseToSolWithRetry lokal (L612) + close(L696 ungated)/claim(L704 gated) wired. Fork = REPLACE (hapus lokal + ganti 2 call-site + import bentrok), BUKAN insert. Premis gating brief keliru: close-path TAK gated autoSwapAfterClaim (hanya claim-path). Nol rugi fungsional (vanilla cover). Owner DEFER. swapBaseToSolWithRetry SUDAH ada di wallet.js (patch 14, dead export) siap dipakai saat blok 6 diport.",
+      "blok_1_update_config": "TETAP DEFER (paths.js executor Batch-2 masih absen, gmgn split-persistence). Di luar scope 5.7.",
+      "7x": "computeDeployAmount(maximize) + persistConfigChange (executor tak import)."
+    },
+    "gating_default_OFF": "exitLiquidityCheck=false + autoSwapAfterClaim=false. Perilaku default = parity vanilla (blok 5 flag+DRY_RUN double-guard). LAPIS-1 test bukti probe TAK dipanggil = kontrol-flow identik pre-blok5.",
+    "gate": "wallet-ext 5/5, executor-exit 10/10 (LAPIS1 parity + LAPIS2 jalur baru), executor-ext 13/13 (blok5 hadir), executor-sizing 14, config-ext 15, agentloop 14, agent-const 8, definitions 4, hooks 8, patcher 14, paths 12/12, profile 10, prompt-racikan 8, smoke PASS. Boot loaded 6 errors 0 + paper virtual-balance aktif. Uninstall wallet.js+executor.js verify:clean porcelain 0 -> reinstall wallet==fork byte-exact. telegram 17/19 = artefak invokasi (test stamp user-config activeSetup, kontrak wajib wrapper backup/restore) BUKAN regresi.",
+    "nol_sentuh_bot_live": true
   }
 }
