@@ -4,7 +4,7 @@
 //   P = buildSystemPrompt(vanilla) + transformPrompt(plugin 40)
 //   F = buildSystemPrompt(fork-ref)
 // dengan fixture config SINTETIS SAMA (nilai jelas-dummy, BUKAN realistis-live).
-// Normalisasi: buang baris Timestamp. timeProfile/narrativeProfile (DEFER) dijamin
+// Normalisasi: buang baris Timestamp. timeProfile/narrativeProfile dijamin
 // absen via fixture (narrativeProfileSignal=false + data lessons kosong → null);
 // kalau bocor ("TIME-OF-DAY"/"NARRATIVE PROFILE") → FAIL keras (fixture tak isolasi).
 import { join } from "node:path";
@@ -100,7 +100,7 @@ for (const agentType of ["SCREENER", "MANAGER", "GENERAL"]) {
       const P = plugin.transformPrompt(agentType, V);
       const F = forkPrompt.buildSystemPrompt(agentType, ...ARGS);
 
-      // DEFER guard: blok time/narrative TIDAK boleh muncul (fixture isolasi).
+      // Fixture-empty guard: blok time/narrative TIDAK boleh muncul.
       assert.ok(!F.includes("TIME-OF-DAY"), "fork bocor timeProfile — fixture tak isolasi");
       assert.ok(!F.includes("NARRATIVE PROFILE"), "fork bocor narrativeProfile");
 

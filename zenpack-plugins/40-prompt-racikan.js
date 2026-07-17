@@ -5,10 +5,8 @@
 // diam-diam. Transform per agentType (SCREENER/MANAGER/GENERAL) meniru cabang
 // buildSystemPrompt vanilla. Recon + peta anchor: notes/fase-4.2-progress.md.
 //
-// DEFER (utang → 6.4/6.5): blok timeProfile (getTimeProfileForPrompt) +
-// narrativeProfile (getNarrativeProfileForPrompt) — dep fork lessons.js absen
-// vanilla. TIDAK diport → plugin TIDAK import lessons.
 import { config } from "../config.js";
+import { getTimeProfileForPrompt, getNarrativeProfileForPrompt } from "../lessons.js";
 
 // Port VERBATIM fork prompt.js:21-38. Racikan-borne prompt rules dari
 // config.promptNotes (dibawa preset aktif). Tak ada notes utk role → "".
@@ -34,6 +32,10 @@ function mustReplace(prompt, oldStr, newStr, label) {
 
 // ── SCREENER (fork prompt.js:114-158) ──────────────────────────────────────
 function transformScreener(p) {
+  const timeProfile = getTimeProfileForPrompt();
+  // 🧪 #7: narrative-profile soft hint — gated by experiment flag (default off).
+  const narrativeProfile = config.experiments?.narrativeProfileSignal ? getNarrativeProfileForPrompt() : null;
+
   // T2 GANTI kalimat "job"
   p = mustReplace(p,
     "All candidates are pre-loaded. Your job: pick the highest-conviction candidate and call deploy_position. active_bin is pre-fetched.",
@@ -82,6 +84,14 @@ function transformScreener(p) {
       "- Pick ONE pool only if it qualifies. Otherwise explain why none qualify.\n\n",
       `- Pick ONE pool only if it qualifies. Otherwise explain why none qualify.\n\n${hint}\n\n`,
       "T6 convictionHint");
+  }
+
+  const profiles = [timeProfile, narrativeProfile].filter(Boolean).join("\n\n");
+  if (profiles) {
+    p = mustReplace(p,
+      "- Pick ONE pool only if it qualifies. Otherwise explain why none qualify.\n\n",
+      `- Pick ONE pool only if it qualifies. Otherwise explain why none qualify.\n\n${profiles}\n\n`,
+      "T9 time+narrative-profiles");
   }
   return p;
 }
