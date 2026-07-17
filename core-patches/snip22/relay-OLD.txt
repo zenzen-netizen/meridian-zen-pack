@@ -1,0 +1,14 @@
+        return {
+          success: true,
+          relay: true,
+          request_id: order.requestId,
+          position: position_address,
+          pool: poolAddress,
+          pool_name: tracked.pool_name || poolMeta.name || null,
+          claim_txs: claimTxHashes,
+          close_txs: closeTxHashes,
+          txs: txHashes,
+          pnl_usd: pnlUsd,
+          pnl_pct: pnlPct,
+          base_mint: closeBaseMint,
+        };

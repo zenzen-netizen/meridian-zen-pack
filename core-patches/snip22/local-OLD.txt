@@ -1,0 +1,12 @@
+      return {
+        success: true,
+        position: position_address,
+        pool: poolAddress,
+        pool_name: tracked.pool_name || poolMeta.name || null,
+        claim_txs: claimTxHashes,
+        close_txs: closeTxHashes,
+        txs: txHashes,
+        pnl_usd: pnlUsd,
+        pnl_pct: pnlPct,
+        base_mint: closeBaseMint,
+      };

@@ -11,7 +11,7 @@ Sumber kebenaran: committed fork `experimental@643e954` dari
 - ✅ F2 — Patch 21 lessons lapisan baca
 - ✅ F3 — reports.js drop-in + smoke import
 - ✅ F4 — repoint gas-est + hapus shim + manifest
-- ⬜ F5 — Patch 22 kategori H dlmm
+- ✅ F5 — Patch 22 kategori H dlmm
 - ⬜ F6 — Patch 23 telegram/render + Patch 24 prompt
 - ⬜ F7 — gate lengkap
 - ⬜ F8 — manifest + tutup
