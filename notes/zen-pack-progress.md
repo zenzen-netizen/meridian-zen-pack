@@ -437,3 +437,35 @@ Scope owner-locked: HANYA blok 1+2. Blok 3/4/5/6 DEFER (7.x). Basis recon: notes
 | D | Manifest stage_5_6 + laporan | ✅ |
 
 Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — schema penuh sudah ada via zenpack-plugins/20-profile-tools.js, registrar patch 04b. Anchor hunk 3 aktual: vanilla-test/tools/definitions.js:195 (`initial_value_usd`), count=1. Hasil gate: definitions-ext 4/4, harness 13 suite hijau, smoke PASS, boot loaded 6 errors 0 + baseline 401, siklus install→uninstall(hash-verify clean)→reinstall→boot 6 lolos. Commit: 787068c (patch 13), fdcbf4d (test), + commit manifest berikut. Nol sentuh bot live.
+
+## Stage 5.8 screening.js + SMI chain
+
+✅ FASE A recon commit `ddcaca5`.
+- `vanilla-test/tools/screening.js:35` `scoreCandidate` export; fork local + `gmgn_score`.
+- `vanilla-test/tools/screening.js:59` `degenScore` export tetap WAJIB; `index.js` opportunity poller masih pakai.
+- `vanilla-test/tools/screening.js:461` single-category fetch anchor; fork multi-category merge/dedupe/fail-open.
+- `fork-ref/tools/screening.js:46` `formatYieldToMe`; consumer index fork belum diport ke vanilla-test → export additive, consumer DEFER.
+- `vanilla-test/tools/smi.js` sudah landed 166 baris identik fork.
+- `vanilla-test/tools/chart-indicators.js` 299 baris vs fork 366; owner putuskan FULL-PARITY fork.
+- `vanilla-test/tools/gmgn.js` belum import `fetchChartIndicatorsForMint`; owner putuskan gmgn wiring DEFER fase gmgn.
+- Fork screening tidak punya `screening:afterFetch`/`afterFetch` emit → hook SKIP.
+
+✅ FASE B commit `9ac80c7`.
+- Patch 16 `core-patches/16-screening-multicategory.mjs`: `formatYieldToMe`, `scoreCandidate` local + gmgn branch, multi-category discovery, `total: rawPools.length`.
+- Patch 16 **tidak menyentuh degenScore**. Installed anchors: `formatYieldToMe` L49, `scoreCandidate` L72, `degenScore` L100, merge log L532.
+- Patch 17 `core-patches/17-chart-indicators-smi.mjs`: full-file replace chart-indicators OLD→fork NEW. Installed `chart-indicators.js == fork-ref/tools/chart-indicators.js` byte-exact.
+- Patcher bugfix: `replaceLine` now uses function replacement so `$${...}` template literals stay literal; patcher test +1 (15/15).
+
+✅ FASE C commit `9a2feb2`.
+- `screening-ext` 4/4: fetch per category, merge dedupe by `pool_address`, category fail-open + log, null/[] categories single default, `degenScore` callable + `scoreCandidate` not exported.
+- `smi-chain` 4/4: config SMI keys from 5.1, `evaluateSmi` fixture PathB deterministic, exported `fetchChartIndicatorsForMint` callable, `confirmIndicatorPreset(supertrend_plus_smi)` confirms via stub.
+- Full suite 17 tests PASS: agent-constants 8, agentloop 14, config-ext 15, definitions 4, executor-exit 10, executor-ext 13, executor-sizing 14, hooks 8, loader, patcher 15, paths 12, profile 10, prompt-racikan 8, screening 4, smi 4, telegram 19, wallet 5.
+- `npm test` smoke PASS.
+- Boot DRY_RUN: `[zen-pack] loaded 6 plugins (skipped 0, errors 0)`, mode DRY RUN, no live tx.
+- Cycle: uninstall restored `screening.js` + `chart-indicators.js` verify clean; `git clean -fd` made porcelain 0; reinstall final OK; scoped ignored artifacts `exports/`/`profiles/` cleaned, `.env` untouched.
+
+✅ FASE D manifest.
+- Stage -> 5.8, patches +16/+17.
+- Deviasi-sadar #2 recorded: `degenScore` retained.
+- SMI status: LUNAS parsial/full for chart consumer; `gmgn.js import fetchChartIndicatorsForMint` DEFER fase gmgn.
+- `formatYieldToMe` consumer index/prompt DEFER; hook afterFetch SKIP.

@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.7,
+  "stage": 5.8,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -20,7 +20,9 @@
     "12-executor-money-blocks",
     "13-deploy-schema-conviction",
     "14-wallet-ext",
-    "15-executor-exit"
+    "15-executor-exit",
+    "16-screening-multicategory",
+    "17-chart-indicators-smi"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -45,7 +47,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. DITUNDA ke Stage 5.8: wiring tools/smi.js chart-indicators (pemakainya file core MODIFIED, bukan materi patch tipis).",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 5.8 mengaktifkan tools/smi.js via chart-indicators full parity; gmgn.js consumer wiring deferred ke fase gmgn.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -137,6 +139,20 @@
     },
     "gating_default_OFF": "exitLiquidityCheck=false + autoSwapAfterClaim=false. Perilaku default = parity vanilla (blok 5 flag+DRY_RUN double-guard). LAPIS-1 test bukti probe TAK dipanggil = kontrol-flow identik pre-blok5.",
     "gate": "wallet-ext 5/5, executor-exit 10/10 (LAPIS1 parity + LAPIS2 jalur baru), executor-ext 13/13 (blok5 hadir), executor-sizing 14, config-ext 15, agentloop 14, agent-const 8, definitions 4, hooks 8, patcher 14, paths 12/12, profile 10, prompt-racikan 8, smoke PASS. Boot loaded 6 errors 0 + paper virtual-balance aktif. Uninstall wallet.js+executor.js verify:clean porcelain 0 -> reinstall wallet==fork byte-exact. telegram 17/19 = artefak invokasi (test stamp user-config activeSetup, kontrak wajib wrapper backup/restore) BUKAN regresi.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_5_8": {
+    "summary": "tools/screening.js patch 16 multi-category discovery + yield proxy; tools/chart-indicators.js patch 17 full fork parity SMI wiring.",
+    "patch_16_screening": "PORT: formatYieldToMe export (soft proxy, consumer index.js deferred), scoreCandidate export->local dengan gmgn_score branch, multi-category Meteora discovery merge+dedupe by pool_address + per-category fail-open log, total rawPools.length. No screening:afterFetch hook dibuat karena fork tidak punya.",
+    "patch_17_chart_indicators": "FULL-PARITY fork chart-indicators.js 366 baris: import evaluateSmi dari tools/smi.js, preset supertrend_plus_smi, export fetchChartIndicatorsForMint, rejectAlreadyAtBottom veto. Installed chart-indicators.js == fork byte-exact.",
+    "deviation_owner_locked": "DEVIASI-SADAR #2: degenScore DIPERTAHANKAN meski fork menghapusnya, karena opportunity poller vanilla-test/index.js masih import/call degenScore. Patch 16 tidak menyentuh degenScore.",
+    "smi_chain_status": "LUNAS parsial: smi.js drop-in sudah landed dan chart-indicators consumer aktif. gmgn.js import fetchChartIndicatorsForMint DEFER ke fase gmgn; export di chart-indicators sekarang dead export siap pakai.",
+    "defer": {
+      "gmgn_js_fetchChartIndicatorsForMint": "DEFER ke fase gmgn.js (target vanilla-test/tools/gmgn.js belum import; owner putuskan chart export dead export dulu).",
+      "formatYieldToMe_consumer_index": "DEFER ke fase index/prompt consumer; export additive aman.",
+      "screening_afterFetch_hook": "SKIP, fork tidak punya hook emit semacam itu."
+    },
+    "gate": "screening-ext 4/4, smi-chain 4/4, full suite 17 tests PASS (agent-constants 8, agentloop 14, config-ext 15, definitions 4, executor-exit 10, executor-ext 13, executor-sizing 14, hooks 8, loader, patcher 15, paths 12, profile 10, prompt-racikan 8, screening 4, smi 4, telegram 19, wallet 5), npm test smoke PASS. Boot DRY_RUN loaded 6 plugins skipped 0 errors 0. Cycle uninstall verified screening.js+chart-indicators.js clean, git clean scoped artifacts -> porcelain 0, reinstall final OK.",
     "nol_sentuh_bot_live": true
   }
 }
