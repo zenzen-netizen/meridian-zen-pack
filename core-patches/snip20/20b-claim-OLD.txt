@@ -1,0 +1,5 @@
+    const txHashes = [];
+    for (const tx of txs) {
+      const txHash = await sendAndConfirmTransaction(getConnection(), tx, [wallet]);
+      txHashes.push(txHash);
+    }

@@ -1,0 +1,12 @@
+/**
+ * sendAndConfirmTransaction + real gas capture. Returns the same signature; the
+ * fee fetch is fire-and-forget and fail-open, so it never delays or breaks the
+ * trade. `action` tags the spend (deploy / close / claim / swap) for reports.
+ */
+async function sendTxTracked(tx, signers, action) {
+  const sig = await sendAndConfirmTransaction(getConnection(), tx, signers);
+  trackTxGas(getConnection(), sig, action); // no await — background, fail-open
+  return sig;
+}
+
+function getWallet() {
