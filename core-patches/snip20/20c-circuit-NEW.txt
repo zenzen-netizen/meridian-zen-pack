@@ -1,0 +1,39 @@
+let _relayCircuitOpen = false;
+let _relayCircuitOpenAt = 0;
+let _relayConsecutiveFailures = 0;
+const RELAY_CIRCUIT_COOLDOWN_MS = 10 * 60 * 1000;
+const RELAY_CIRCUIT_FAIL_THRESHOLD = 2;
+
+function shouldUseLpAgentRelay() {
+  if (!config.api.lpAgentRelayEnabled) return false;
+  if (_relayCircuitOpen) {
+    if (Date.now() - _relayCircuitOpenAt > RELAY_CIRCUIT_COOLDOWN_MS) {
+      _relayCircuitOpen = false;
+      _relayConsecutiveFailures = 0;
+      log("positions", "Relay circuit breaker reset — retrying relay");
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
+
+function openRelayCircuit(reason) {
+  if (_relayCircuitOpen) return;
+  _relayCircuitOpen = true;
+  _relayCircuitOpenAt = Date.now();
+  log("positions_warn", `Relay circuit breaker OPEN (${reason}) — skipping relay for ${RELAY_CIRCUIT_COOLDOWN_MS / 60000}m`);
+}
+
+function relayCallFailed(error) {
+  _relayConsecutiveFailures += 1;
+  if (error.status === 401 || error.status === 403) {
+    openRelayCircuit(`${error.status} auth error`);
+  } else if (_relayConsecutiveFailures >= RELAY_CIRCUIT_FAIL_THRESHOLD) {
+    openRelayCircuit(`${_relayConsecutiveFailures} consecutive failures`);
+  }
+}
+
+function relayCallSucceeded() {
+  _relayConsecutiveFailures = 0;
+}
