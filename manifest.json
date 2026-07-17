@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.8,
+  "stage": 5.9,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -153,6 +153,13 @@
       "screening_afterFetch_hook": "SKIP, fork tidak punya hook emit semacam itu."
     },
     "gate": "screening-ext 4/4, smi-chain 4/4, full suite 17 tests PASS (agent-constants 8, agentloop 14, config-ext 15, definitions 4, executor-exit 10, executor-ext 13, executor-sizing 14, hooks 8, loader, patcher 15, paths 12, profile 10, prompt-racikan 8, screening 4, smi 4, telegram 19, wallet 5), npm test smoke PASS. Boot DRY_RUN loaded 6 plugins skipped 0 errors 0. Cycle uninstall verified screening.js+chart-indicators.js clean, git clean scoped artifacts -> porcelain 0, reinstall final OK.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_5_9": {
+    "summary": "tools/token.js + tools/study.js verdict-only. No Stage 5 patch.",
+    "token_js": "vanilla-test/tools/token.js == fork-ref/tools/token.js byte-identical (diff 0), no custom extraction needed.",
+    "study_js": "vanilla-test/tools/study.js remains vanilla-main; fork-ref/tools/study.js differs by experimental API wiring (direct config.api fetch vs agent-meridian helper). Owner verdict: decision-basis debt for Stage 8, not Stage 5 extraction.",
+    "evidence": "token cmp exit=0; study vanilla-test==vanilla true; study vanilla-test!=fork-ref; fork study 159 lines vs vanilla 152.",
     "nol_sentuh_bot_live": true
   }
 }

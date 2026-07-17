@@ -469,3 +469,10 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 - Deviasi-sadar #2 recorded: `degenScore` retained.
 - SMI status: LUNAS parsial/full for chart consumer; `gmgn.js import fetchChartIndicatorsForMint` DEFER fase gmgn.
 - `formatYieldToMe` consumer index/prompt DEFER; hook afterFetch SKIP.
+
+## Stage 5.9 tools/token.js + tools/study.js verdict-only
+
+✅ FASE 0 commit TBD.
+- `tools/token.js`: `vanilla-test == fork-ref` byte-identik (`cmp` exit 0). Nol patch, nol plugin.
+- `tools/study.js`: `vanilla-test == vanilla-main` true, `vanilla-test != fork-ref`; fork-ref memakai wiring experimental API (`config.api` + fetch langsung) sedangkan vanilla-main memakai `agent-meridian.js` helper. Owner verdict: bukan ekstraksi Stage 5, masuk keputusan-basis Stage 8.
+- Evidence: fork study 159 baris vs vanilla 152; target tidak diubah. Nol sentuh bot live.
