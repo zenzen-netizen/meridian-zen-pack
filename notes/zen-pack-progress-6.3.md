@@ -6,8 +6,8 @@
 - ✅ F3 - Patch 20b: `sendTxTracked`
 - ✅ F4 - Patch 20c: relay circuit breaker
 - ✅ F5 - Patch 20d/20f/20e: shadow, helper pnl, cleanup, rent, logging
-- ⬜ F6 - Gate: semua runtime/regresi hijau; STOP pada kontrak raw diff
-- ⬜ F7 - Manifest + tutup
+- ✅ F6 - Gate lengkap; raw diff habis terklasifikasi
+- ✅ F7 - Manifest + tutup
 
 ## F0 - Pre-flight
 
@@ -135,3 +135,22 @@ Opsi owner: (a) tambahkan tiga delta baseline tersebut ke pengecualian raw diff
 (rekomendasi; tidak mengubah money path yang telah digate), atau (b) otorisasi
 patch baru yang mengganti shim transport vanilla dengan implementasi lokal fork
 dan menghapus fallback instruction-key.
+
+## Keputusan owner final + sapu-tuntas raw diff
+
+Owner memilih opsi (a), lalu mengesahkan fallback dinamis `node-fetch` sebagai
+baseline transport delta keempat. Tidak ada kode runtime yang diubah.
+
+Audit full-file sekali jalan memakai raw diff dan pass `-w`:
+
+- `tools/dlmm.js`: 16 hunk semantik seluruhnya terpetakan ke import shim gas-est,
+  kategori H, `ensureDeployedAt` backfill, atau empat baseline transport delta
+  (shim agent-meridian, fallback instruction keys, komentar relay-disabled, dan
+  fallback node-fetch). Kandidat delta baru: **0**.
+- `tools/pnl.js`: blok enam helper 20f identik fork. Empat hunk sisa seluruhnya
+  adalah propagasi Jupiter symbol/display F6 lain yang addendum owner eksplisit
+  larang ikut karena di luar scope. Kandidat delta baru: **0**.
+
+Manifest dinaikkan ke 6.3, patch 20a-20f dicatat, config keys plugin 50 dicatat,
+utang `dual_side_restore` dihapus sebagai LUNAS, H tetap 6.4/6.5, dan
+`ensureDeployedAt/deployed_at` digabung ke utang 7.8/7.9.

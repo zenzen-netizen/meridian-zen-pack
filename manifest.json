@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "6.2",
+  "stage": "6.3",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -26,7 +26,13 @@
     "18-telegram-ext",
     "19a-dlmm-paper-deploy",
     "19b-dlmm-paper-edges",
-    "19c-dlmm-paper-lifecycle"
+    "19c-dlmm-paper-lifecycle",
+    "20a-dlmm-dual-side",
+    "20b-dlmm-gas-tracking",
+    "20c-dlmm-relay-circuit",
+    "20d-dlmm-shadow-learning",
+    "20e-dlmm-cleanup-rent-safety",
+    "20f-pnl-display-helpers"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -51,7 +57,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.2 adds dlmm.js paper lifecycle through patch 19a/b/c; reports.js import trap remains isolated behind gas-est shim.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.3 adds dlmm.js custom non-paper patches 20a-20e plus pnl display helpers 20f; reports.js import trap remains isolated behind gas-est shim.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -181,11 +187,43 @@
     "patch_19b": "A2 routes getPositionPnl untuk paper_ ke simulator; A4 routes closePosition DRY_RUN paper_ ke closePaperPosition.",
     "patch_19c": "A3 ports helper simulation, paper position rows/listing, recordPerformance close, decomposition, dan getMyPositions paper dispatch.",
     "deviation_owner_locked_3": "DEVIASI-SADAR #3: mesin exit vanilla 2-tick DIPERTAHANKAN; mesin queue/resolve 15s fork tidak diport pada 6.2.",
-    "defer_7_8_7_9": "Utang state/exit fields trough_pnl_pct, price_peak_pct/price_trough_pct, dan peakPnl/peak_pnl_pct dilanjutkan ke 7.8/7.9.",
+    "defer_7_8_7_9": "Utang state/exit fields trough_pnl_pct, price_peak_pct/price_trough_pct, peakPnl/peak_pnl_pct, serta ensureDeployedAt/deployed_at backfill dilanjutkan ke 7.8/7.9.",
     "gas_est_shim_debt": "6.4/6.5 — re-point import estimateGasSol di dlmm.js ke ../reports.js, lalu hapus zenpack-lib/gas-est.js.",
-    "dual_side_restore": "6.3 — pulihkan !dualSide pada pMaxBinId bersamaan patch dual-side; marker ZP-6.2 ada di kode. Kategori B dual-side tidak diport sekarang.",
     "diff_contract": "Blok paper vs experimental identik kecuali: (a) marker ZP-6.2, (b) pMaxBinId bentuk vanilla tanpa !dualSide, (c) sumber import estimateGasSol memakai ../zenpack-lib/gas-est.js.",
     "gate": "dlmm-paper 6/6: LAPIS1 flag-OFF before/after identik diff=[]; LAPIS2 flag-ON paper_* hidup/listed/PnL/close dan ZERO-TX=0. Telegram target 19/19. Golden A1 normalized+A2+A3+A4+gas-est diff kosong. Full regression harness PASS, pack smoke PASS, target npm syntax PASS, import dlmm PASS, DRY_RUN boot loaded 6/skipped 0/errors 0 lalu baseline 401; idempotent 7/7 skip; uninstall hash-clean tools/dlmm.js + reinstall PASS; raw diff tepat 3 pengecualian owner.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_6_3": {
+    "summary": "tools/dlmm.js CUSTOM NON-PAPER: patch 20a dual-side, 20b gas tracking, 20c relay circuit, 20d shadow learning, 20e cleanup/rent safety; tools/pnl.js patch 20f display helpers.",
+    "config_keys_plugin_50": "Empat key fork dualSideEnabled=false, dualSideTokenPct=10, dualSideUpsidePct=15, dualSideStrategy=bid_ask disuntik melalui zenpack-plugins/50-config-ext.js; config.js core tidak dipatch.",
+    "patch_20a": "Dual-side E1 transform/shape/pre-swap/strategy-percentX dipasang verbatim; !dualSide pada paper pMaxBinId dipulihkan dan marker utang ZP-6.2 dihapus.",
+    "patch_20b": "sendTxTracked + trackTxGas: satu wrapper dan tujuh call-site deploy/claim/close; delapan kemunculan sendTxTracked termasuk deklarasi.",
+    "patch_20c": "Relay circuit breaker cooldown/failure threshold + failure hook close dipasang verbatim.",
+    "patch_20d": "captureShadowSignals, narrative/shadow deploy fields, dan performance learning fields dipasang; hunk kategori H tidak disentuh.",
+    "patch_20e": "Non-atomic wide-range orphan cleanup, dual-side swap-back cleanup, signal logging fallback, retry 8s, PnL sanity, empirical rent fallback, display fallback, dan close_reason; ensureDeployedAt backfill dikeluarkan.",
+    "patch_20f": "Enam helper display/string fork tools/pnl.js dipasang verbatim dan diimport dlmm.js; hanya pemakaian G row posisi dan I final close non-tracked yang diaktifkan.",
+    "dual_side_restore_paid": "LUNAS 6.3 — !dualSide pulih; blok paper sekarang memakai bentuk fork penuh.",
+    "defer_6_4_6_5": "Kategori H tetap utuh: F9-light close notification/recorded PnL dan re-point estimateGasSol ke reports.js.",
+    "defer_7_8_7_9": "ensureDeployedAt/deployed_at backfill ditunda bersama utang state/exit fields stage 6.2; state.js tidak ditambah fungsi pada 6.3.",
+    "baseline_transport_deltas": {
+      "items": [
+        "shim agent-meridian.js",
+        "fallback ix.accountKeyIndexes || ix.accounts || []",
+        "komentar zap-in-relay-disabled",
+        "fallback node-fetch (vanilla tools/dlmm.js:1659)"
+      ],
+      "reason": "delta sisi-vanilla pasca-fork; dipertahankan sesuai prinsip adopsi upstream (sekelas poller/2-tick), di luar 6 kategori custom"
+    },
+    "dlmm_raw_diff_contract": [
+      "marker zen-pack",
+      "import shim estimateGasSol dari ../zenpack-lib/gas-est.js",
+      "kategori H utuh — utang 6.4/6.5",
+      "deployed_at/ensureDeployedAt backfill — utang 7.8/7.9",
+      "empat baseline_transport_deltas yang disahkan owner"
+    ],
+    "pnl_raw_diff_contract": "Blok enam helper 20f identik fork. Empat hunk sisa adalah propagasi Jupiter symbol/display F6 lain yang addendum owner eksplisit larang ikut karena di luar scope.",
+    "raw_diff_audit": "Sapu-tuntas full-file: 16 hunk semantik dlmm.js seluruhnya terklasifikasi oleh dlmm_raw_diff_contract; 4 hunk pnl.js seluruhnya terklasifikasi oleh pnl_raw_diff_contract; kandidat baseline delta baru = 0.",
+    "gate": "node --check semua file tersentuh PASS; fresh uninstall seluruh hash clean + porcelain 0 + git clean -fd; fresh reinstall PASS dan install kedua seluruh op idempotent; dual-side OFF diff=[]; ON+DRY_RUN shape hidup dan ZERO-TX=0; DLMM-PAPER 6/6; Telegram 19/19+5/5; full regression harness dan smoke PASS; 25 snippet NEW golden terhadap committed fork.",
     "nol_sentuh_bot_live": true
   }
 }
