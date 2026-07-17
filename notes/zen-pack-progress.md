@@ -472,7 +472,16 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 
 ## Stage 5.9 tools/token.js + tools/study.js verdict-only
 
-✅ FASE 0 commit TBD.
+✅ FASE 0 commit `140759a`.
 - `tools/token.js`: `vanilla-test == fork-ref` byte-identik (`cmp` exit 0). Nol patch, nol plugin.
 - `tools/study.js`: `vanilla-test == vanilla-main` true, `vanilla-test != fork-ref`; fork-ref memakai wiring experimental API (`config.api` + fetch langsung) sedangkan vanilla-main memakai `agent-meridian.js` helper. Owner verdict: bukan ekstraksi Stage 5, masuk keputusan-basis Stage 8.
 - Evidence: fork study 159 baris vs vanilla 152; target tidak diubah. Nol sentuh bot live.
+
+## Stage 5.10 telegram.js
+
+✅ FASE A recon commit TBD (`notes/fase-5.10-recon.md`).
+- Anchor telegram.js count=1: `sendMessage`, `sendHTML`, `toolLabel`, `summarizeToolResult`, semua `notify*`. `splitText`/`flushFinal` absent.
+- Patch 03b hidup di `index.js:1431-1435`, bukan `telegram.js`; order runner `03b` sebelum future `18`; verdict no-overlap.
+- Path routing sudah hidup di `telegram.js` (`paths.userConfigPath`), jadi blok path patch 18 skip.
+- `views/notifs.js` + `views/format.js` self-contained/import OK.
+- `reports.js` trap valid: import gagal karena lessons belum export `classifyNarrative`; patch 18 dilarang import reports, pakai `gasSol = null`.
