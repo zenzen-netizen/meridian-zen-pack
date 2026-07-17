@@ -12,7 +12,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 - ✅ F3 — Patch 25b W3+W4
 - ✅ F4 — Patch 25c W5+W6+W7+W8
 - ✅ F5 — gate money penuh
-- ⬜ F6 — manifest + tutup
+- ✅ F6 — manifest + tutup
 
 ## F0 — bukti satu baris
 
@@ -50,3 +50,13 @@ di `notes/lessons-write-6.5-recon.md`. Pekerjaan boleh lanjut ke F2.
   rumah Patch 04a/21, marker deletion W4, dan marker read-layer. Hunk custom
   write-layer tersisa = 0. `tools/pnl.js` tetap empat hunk display yang dikunci
   scope negatif dan tidak disentuh.
+
+## F6 — manifest + tutup
+
+- Manifest naik ke Stage 6.5 dan mencatat Patch 21–23 yang sudah hidup serta
+  Patch 25a–c.
+- Utang `lessons write-layer` dinyatakan LUNAS; pengecualian raw lessons tinggal
+  marker/routing/relokasi rumah Patch 04a/21, tanpa delta semantik.
+- Commit per sub-fase: `5350cb4` recon, `8af0700` Patch 25a, `40083f3` Patch
+  25b, `00e6d0b` Patch 25c, `278d94b` gate fixture, lalu commit penutup
+  manifest/progress.

@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "6.3",
+  "stage": "6.5",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -32,7 +32,13 @@
     "20c-dlmm-relay-circuit",
     "20d-dlmm-shadow-learning",
     "20e-dlmm-cleanup-rent-safety",
-    "20f-pnl-display-helpers"
+    "20f-pnl-display-helpers",
+    "21-lessons-read-layer",
+    "22-dlmm-close-notif",
+    "23-telegram-reports",
+    "25a-lessons-record-live",
+    "25b-lessons-evolve-cleanup",
+    "25c-lessons-writers-prompt"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -57,7 +63,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.4 activates reports.js through the lessons read layer and removes the gas-est shim.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.5 closes the lessons read/write extraction with live-only learning isolation.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -203,7 +209,7 @@
     "patch_20e": "Non-atomic wide-range orphan cleanup, dual-side swap-back cleanup, signal logging fallback, retry 8s, PnL sanity, empirical rent fallback, display fallback, dan close_reason; ensureDeployedAt backfill dikeluarkan.",
     "patch_20f": "Enam helper display/string fork tools/pnl.js dipasang verbatim dan diimport dlmm.js; hanya pemakaian G row posisi dan I final close non-tracked yang diaktifkan.",
     "dual_side_restore_paid": "LUNAS 6.3 — !dualSide pulih; blok paper sekarang memakai bentuk fork penuh.",
-    "defer_6_4_6_5": "Bagian 6.4 LUNAS: kategori H F9-light + re-point reports. Sisa 6.5 hanya lessons write-layer.",
+    "defer_6_4_6_5": "LUNAS: 6.4 kategori H/reports/read-layer dan 6.5 lessons write-layer seluruhnya terpasang.",
     "defer_7_8_7_9": "ensureDeployedAt/deployed_at backfill ditunda bersama utang state/exit fields stage 6.2; state.js tidak ditambah fungsi pada 6.3.",
     "baseline_transport_deltas": {
       "items": [
@@ -240,13 +246,23 @@
       "prompt timeProfile + narrativeProfile"
     ],
     "debts_remaining": [
-      "6.5 lessons write-layer: recordPerformance suspect/paper/time fields, evolve isolation, addLesson dedup, prompt paper filter, fmt sim marker",
       "7.8/7.9 state deployed_at/ensureDeployedAt dan exit fields",
       "7.x executor/index/config/gmgn dan workstream lain yang sudah tercatat",
       "tools/pnl.js empat hunk propagasi Jupiter display"
     ],
     "raw_diff_contract": "dlmm: marker + ensureDeployedAt 7.8/7.9 + empat baseline transport deltas; gas shim dan kategori H dicabut. lessons: marker/relokasi Patch 21 + write-layer 6.5. Tidak ada hunk tak terklasifikasi.",
     "gate": "Syntax seluruh touched PASS; uninstall hash-clean + git clean -fd porcelain 0; fresh install + reinstall idempotent; full harness pasca-reinstall hijau; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side LAPIS diff=[]; lessons 17 exports empty/legacy/synthetic; reports/pnlBlock smoke; prompt parity 8/8 + profile functional; close notif memuat gas/PnL/fee/give-back/lesson.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_6_5": {
+    "summary": "lessons.js write-layer selesai melalui Patch 25a–c: suspect quarantine, evolve live-only/racikan-only, dedup/remove writer, paper prompt filter, dan marker sim.",
+    "patch_25a": "Exact whole-function replacement recordPerformance dari experimental@643e954. Close ≤−90% non-stopLoss pada posisi ≥$20 disimpan sebagai suspect (bukan dibuang), lesson/pool/hive dikarantina; field waktu/paper ikut ditag; evolve dan Darwin hanya menerima livePerf non-paper/non-suspect milik active racikan tiap 5 close.",
+    "patch_25b": "evolveThresholds memfilter keepActiveRacikan lagi di chokepoint untuk auto+manual; dua alignment fork disamakan; helper percentile delapan baris yang nol konsumen dihapus via exact replacement menjadi marker kosong.",
+    "patch_25c": "addLesson refresh-recency dedup aturan exact, removeLesson(id) diekspor, prompt live membuang paper kecuali usePaperHistoryWhenLive dan selalu membuang suspect, fmt memberi marker 🧪 pada paper.",
+    "lessons_write_layer_debt": "LUNAS — W1–W8 terpasang verbatim; tidak ada custom semantic hunk lessons tersisa.",
+    "lessons_raw_diff_contract": "Empat hunk tersisa hanya marker/routing: marker paths; relokasi binding/time helper rumah Patch 04a/21; marker kosong penghapusan W4; marker read-layer. recordPerformance, evolveThresholds, dan addLesson→fmt byte-identik fork.",
+    "scope_negative": "tools/pnl.js tetap empat hunk propagasi Jupiter display; state.js tetap utang 7.8/7.9; file target lain tidak diubah oleh 6.5.",
+    "gate": "Syntax PASS; uninstall verify clean + porcelain 0 + git clean -fd; fresh reinstall + Patch 25a-c idempotent; lessons-write 5/5 (paper config/weights byte-sama, live threshold+Darwin bergerak, suspect/dedup/remove/prompt filter); full harness PASS; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side diff=[]; prompt parity 8/8; smoke v0.2 PASS.",
     "nol_sentuh_bot_live": true
   }
 }
