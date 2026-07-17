@@ -1,0 +1,99 @@
+  if (process.env.DRY_RUN === "true") {
+    // 🧪 Paper trading: track the would-deploy as a virtual position so the full
+    // lifecycle runs in simulation. Off → unchanged would_deploy (factory).
+    if (isPaperMode()) {
+      try {
+        const pMinBinId = activeBin.binId - activeBinsBelow;
+        // ZP-6.2: !dualSide ditunda — dipulihkan patch dual-side 6.3
+        const pMaxBinId = isSingleSidedSol ? activeBin.binId : activeBin.binId + activeBinsAbove;
+        const pMinPrice = Number(getPriceOfBinByBinId(pMinBinId, actualBinStep).toString());
+        const pMaxPrice = Number(getPriceOfBinByBinId(pMaxBinId, actualBinStep).toString());
+        const baseFactor = pool.lbPair.parameters?.baseFactor ?? 0;
+        const pBaseFee = base_fee ?? (baseFactor > 0
+          ? parseFloat((baseFactor * actualBinStep / 1e6 * 100).toFixed(4))
+          : null);
+        const coveragePct = activePrice > 0 ? ((activePrice - pMinPrice) / activePrice) * 100 : null;
+        const displayName = pool_name || `${baseMint.slice(0, 6)}-SOL`;
+        const paperId = makePaperPositionId(pool_address);
+
+        // 🧪 Paper fee model (FASE 1): capture RAW fee + active_tvl so the sim can use
+        // the TRUE per-window yield fee = fee/active_tvl (NOT the ×100 percentage that
+        // fee_active_tvl_ratio actually is — see notes/paper-recon.md + paper-fix-progress.md).
+        // Fetched at the 24h window: active_tvl is window-invariant and the daily fee rate is
+        // far more stable/predictive than a 5m/30m snapshot. Stashed INSIDE signal_snapshot
+        // (already stored verbatim) so this stays 100% paper-only — no change to the shared
+        // state.js record shape. Fail-open: any error leaves these absent and
+        // computePaperMetrics falls back to fee_tvl_ratio/100.
+        const paperSig = { base_mint: baseMint, entry_fee_window: "24h" };
+        try {
+          const f = encodeURIComponent(`pool_address=${pool_address}`);
+          const detail = await fetch(`https://pool-discovery-api.datapi.meteora.ag/pools?page_size=1&filter_by=${f}&timeframe=24h`).then((r) => r.json()).catch(() => null);
+          const row = detail?.data?.[0];
+          if (row) {
+            const rf = Number(row.fee);
+            const rt = Number(row.active_tvl ?? row.tvl);
+            if (Number.isFinite(rf)) paperSig.entry_fee = rf;
+            if (Number.isFinite(rt) && rt > 0) paperSig.entry_active_tvl = rt;
+          }
+        } catch { /* fail-open: fall back to stored fee_tvl_ratio */ }
+
+        trackPosition({
+          position: paperId,
+          pool: pool_address,
+          pool_name: displayName,
+          strategy: activeStrategy,
+          bin_range: { min: pMinBinId, max: pMaxBinId, active: activeBin.binId },
+          amount_sol: finalAmountY,
+          amount_x: finalAmountX,
+          active_bin: activeBin.binId,
+          bin_step: actualBinStep,
+          volatility: normalizedVolatility,
+          fee_tvl_ratio: fee_tvl_ratio ?? null,
+          organic_score: organic_score ?? null,
+          narrative_category: narrative_category ?? null,
+          signal_snapshot: paperSig,
+          entry_mcap: entry_mcap ?? null,
+          entry_tvl: entry_tvl ?? null,
+          entry_volume: entry_volume ?? null,
+          entry_holders: entry_holders ?? null,
+        });
+
+        log("deploy", `[PAPER] tracked virtual position ${paperId} in ${displayName}`);
+        return {
+          success: true,
+          dry_run: true,
+          paper: true,
+          position: paperId,
+          pool: pool_address,
+          pool_name: `🧪 ${displayName}`,
+          base_mint: baseMint,
+          strategy: activeStrategy,
+          bin_step: actualBinStep,
+          base_fee: pBaseFee,
+          bins_below: activeBinsBelow,
+          bins_above: activeBinsAbove,
+          amount_y: finalAmountY,
+          price_range: `${pMinPrice.toPrecision(4)}–${pMaxPrice.toPrecision(4)}`,
+          range_coverage: coveragePct != null ? `-${coveragePct.toFixed(1)}%` : null,
+          message: "PAPER deploy — virtual position tracked",
+        };
+      } catch (e) {
+        log("deploy_warn", `paper deploy tracking failed, falling back to would_deploy: ${e.message}`);
+      }
+    }
+    return {
+      dry_run: true,
+      would_deploy: {
+        pool_address,
+        strategy: activeStrategy,
+        bins_below: activeBinsBelow,
+        bins_above: activeBinsAbove,
+        downside_pct: downside_pct ?? null,
+        upside_pct: upside_pct ?? null,
+        amount_x: finalAmountX,
+        amount_y: finalAmountY,
+        wide_range: totalBins > 69,
+      },
+      message: "DRY RUN — no transaction sent",
+    };
+  }

@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "5.10",
+  "stage": "6.2",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -23,7 +23,10 @@
     "15-executor-exit",
     "16-screening-multicategory",
     "17-chart-indicators-smi",
-    "18-telegram-ext"
+    "18-telegram-ext",
+    "19a-dlmm-paper-deploy",
+    "19b-dlmm-paper-edges",
+    "19c-dlmm-paper-lifecycle"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -48,7 +51,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 5 closed with patch 18 telegram display/notif parity; reports.js import trap avoided.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.2 adds dlmm.js paper lifecycle through patch 19a/b/c; reports.js import trap remains isolated behind gas-est shim.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -170,6 +173,19 @@
     "reports_trap": "No import from reports.js. reports.js still fails static import because lessons lacks classifyNarrative/classifySession/sessionLabel. notifyClose sets gasSol=null with comment; estimateGasSol deferred to 6.4/6.5.",
     "gate": "telegram-ext 5/5, telegram-cmds 19/19 restored, full harness PASS, npm test smoke PASS, boot DRY_RUN loaded 6 plugins skipped 0 errors 0. Cycle uninstall -> porcelain 0 -> reinstall OK.",
     "stage_5_closed": true,
+    "nol_sentuh_bot_live": true
+  },
+  "stage_6_2": {
+    "summary": "tools/dlmm.js paper lifecycle: patch 19a import+A1 deploy, patch 19b A2 PnL+A4 close, patch 19c A3 simulation/listing; paper-trading.js existing drop-in reused.",
+    "patch_19a": "A0 memperluas import existing state.js/getTrackedPositions + wallet.js/getWalletBalances, menambah paper-trading.js dan zenpack-lib/gas-est.js; deployPosition menerima narrative_category; A1 track virtual deploy.",
+    "patch_19b": "A2 routes getPositionPnl untuk paper_ ke simulator; A4 routes closePosition DRY_RUN paper_ ke closePaperPosition.",
+    "patch_19c": "A3 ports helper simulation, paper position rows/listing, recordPerformance close, decomposition, dan getMyPositions paper dispatch.",
+    "deviation_owner_locked_3": "DEVIASI-SADAR #3: mesin exit vanilla 2-tick DIPERTAHANKAN; mesin queue/resolve 15s fork tidak diport pada 6.2.",
+    "defer_7_8_7_9": "Utang state/exit fields trough_pnl_pct, price_peak_pct/price_trough_pct, dan peakPnl/peak_pnl_pct dilanjutkan ke 7.8/7.9.",
+    "gas_est_shim_debt": "6.4/6.5 — re-point import estimateGasSol di dlmm.js ke ../reports.js, lalu hapus zenpack-lib/gas-est.js.",
+    "dual_side_restore": "6.3 — pulihkan !dualSide pada pMaxBinId bersamaan patch dual-side; marker ZP-6.2 ada di kode. Kategori B dual-side tidak diport sekarang.",
+    "diff_contract": "Blok paper vs experimental identik kecuali: (a) marker ZP-6.2, (b) pMaxBinId bentuk vanilla tanpa !dualSide, (c) sumber import estimateGasSol memakai ../zenpack-lib/gas-est.js.",
+    "gate": "dlmm-paper 6/6: LAPIS1 flag-OFF before/after identik diff=[]; LAPIS2 flag-ON paper_* hidup/listed/PnL/close dan ZERO-TX=0. Telegram target 19/19. Golden A1 normalized+A2+A3+A4+gas-est diff kosong. Full regression harness PASS, pack smoke PASS, target npm syntax PASS, import dlmm PASS, DRY_RUN boot loaded 6/skipped 0/errors 0 lalu baseline 401; idempotent 7/7 skip; uninstall hash-clean tools/dlmm.js + reinstall PASS; raw diff tepat 3 pengecualian owner.",
     "nol_sentuh_bot_live": true
   }
 }

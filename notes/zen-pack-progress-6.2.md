@@ -1,12 +1,12 @@
 # Progress 6.2 - dlmm.js paper branches
 
 - ✅ F0 - Pre-flight
-- ✅ F1 - Verifikasi dependensi (STOP: blocker ditemukan)
-- ⬜ F2 - Patch 19a: import + A1
-- ⬜ F3 - Patch 19b: A2 + A4
-- ⬜ F4 - Patch 19c: A3
-- ⬜ F5 - Gate
-- ⬜ F6 - Manifest + tutup
+- ✅ F1 - Verifikasi dependensi + keputusan owner atas 4 blocker
+- ✅ F2 - Patch 19a: import + A1
+- ✅ F3 - Patch 19b: A2 + A4
+- ✅ F4 - Patch 19c: A3
+- ✅ F5 - Gate
+- ✅ F6 - Manifest + tutup
 
 ## F0
 
@@ -66,3 +66,80 @@ Sumber dibaca dari committed branch `experimental` pada `643e954` dengan
    `paper-trading.js`.
 
 Tidak ada patch 19a/b/c dibuat dan sandbox tidak diubah pada F1.
+
+### Keputusan owner (Addendum Brief 6.2)
+
+1. `dualSide`: A1 memakai bentuk vanilla tanpa `!dualSide`; kategori B tetap
+   ditunda. Kode wajib membawa marker restore ke patch dual-side 6.3.
+2. `narrative_category`: ditambahkan verbatim ke destructuring `deployPosition`
+   agar konsisten dengan schema patch 13; caller tanpa field aman (`null`).
+3. `estimateGasSol`: dibuat shim `zenpack-lib/gas-est.js` dari
+   `experimental:reports.js:596-606`; A3 mengimpor shim, bukan `reports.js`.
+   Re-point ke `../reports.js` dan hapus shim ditunda ke 6.4/6.5.
+4. Scope A0 dikoreksi: selain import `paper-trading.js`, perluasan import
+   existing `wallet.js` (`getWalletBalances`) dan `state.js`
+   (`getTrackedPositions`) diizinkan. Modul absent lain tetap STOP.
+
+## F2 - Patch 19a
+
+- `19a-dlmm-paper-deploy.mjs`: perluasan import A0, parameter
+  `narrative_category`, dan blok A1 paper deploy.
+- `pMaxBinId` memakai bentuk vanilla yang diputuskan owner dan marker tunggal:
+  `// ZP-6.2: !dualSide ditunda — dipulihkan patch dual-side 6.3`.
+- Kategori B dual-side tidak disentuh.
+
+## F3 - Patch 19b
+
+- A2: `getPositionPnl` merutekan id `paper_` ke `computePaperMetrics`.
+- A4: `closePosition` DRY_RUN merutekan id `paper_` ke
+  `closePaperPosition`; jalur factory non-paper tetap utuh.
+
+## F4 - Patch 19c
+
+- A3 dipasang verbatim: estimator metric, row/list paper, close +
+  `recordPerformance`, decomposition, dan dispatch `getMyPositions`.
+- `lib/gas-est.js` byte-identik `experimental:reports.js:596-606`; hasil
+  round-trip estimator = `0.0001 SOL`.
+- Import A3 memakai `../zenpack-lib/gas-est.js`; `reports.js` tidak diport.
+
+## F5 - Gate
+
+- `node --check`: tiga patch, shim, dan target `tools/dlmm.js` PASS.
+- Import aktual `tools/dlmm.js`: PASS; boot DRY_RUN: 6 plugin loaded, 0
+  skipped, 0 errors; berhenti timeout sesudah baseline 401, nol transaksi.
+- `tests/dlmm-paper.test.mjs`: 6/6 PASS, termasuk LAPIS 1 flag-OFF
+  before/after identik (`diff: []`) dan LAPIS 2 flag-ON menghasilkan posisi
+  `paper_*` yang hidup di listing, PnL+close sukses, serta `ZERO-TX: 0`.
+  Harness memulihkan `state.json`, `lessons.json`, dan `pool-memory.json`.
+  Full regression harness: seluruh
+  suite PASS (termasuk agent 8, agentloop 14, config 15, definitions 4,
+  executor 10+13+14, prompt 8, screening 4, SMI 4, telegram 19+5,
+  wallet 5). Pack smoke dan target syntax test PASS.
+- Idempotensi patch 19: 4+2+1 replacement semuanya
+  `skipped-idempotent` pada pass berikutnya.
+- Siklus uninstall memulihkan seluruh file core termasuk `tools/dlmm.js`
+  dengan hash `clean`; reinstall memasang 19a/b/c dan shim lagi. Artefak
+  `exports/` + `profiles/` yang dibuat harness dipindah (recoverable) ke
+  `/tmp/zenpack-6.2-test-artifacts.ND3BfM` sebelum gate akhir.
+
+### Laporan diff paper vs fork
+
+- A1 raw diff memuat tepat: **(a)** komentar marker dan **(b)** baris
+  `pMaxBinId` bentuk vanilla tanpa `!dualSide`. Setelah dua normalisasi itu,
+  A1 identik.
+- A2, A3, dan A4: byte-identik fork (diff kosong).
+- Import `estimateGasSol`: tepat satu diff **(c)**,
+  `../reports.js` → `../zenpack-lib/gas-est.js`.
+- Golden reference aktual: A1 setelah normalisasi, A2, A3, A4, dan
+  `gas-est.js` seluruhnya `diff` kosong. Telegram target: 19/19.
+- Tidak ada perbedaan blok paper lain.
+
+## F6 - Manifest + tutup
+
+- Stage manifest dinaikkan ke `6.2`; patch 19a/19b/19c dicatat.
+- DEVIASI-SADAR #3: exit vanilla 2-tick dipertahankan.
+- Utang `trough_pnl_pct`, `price_peak_pct`/`price_trough_pct`, dan
+  `peakPnl`/`peak_pnl_pct` → 7.8/7.9.
+- Utang shim gas: re-point import ke `../reports.js` + hapus shim → 6.4/6.5.
+- Restore `!dualSide` → 6.3.
+- Nol sentuh bot live.

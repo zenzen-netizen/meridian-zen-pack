@@ -1,0 +1,7 @@
+  if (process.env.DRY_RUN === "true") {
+    // 🧪 Paper trading: finalize the virtual position (record sim PnL → lessons).
+    if (isPaperMode() && String(position_address).startsWith("paper_")) {
+      return await closePaperPosition(position_address, reason);
+    }
+    return { dry_run: true, would_close: position_address, message: "DRY RUN — no transaction sent" };
+  }

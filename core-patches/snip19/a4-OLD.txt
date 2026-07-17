@@ -1,0 +1,3 @@
+  if (process.env.DRY_RUN === "true") {
+    return { dry_run: true, would_close: position_address, message: "DRY RUN — no transaction sent" };
+  }

@@ -1,0 +1,23 @@
+  position_address = normalizeMint(position_address);
+  // 🧪 Paper trading: simulate PnL for a virtual position from the on-chain bin.
+  if (isPaperMode() && String(position_address).startsWith("paper_")) {
+    const tracked = getTrackedPosition(position_address);
+    if (!tracked) return { error: "Paper position not found" };
+    const m = await computePaperMetrics(tracked);
+    if (!m) return { error: "Paper PnL simulation unavailable" };
+    return {
+      pnl_usd: m.pnl_usd,
+      pnl_pct: m.pnl_pct,
+      current_value_usd: m.position_value_usd,
+      unclaimed_fee_usd: m.fees_usd,
+      all_time_fees_usd: m.fees_usd,
+      fee_per_tvl_24h: tracked.fee_tvl_ratio != null ? Math.round(Number(tracked.fee_tvl_ratio) * 100) / 100 : 0,
+      in_range: m.in_range,
+      lower_bin: m.lowerBin,
+      upper_bin: m.upperBin,
+      active_bin: m.currentBin,
+      age_minutes: m.minutes_held,
+      paper: true,
+    };
+  }
+  const walletAddress = getWallet().publicKey.toString();
