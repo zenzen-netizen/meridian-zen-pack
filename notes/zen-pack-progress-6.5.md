@@ -9,7 +9,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 - ✅ F0 — pre-flight
 - ✅ F1 — recon OLD/NEW presisi
 - ✅ F2 — Patch 25a W1+W2
-- ⬜ F3 — Patch 25b W3+W4
+- ✅ F3 — Patch 25b W3+W4
 - ⬜ F4 — Patch 25c W5+W6+W7+W8
 - ⬜ F5 — gate money penuh
 - ⬜ F6 — manifest + tutup
