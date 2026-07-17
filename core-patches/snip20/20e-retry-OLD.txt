@@ -1,0 +1,4 @@
+    retry: {
+      maxElapsedMs: 30_000,
+      perAttemptTimeoutMs: 10_000,
+    },

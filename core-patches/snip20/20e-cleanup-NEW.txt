@@ -1,0 +1,48 @@
+  } catch (error) {
+    log("deploy_error", error.message);
+    // Non-atomic wide-range cleanup: if Phase 1 (Create) succeeded but a later
+    // phase (Add-liquidity) threw, the position account exists ON-CHAIN with rent
+    // locked but was never tracked → orphan (otherwise only adopted much later by
+    // the on-chain backfill). Track it NOW so the management loop closes it via the
+    // normal close path and recovers the rent. Idempotent: trackPosition is keyed
+    // by address and ensureDeployedAt early-returns for already-tracked positions,
+    // so the later backfill never double-adopts. Wrapped in its own try/catch so
+    // this cleanup can NEVER block the failure return below. The standard (atomic)
+    // path leaves positionCreated=false → never reaches here with a created position.
+    if (positionCreated) {
+      try {
+        const orphanAddr = newPosition.publicKey.toString();
+        trackPosition({
+          position: orphanAddr,
+          pool: pool_address,
+          pool_name,
+          strategy: activeStrategy,
+          bin_range: { min: minBinId, max: maxBinId, bins_below: activeBinsBelow, bins_above: activeBinsAbove },
+          bin_step,
+          amount_sol: finalAmountY,
+          amount_x: finalAmountX,
+          active_bin: activeBin.binId,
+        });
+        setPositionInstruction(orphanAddr, "incomplete deploy — liquidity add failed; close to recover rent");
+        log("deploy_error", `Tracked orphan position ${orphanAddr} (create succeeded, liquidity-add failed) for cleanup`);
+      } catch (trackErr) {
+        log("deploy_error", `Failed to track orphan position for cleanup: ${trackErr.message}`);
+      }
+    }
+
+    // ─── Dual-side (E1) cleanup: pre-swap sukses TAPI deploy gagal → token balik ke SOL ───
+    if (dualSideSwapped && finalAmountX > 0) {
+      try {
+        const dsBaseMint = pool.lbPair.tokenXMint.toString();
+        log("deploy_warn", `Dual-side deploy gagal — swap ${finalAmountX} token balik ke SOL`);
+        const dsBack = await swapToken({ input_mint: dsBaseMint, output_mint: config.tokens.SOL, amount: finalAmountX });
+        if (dsBack?.success) {
+          log("deploy_warn", `Dual-side cleanup selesai — token balik ke SOL`);
+        } else {
+          log("deploy_error", `⚠️ Dual-side cleanup GAGAL — token nyangkut, owner swap manual: ${dsBack?.error ?? 'unknown'}`);
+        }
+      } catch (dsCleanupErr) {
+        log("deploy_error", `⚠️ Dual-side cleanup GAGAL — token mungkin nyangkut, owner swap manual: ${dsCleanupErr.message}`);
+      }
+    }
+    return { success: false, error: error.message };

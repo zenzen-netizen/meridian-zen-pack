@@ -1,0 +1,9 @@
+  log("deploy", `Position: ${newPosition.publicKey.toString()}`);
+
+  // Wide-range deploy is NON-ATOMIC (Create and Add-liquidity are separate txs).
+  // Track whether the position account was created so the catch can clean up an
+  // orphan if the add-liquidity phase fails. The standard (≤69 bins) path is a
+  // single atomic tx and never sets this — its failure creates nothing.
+  let positionCreated = false;
+
+  try {

@@ -1,0 +1,2 @@
+        txHashes.push(txHash);
+        log("deploy", `Create tx ${i + 1}/${createTxArray.length}: ${txHash}`);

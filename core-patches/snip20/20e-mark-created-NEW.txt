@@ -1,0 +1,6 @@
+        txHashes.push(txHash);
+        // Position account exists on-chain from the first create tx onward (i===0
+        // signs with newPosition) → rent is locked → mark for orphan cleanup if a
+        // later phase throws.
+        positionCreated = true;
+        log("deploy", `Create tx ${i + 1}/${createTxArray.length}: ${txHash}`);

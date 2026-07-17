@@ -1,0 +1,5 @@
+      pool_name: poolMeta.name || null,
+      claim_txs: claimTxHashes,
+      close_txs: closeTxHashes,
+      txs: txHashes,
+      base_mint: pool.lbPair.tokenXMint.toString(),

@@ -1,0 +1,3 @@
+  } catch (error) {
+    log("deploy_error", error.message);
+    return { success: false, error: error.message };

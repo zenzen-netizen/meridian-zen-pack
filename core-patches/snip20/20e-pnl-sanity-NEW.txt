@@ -1,0 +1,9 @@
+        const pnlPctSuspicious = pnlPctDiff != null && pnlPctDiff > (config.management.pnlSanityMaxDiffPct ?? 5);
+        if (pnlPctSuspicious) {
+          log("positions_warn", `Suspicious pnl_pct for ${positionAddress.slice(0, 8)}: reported=${reportedPnlPct.toFixed(2)} derived=${derivedPnlPct.toFixed(2)} diff=${pnlPctDiff.toFixed(2)}`);
+        }
+
+        positions.push({
+          position:           positionAddress,
+          pool:               pool.poolAddress,
+          pair:               resolveDisplayPair(tracked?.pool_name || `${pool.tokenX}-${pool.tokenY}`, pool.tokenXMint),

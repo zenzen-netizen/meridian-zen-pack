@@ -1,0 +1,6 @@
+      pool_name: resolveDisplayPair(firstResolvedName(poolMeta.name), pool.lbPair.tokenXMint.toString()),
+      claim_txs: claimTxHashes,
+      close_txs: closeTxHashes,
+      txs: txHashes,
+      base_mint: pool.lbPair.tokenXMint.toString(),
+      close_reason: reason || "agent decision",
