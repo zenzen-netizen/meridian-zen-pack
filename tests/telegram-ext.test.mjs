@@ -83,10 +83,18 @@ await t("notifyClose memakai estimasi gas reports.js", async () => {
     };
   });
   const tg = await importTelegram();
-  await tg.notifyClose({ pair: "TEST/SOL", pnlUsd: 1.23, pnlPct: 4.56, feesUsd: 0.5 });
+  // Bentuk payload setelah executor memetakan result kategori-H fork.
+  await tg.notifyClose({
+    pair: "TEST/SOL", pnlUsd: 3.5, pnlPct: 7, peakPnlPct: 10,
+    feesUsd: 0.5, reason: "PnL 5%", lesson: "fixture lesson",
+  });
   const msg = calls.find((c) => c.url.includes("api.telegram.org") && c.body?.parse_mode === "HTML");
   assert.ok(msg, "telegram HTML message captured");
   assert.ok(msg.body.text.includes("Closed"));
+  assert.ok(msg.body.text.includes("+$3.50"), msg.body.text);
+  assert.ok(msg.body.text.includes("Fee panen"), msg.body.text);
+  assert.ok(msg.body.text.includes("Give-back"), msg.body.text);
+  assert.ok(msg.body.text.includes("fixture lesson"), msg.body.text);
   assert.ok(msg.body.text.includes("Gas ~0.00006 SOL"), msg.body.text);
 });
 
