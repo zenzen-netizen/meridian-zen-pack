@@ -1,18 +1,3 @@
-// ─── Notification helpers ────────────────────────────────────────
-// Current "Racikan" (saved-snapshot name) read straight from user-config.json —
-// keeps telegram.js free of the heavy config.js import. null = none.
-function activeRacikan() {
-  try { return JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")).activeSetup || null; }
-  catch { return null; }
-}
-
-// Display unit toggle (◎ vs $) read straight from user-config — mirip activeRacikan,
-// dipakai notifyClose buat render mode-correct (fix HARD-$). Fail-open → false ($).
-function solModeOn() {
-  try { return !!JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")).management?.solMode; }
-  catch { return false; }
-}
-
 export async function notifyDeploy(data) {
   if (hasActiveLiveMessage()) return;
   // Render dipindah ke views/notifs.js (renderDeploy). racikan di-resolve di sini
@@ -46,6 +31,3 @@ export async function notifyOutOfRange(data) {
   await sendHTML(renderOOR(data)); // render → views/notifs.js; guard/trigger tak diubah
 }
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}

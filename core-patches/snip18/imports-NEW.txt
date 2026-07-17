@@ -6,3 +6,4 @@ import { paths } from "./paths.js";
 // <<< zen-pack:02-paths-routing <<<
 import { renderDeploy, renderOOR, renderSwap, renderClose } from "./views/notifs.js";
 import { ICON } from "./views/format.js";
+import { estimateGasSol } from "./reports.js";

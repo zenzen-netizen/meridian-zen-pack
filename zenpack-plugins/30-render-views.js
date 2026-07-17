@@ -18,18 +18,13 @@
 //         buildRangeEfficiencyLines (/pool rangeEff) — index.js-local fork.
 //       Seksi digerbang null di views/ → degrade bersih. Vonis dep per item:
 //       notes/zen-pack-progress.md "Stage 3.7".
-//   (d) KLARIFIKASI 3.6 pnlBlock: 3.6 menunda dgn alasan KELIRU ("getModePerformance
-//       absen vanilla+pack") — nyatanya getModePerformance ADA (lessons.js:829, port
-//       04a). TAPI outcome tunda BENAR: formatPnlTracker (pnl-tracker.js) transitif
-//       import reports.js, yang (reports.js:16) butuh classifyNarrative/classifySession/
-//       sessionLabel dari lessons.js — TAK diport 04a → rantai putus di vanilla-test.
-//       Jadi pnlBlock TETAP DEFER, alasan dikoreksi = transitif reports.js absen.
-//       solTracker (sol-tracker.js) rantainya BERSIH → DIAKTIFKAN di /wallet.
+//   (d) Patch 23: pnlBlock hidup setelah reports.js + lessons read-layer tersedia.
 import { getMyPositions } from "../tools/dlmm.js";
 import { getWalletBalances } from "../tools/wallet.js";
 import { config, computeDeployAmount } from "../config.js";
-import { getPerformanceSummary } from "../lessons.js";
+import { getPerformanceSummary, getModePerformance } from "../lessons.js";
 import { formatSolTracker } from "../sol-tracker.js";
+import { formatPnlTracker } from "../pnl-tracker.js";
 import { formatIdentity, getActiveSetupStatus } from "../preset-manager.js";
 import { CORE_GROUPS } from "../config-origin.js";
 import { isHiveMindEnabled } from "../hivemind.js";
@@ -364,7 +359,7 @@ async function handleStatus() {
     orLines: undefined,                                      // DEFER buildOpenRouterLines
     perf: getPerformanceSummary(),
     lastGoodRule: null, lastBadRule: null,                   // DEFER condenseRule
-    pnlBlock: null,                                          // DEFER formatPnlTracker (transitif reports.js putus)
+    pnlBlock: formatPnlTracker(getModePerformance(), { solPriceUsd: wallet?.sol_price ?? null }),
     disclosure: null,                                        // DEFER racikanScopeDisclosure
   });
   await sendHTML(render(vm, "telegram"));
@@ -388,7 +383,7 @@ async function handleWallet() {
     dryRun: process.env.DRY_RUN === "true", hive: isHiveMindEnabled(),
     orLines: undefined,                                      // DEFER buildOpenRouterLines
     solTracker: formatSolTracker(wallet.sol),
-    pnlBlock: null,                                          // DEFER formatPnlTracker (transitif reports.js putus)
+    pnlBlock: formatPnlTracker(getModePerformance(), { solPriceUsd: wallet?.sol_price ?? null }),
     disclosure: null,                                        // DEFER racikanScopeDisclosure
   });
   await sendHTML(render(vm, "telegram"));

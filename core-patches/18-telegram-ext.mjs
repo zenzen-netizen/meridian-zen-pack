@@ -1,7 +1,7 @@
 // Patch 18: telegram.js display/notif parity.
 //
-// Owner-locked deviation: do not import reports.js here. reports.js still
-// depends on lessons helpers deferred to 6.4/6.5, so notifyClose uses gasSol=null.
+// Patch 23 finalizes the reports import/gas payload; keeping that final NEW here
+// preserves Patch 18 idempotency on reinstall while Patch 23 migrates old installs.
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

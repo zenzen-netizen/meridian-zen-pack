@@ -71,7 +71,7 @@ await t("sendHTML parse gagal -> retry plain", async () => {
   assert.strictEqual(calls[1].body.text, "Hello world");
 });
 
-await t("notifyClose gasSol=null renderClose fallback tanpa crash", async () => {
+await t("notifyClose memakai estimasi gas reports.js", async () => {
   const solMint = "So11111111111111111111111111111111111111112";
   const calls = stubFetch(({ url }) => {
     if (url.includes("api.telegram.org")) return okJson();
@@ -87,7 +87,7 @@ await t("notifyClose gasSol=null renderClose fallback tanpa crash", async () => 
   const msg = calls.find((c) => c.url.includes("api.telegram.org") && c.body?.parse_mode === "HTML");
   assert.ok(msg, "telegram HTML message captured");
   assert.ok(msg.body.text.includes("Closed"));
-  assert.ok(msg.body.text.includes("Gas ~0.00000 SOL"), msg.body.text);
+  assert.ok(msg.body.text.includes("Gas ~0.00006 SOL"), msg.body.text);
 });
 
 await t("live message labels: smart wallets + active bin", async () => {
