@@ -1,0 +1,5 @@
+          active_bin: activeBin.binId,
+          initial_value_usd,
+          narrative_category,
+          shadow_signals: captureShadowSignals(pool_address),
+          signal_snapshot: signalSnapshot,

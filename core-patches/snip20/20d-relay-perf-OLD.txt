@@ -1,0 +1,3 @@
+          organic_score: tracked.organic_score || null,
+          amount_sol: tracked.amount_sol,
+          fees_earned_usd: feesUsd,

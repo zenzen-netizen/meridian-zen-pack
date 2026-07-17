@@ -1,0 +1,26 @@
+/**
+ * 🔬 Shadow-logging: snapshot the experiment signals' VALUES for a pool at deploy
+ * time so we can later correlate them with PnL — WITHOUT letting them influence
+ * the deploy (that stays gated by the experiment flags). momentum & sw-momentum
+ * are ephemeral (24h candidate-memory) so they MUST be frozen here; expected-yield
+ * is omitted because it's derivable later from the stored signal_snapshot. Returns
+ * null when there's no warm-up data yet (e.g. first sighting). Fail-open.
+ */
+function captureShadowSignals(poolAddress) {
+  try {
+    const m = getCandidateMomentum(poolAddress);
+    const sw = getSmartWalletMomentum(poolAddress);
+    const out = {};
+    if (m && !m.first_sighting && m.samples >= 2) {
+      out.momentum = { tvl_pct: m.tvl_delta_pct, vol_pct: m.volume_delta_pct, mcap_pct: m.mcap_delta_pct, samples: m.samples };
+    }
+    if (sw && sw.samples >= 2) {
+      out.sw = { count: sw.last, delta: sw.delta, samples: sw.samples };
+    }
+    return Object.keys(out).length ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Lazy SDK loader ───────────────────────────────────────────

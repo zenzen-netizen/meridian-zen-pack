@@ -1,0 +1,3 @@
+          active_bin: activeBin.binId,
+          initial_value_usd,
+          signal_snapshot: signalSnapshot,
