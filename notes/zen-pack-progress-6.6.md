@@ -8,7 +8,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 
 - ✅ F0 — pre-flight
 - ✅ F1 — verifikasi import + lunasi pool-memory
-- ⬜ F2 — replace briefing.js byte-exact
+- ✅ F2 — replace briefing.js byte-exact
 - ⬜ F3 — gate penuh
 - ⬜ F4 — manifest + tutup Stage 6
 
