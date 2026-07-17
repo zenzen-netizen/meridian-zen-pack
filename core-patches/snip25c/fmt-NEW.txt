@@ -1,0 +1,8 @@
+function fmt(lessons) {
+  return lessons.map((l) => {
+    const date = l.created_at ? l.created_at.slice(0, 16).replace("T", " ") : "unknown";
+    const pin  = l.pinned ? "📌 " : "";
+    const sim  = l.paper ? "🧪 " : "";  // sim/paper-derived → low-credibility soft reference
+    return `${pin}${sim}[${l.outcome.toUpperCase()}] [${date}] ${l.rule}`;
+  }).join("\n");
+}

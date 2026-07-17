@@ -1,0 +1,16 @@
+  const data = load();
+
+  // Dedup: an identical rule already on file is pure noise. This guards against
+  // the model firing update_config (or any addLesson source) repeatedly with the
+  // same change — which historically stacked the same lesson 60+ times. Refresh
+  // the existing lesson's recency instead so it still injects, then bail.
+  const existing = data.lessons.find((l) => l.rule === safeRule);
+  if (existing) {
+    existing.created_at = new Date().toISOString();
+    if (pinned) existing.pinned = true;
+    save(data);
+    log("lessons", `Duplicate lesson skipped (refreshed recency): ${safeRule.slice(0, 60)}`);
+    return;
+  }
+
+  const lesson = {
