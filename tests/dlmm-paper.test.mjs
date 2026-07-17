@@ -1,4 +1,4 @@
-// Gerbang 6.2: paper lifecycle wiring + gas shim.
+// Gerbang 6.2/6.4: paper lifecycle wiring + reports gas estimator.
 import assert from "node:assert";
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -11,11 +11,11 @@ const src = await readFile(join(target, "tools/dlmm.js"), "utf8");
 let pass = 0;
 const t = async (name, fn) => { await fn(); console.log("  ✅", name); pass++; };
 
-await t("A0 imports paper + dual-side wallet + existing state + shim", () => {
+await t("A0 imports paper + dual-side wallet + existing state + reports", () => {
   assert.match(src, /getTrackedPosition,\n  getTrackedPositions,\n  minutesOutOfRange,/);
   assert.match(src, /import \{ normalizeMint, getWalletBalances, swapToken \} from "\.\/wallet\.js";/);
-  assert.match(src, /import \{ estimateGasSol \} from "\.\.\/zenpack-lib\/gas-est\.js";/);
-  assert.doesNotMatch(src, /import \{ estimateGasSol \} from "\.\.\/reports\.js";/);
+  assert.match(src, /import \{ estimateGasSol \} from "\.\.\/reports\.js";/);
+  assert.doesNotMatch(src, /import \{ estimateGasSol \} from "\.\.\/zenpack-lib\/gas-est\.js";/);
   for (const name of ["isPaperMode", "makePaperPositionId", "simulatePaperMetrics", "timeframeMinutes", "classifyPaperEdge", "formatPaperDecomposition"]) {
     assert.match(src, new RegExp(`\\b${name}\\b`));
   }
@@ -37,8 +37,8 @@ await t("A2/A3/A4 lifecycle routes are present", () => {
   assert.match(src, /return await closePaperPosition\(position_address, reason\);/);
 });
 
-const gas = await import(pathToFileURL(join(target, "zenpack-lib/gas-est.js")).href);
-await t("gas shim keeps fork constants and estimator", () => {
+const gas = await import(pathToFileURL(join(target, "reports.js")).href);
+await t("reports keeps fork gas constants and estimator", () => {
   assert.deepStrictEqual(gas.GAS_EST_SOL, {
     deploy_position: 0.00004,
     close_position: 0.00003,

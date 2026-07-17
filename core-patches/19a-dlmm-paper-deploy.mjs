@@ -16,7 +16,7 @@ export default [{
     },
     {
       old: "import { recordPerformance } from \"../lessons.js\";\nimport { isBaseMintOnCooldown, isPoolOnCooldown } from \"../pool-memory.js\";\nimport { normalizeMint } from \"./wallet.js\";\nimport { appendDecision } from \"../decision-log.js\";",
-      new: "import { recordPerformance } from \"../lessons.js\";\nimport { estimateGasSol } from \"../zenpack-lib/gas-est.js\";\nimport { isBaseMintOnCooldown, isPoolOnCooldown } from \"../pool-memory.js\";\nimport { normalizeMint, getWalletBalances, swapToken } from \"./wallet.js\";\nimport {\n  isPaperMode,\n  makePaperPositionId,\n  simulatePaperMetrics,\n  timeframeMinutes,\n  classifyPaperEdge,\n  formatPaperDecomposition,\n} from \"../paper-trading.js\";\nimport { appendDecision } from \"../decision-log.js\";",
+      new: "import { recordPerformance } from \"../lessons.js\";\nimport { estimateGasSol } from \"../reports.js\";\nimport { isBaseMintOnCooldown, isPoolOnCooldown } from \"../pool-memory.js\";\nimport { normalizeMint, getWalletBalances, swapToken } from \"./wallet.js\";\nimport {\n  isPaperMode,\n  makePaperPositionId,\n  simulatePaperMetrics,\n  timeframeMinutes,\n  classifyPaperEdge,\n  formatPaperDecomposition,\n} from \"../paper-trading.js\";\nimport { appendDecision } from \"../decision-log.js\";",
     },
     {
       old: "  initial_value_usd,\n  // entry market conditions (injected by executor safety checks)",
