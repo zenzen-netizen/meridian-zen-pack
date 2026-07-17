@@ -1,0 +1,5 @@
+    async toolStart(name) {
+      await upsertToolLine(name, "ℹ️", "...");
+    },
+    async toolFinish(name, result, success) {
+      const icon = success ? "✅" : "❌";

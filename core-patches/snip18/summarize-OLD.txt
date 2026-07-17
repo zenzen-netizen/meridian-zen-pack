@@ -1,0 +1,4 @@
+    case "study_top_lpers":
+    case "get_top_lpers":
+      return `${result.lpers?.length ?? 0} LPers`;
+    default:

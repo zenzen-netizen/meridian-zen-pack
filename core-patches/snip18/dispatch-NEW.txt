@@ -1,0 +1,11 @@
+
+// ─── Long polling ────────────────────────────────────────────────
+// Run a handler without blocking the poll loop, so update fetching keeps
+// going even while a handler awaits user input (config confirmation, etc.).
+function dispatch(onMessage, msg) {
+  Promise.resolve()
+    .then(() => onMessage(msg))
+    .catch((e) => log("telegram_error", `Handler error: ${e.message}`));
+}
+
+async function poll(onMessage) {

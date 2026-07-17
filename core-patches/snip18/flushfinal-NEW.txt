@@ -1,0 +1,32 @@
+  function scheduleFlush(delay = 300) {
+    if (state.flushTimer) {
+      state.flushRequested = true;
+      return;
+    }
+    state.flushTimer = setTimeout(() => {
+      state.flushPromise = flushNow().catch(() => null);
+    }, delay);
+  }
+
+  // Final flush: unlike the live edits above (which slice to a single 4096-char
+  // message), this splits a long final answer across multiple messages so it is
+  // never truncated. The first chunk edits the live message in place; the rest
+  // are sent as follow-up messages.
+  async function flushFinal() {
+    const sections = [state.title];
+    if (state.intro) sections.push(state.intro);
+    if (state.toolLines.length > 0) sections.push(state.toolLines.join("\n"));
+    if (state.footer) sections.push(state.footer);
+    const chunks = splitText(sections.join("\n\n"));
+    if (!state.messageId) {
+      const sent = await postTelegram("sendMessage", { text: chunks[0] });
+      state.messageId = sent?.result?.message_id ?? null;
+    } else {
+      await editMessage(chunks[0], state.messageId);
+    }
+    for (let i = 1; i < chunks.length; i++) {
+      await postTelegram("sendMessage", { text: chunks[i] });
+    }
+  }
+
+  async function upsertToolLine(name, icon, suffix = "") {

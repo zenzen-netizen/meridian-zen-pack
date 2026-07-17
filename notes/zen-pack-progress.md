@@ -485,3 +485,9 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 - Path routing sudah hidup di `telegram.js` (`paths.userConfigPath`), jadi blok path patch 18 skip.
 - `views/notifs.js` + `views/format.js` self-contained/import OK.
 - `reports.js` trap valid: import gagal karena lessons belum export `classifyNarrative`; patch 18 dilarang import reports, pakai `gasSol = null`.
+
+✅ FASE B patch commit TBD.
+- Patch 18 `core-patches/18-telegram-ext.mjs` + `snip18/*`: 11 replaceLine exact over `telegram.js`.
+- Ported: `splitText`, multi-chunk `sendMessage`/`sendHTML` with HTML fallback, `flushFinal`, 2 summarize cases, dispatch polling, fork bot command descriptions, render-based `notify*`.
+- Path block skipped (covered by patch 02). `reports.js` not imported; `notifyClose` uses `const gasSol = null` with `[zen-pack] estimateGasSol deferred to 6.4/6.5`.
+- Validation: `node --check telegram.js`, count `splitText=1 flushFinal=1 dispatch=1 reportsImport=0 gasNull=1`; apply pass 2 = 11 skipped-idempotent.

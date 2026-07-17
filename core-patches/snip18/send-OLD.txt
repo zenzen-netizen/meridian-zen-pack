@@ -1,0 +1,17 @@
+export async function sendMessage(text) {
+  if (!TOKEN || !chatId) return;
+  return postTelegram("sendMessage", { text: String(text).slice(0, 4096) });
+}
+
+export async function sendMessageWithButtons(text, inlineKeyboard) {
+  if (!TOKEN || !chatId) return;
+  return postTelegram("sendMessage", {
+    text: String(text).slice(0, 4096),
+    reply_markup: { inline_keyboard: inlineKeyboard },
+  });
+}
+
+export async function sendHTML(html) {
+  if (!TOKEN || !chatId) return;
+  return postTelegram("sendMessage", { text: html.slice(0, 4096), parse_mode: "HTML" });
+}

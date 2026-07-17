@@ -1,0 +1,50 @@
+// ─── Notification helpers ────────────────────────────────────────
+// Current "Racikan" (saved-snapshot name) read straight from user-config.json —
+// keeps telegram.js free of the heavy config.js import. null = none.
+function activeRacikan() {
+  try { return JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")).activeSetup || null; }
+  catch { return null; }
+}
+
+// Display unit toggle (◎ vs $) read straight from user-config — mirip activeRacikan,
+// dipakai notifyClose buat render mode-correct (fix HARD-$). Fail-open → false ($).
+function solModeOn() {
+  try { return !!JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")).management?.solMode; }
+  catch { return false; }
+}
+
+export async function notifyDeploy(data) {
+  if (hasActiveLiveMessage()) return;
+  // Render dipindah ke views/notifs.js (renderDeploy). racikan di-resolve di sini
+  // (config-read tetap di telegram.js); guard/trigger TIDAK diubah.
+  await sendHTML(renderDeploy({ ...data, racikan: activeRacikan() }));
+}
+
+export async function notifyClose(data) {
+  if (hasActiveLiveMessage()) return;
+  // Render → views/notifs.js (renderClose). gasSol (estimasi) + solMode di-resolve di
+  // sini; guard/trigger/logic TIDAK diubah.
+  // [zen-pack] estimateGasSol deferred to 6.4/6.5 (reports.js dep).
+  // renderClose falls back cleanly when gasSol is null.
+  const gasSol = null;
+  let solPrice = null;
+  try {
+    const { getSolMarketRegime } = await import("./tools/wallet.js");
+    solPrice = (await getSolMarketRegime())?.usdPrice || null;
+  } catch { /* fail-open: 1-unit */ }
+  await sendHTML(renderClose({ ...data, gasSol, solMode: solModeOn(), solPrice }));
+}
+
+export async function notifySwap(data) {
+  if (hasActiveLiveMessage()) return;
+  await sendHTML(renderSwap(data)); // render → views/notifs.js; guard/trigger tak diubah
+}
+
+export async function notifyOutOfRange(data) {
+  if (hasActiveLiveMessage()) return;
+  await sendHTML(renderOOR(data)); // render → views/notifs.js; guard/trigger tak diubah
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}

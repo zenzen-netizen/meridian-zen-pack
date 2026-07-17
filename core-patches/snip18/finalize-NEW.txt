@@ -1,0 +1,28 @@
+    async finalize(finalText) {
+      if (state.flushTimer) {
+        clearTimeout(state.flushTimer);
+        state.flushTimer = null;
+      }
+      if (state.flushPromise) await state.flushPromise;
+      try {
+        state.footer = finalText;
+        await flushFinal();
+      } finally {
+        _liveMessageDepth = Math.max(0, _liveMessageDepth - 1);
+        typing.stop();
+      }
+    },
+    async fail(errorText) {
+      if (state.flushTimer) {
+        clearTimeout(state.flushTimer);
+        state.flushTimer = null;
+      }
+      if (state.flushPromise) await state.flushPromise;
+      try {
+        state.footer = `❌ ${errorText}`;
+        await flushNow();
+      } finally {
+        _liveMessageDepth = Math.max(0, _liveMessageDepth - 1);
+        typing.stop();
+      }
+    },

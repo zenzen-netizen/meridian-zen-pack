@@ -1,0 +1,5 @@
+    async toolStart(name) {
+      await upsertToolLine(name, ICON.pending, "…");
+    },
+    async toolFinish(name, result, success) {
+      const icon = success ? ICON.ok : ICON.fail;

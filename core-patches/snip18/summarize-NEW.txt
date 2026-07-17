@@ -1,0 +1,8 @@
+    case "study_top_lpers":
+    case "get_top_lpers":
+      return `${result.lpers?.length ?? 0} LPers`;
+    case "check_smart_wallets_on_pool":
+      return `${result.in_pool?.length ?? 0} smart wallets`;
+    case "get_active_bin":
+      return result.binId != null ? `bin ${result.binId}` : "done";
+    default:

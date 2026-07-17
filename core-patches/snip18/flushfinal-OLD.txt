@@ -1,0 +1,11 @@
+  function scheduleFlush(delay = 300) {
+    if (state.flushTimer) {
+      state.flushRequested = true;
+      return;
+    }
+    state.flushTimer = setTimeout(() => {
+      state.flushPromise = flushNow().catch(() => null);
+    }, delay);
+  }
+
+  async function upsertToolLine(name, icon, suffix = "") {

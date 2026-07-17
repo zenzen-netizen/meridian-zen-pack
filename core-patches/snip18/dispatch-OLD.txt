@@ -1,0 +1,3 @@
+
+// ─── Long polling ────────────────────────────────────────────────
+async function poll(onMessage) {

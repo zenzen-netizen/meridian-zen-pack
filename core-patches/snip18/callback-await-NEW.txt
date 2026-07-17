@@ -1,0 +1,11 @@
+          // Fire-and-forget: a handler may await user input (e.g. a config
+          // confirmation button). If we awaited here, the poll loop would block
+          // and could never fetch the very button-press it is waiting on —
+          // a deadlock. The handler guards its own concurrency via `busy`.
+          dispatch(onMessage, {
+            ...callbackMsg,
+            isCallback: true,
+            callbackQueryId: callback.id,
+            callbackData: callback.data,
+            messageId: callback.message.message_id,
+          });
