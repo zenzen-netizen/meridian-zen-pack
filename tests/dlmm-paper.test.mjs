@@ -11,9 +11,9 @@ const src = await readFile(join(target, "tools/dlmm.js"), "utf8");
 let pass = 0;
 const t = async (name, fn) => { await fn(); console.log("  ✅", name); pass++; };
 
-await t("A0 imports paper + existing wallet/state + shim", () => {
+await t("A0 imports paper + dual-side wallet + existing state + shim", () => {
   assert.match(src, /getTrackedPosition,\n  getTrackedPositions,\n  minutesOutOfRange,/);
-  assert.match(src, /import \{ normalizeMint, getWalletBalances \} from "\.\/wallet\.js";/);
+  assert.match(src, /import \{ normalizeMint, getWalletBalances, swapToken \} from "\.\/wallet\.js";/);
   assert.match(src, /import \{ estimateGasSol \} from "\.\.\/zenpack-lib\/gas-est\.js";/);
   assert.doesNotMatch(src, /import \{ estimateGasSol \} from "\.\.\/reports\.js";/);
   for (const name of ["isPaperMode", "makePaperPositionId", "simulatePaperMetrics", "timeframeMinutes", "classifyPaperEdge", "formatPaperDecomposition"]) {
@@ -21,9 +21,12 @@ await t("A0 imports paper + existing wallet/state + shim", () => {
   }
 });
 
-await t("A1 deploy branch uses owner-approved vanilla range", () => {
+await t("A1 deploy branch restores full fork dual-side range", () => {
   assert.match(src, /narrative_category, \/\/ 🧪 #7: optional narrative bucket for performance learning/);
-  assert.match(src, /\/\/ ZP-6\.2: !dualSide ditunda — dipulihkan patch dual-side 6\.3\n        const pMaxBinId = isSingleSidedSol \? activeBin\.binId : activeBin\.binId \+ activeBinsAbove;/);
+  assert.match(src, /const pMaxBinId = \(isSingleSidedSol && !dualSide\) \? activeBin\.binId : activeBin\.binId \+ activeBinsAbove;/);
+  assert.doesNotMatch(src, /ZP-6\.2: !dualSide ditunda/);
+  assert.match(src, /strategy: dualSide \? \(config\.strategy\.dualSideStrategy === "spot" \? "Spot" : "BidAsk"\)/);
+  assert.match(src, /percentX: dualSide \? dualSideTokenPct/);
   assert.match(src, /\[PAPER\] tracked virtual position/);
 });
 
@@ -95,7 +98,7 @@ try {
     },
     getDLMM: {
       StrategyType: { Spot: "spot", Curve: "curve", BidAsk: "bid_ask" },
-      getBinIdFromPrice: (price) => Math.round(Number(price)),
+      getBinIdFromPrice: (price) => Math.round((Number(price) - 1) * 1000),
       getPriceOfBinByBinId: (bin) => ({ toString: () => String(1 + Number(bin) / 1000) }),
     },
   };
@@ -117,7 +120,8 @@ try {
 
   config.experiments ??= {};
   config.experiments.paperTrading = false;
-  await t("LAPIS 1 flag-OFF parity: output diff kosong", async () => {
+  await t("DUAL LAPIS 1 OFF parity + LAPIS 2 ON shape, ZERO-TX", async () => {
+    config.strategy.dualSideEnabled = false;
     const before = await baseline.deployPosition({ ...args });
     const after = await patched.deployPosition({ ...args });
     assert.deepStrictEqual(after, before);
@@ -125,6 +129,21 @@ try {
     console.log("     before:", JSON.stringify(before));
     console.log("     after :", JSON.stringify(after));
     console.log("     diff  : []");
+
+    config.strategy.dualSideEnabled = true;
+    config.strategy.dualSideTokenPct = 10;
+    config.strategy.dualSideUpsidePct = 15;
+    config.strategy.dualSideStrategy = "bid_ask";
+    const dual = await patched.deployPosition({ ...args });
+    assert.strictEqual(dual.dry_run, true);
+    assert.ok(dual.would_deploy.bins_above > 0);
+    assert.strictEqual(dual.would_deploy.amount_x, 0);
+    assert.strictEqual(dual.would_deploy.amount_y, args.amount_y);
+    assert.strictEqual(globalThis.__paperHarness.txCount, 0);
+    console.log("     dual   :", JSON.stringify(dual.would_deploy));
+    console.log("     strategy branch: dualSideStrategy/percentX exact fork (static assert)");
+    console.log("     ZERO-TX:", globalThis.__paperHarness.txCount);
+    config.strategy.dualSideEnabled = false;
   });
 
   config.experiments.paperTrading = true;
