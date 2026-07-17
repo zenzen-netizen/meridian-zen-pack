@@ -71,10 +71,14 @@ function injectCustomKeys(u) {
   // ── strategy (fork :269, :277-280) ──
   const st = config.strategy;
   st.strategyLock      = u.strategyLock      ?? "default";
-  st.dualSideEnabled   = u.dualSideEnabled   ?? false;
-  st.dualSideTokenPct  = u.dualSideTokenPct  ?? 10;
-  st.dualSideUpsidePct = u.dualSideUpsidePct ?? 15;
-  st.dualSideStrategy  = u.dualSideStrategy  ?? "bid_ask";
+
+  // ─── Dual-side (E1) — default OFF, byte-identical saat OFF ───
+  // Naruh sebagian kecil modal sbg TOKEN di bin ATAS harga → nangkep fee & apresiasi
+  // saat harga pump. OFF = single-side SOL seperti biasa (nol perubahan perilaku).
+  st.dualSideEnabled   = u.dualSideEnabled   ?? false;  // gerbang utama
+  st.dualSideTokenPct  = u.dualSideTokenPct  ?? 10;     // PERSEN (10 = 10%); di-/100 saat dipakai
+  st.dualSideUpsidePct = u.dualSideUpsidePct ?? 15;     // seberapa jauh (%) di atas harga token dipasang
+  st.dualSideStrategy  = u.dualSideStrategy  ?? "bid_ask"; // "spot" | "bid_ask" bentuk sebaran atas
 
   // ── schedule (fork :292-293) ──
   config.schedule.adaptiveScreening       = u.adaptiveScreening       ?? false;
