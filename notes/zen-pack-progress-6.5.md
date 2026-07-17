@@ -8,7 +8,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 
 - ✅ F0 — pre-flight
 - ✅ F1 — recon OLD/NEW presisi
-- ⬜ F2 — Patch 25a W1+W2
+- ✅ F2 — Patch 25a W1+W2
 - ⬜ F3 — Patch 25b W3+W4
 - ⬜ F4 — Patch 25c W5+W6+W7+W8
 - ⬜ F5 — gate money penuh
@@ -23,4 +23,3 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 Seluruh W1–W8 ada dan cocok konten; tidak ada dependensi absen atau pola OLD
 ambigu. Kutipan exact OLD/NEW, peta konsumen W2, dan analisis penghapusan W4 ada
 di `notes/lessons-write-6.5-recon.md`. Pekerjaan boleh lanjut ke F2.
-

@@ -1,0 +1,117 @@
+export async function recordPerformance(perf) {
+  const data = load();
+
+  // Guard against unit-mixed records where a SOL-sized final value is
+  // accidentally written into a USD field (e.g. final_value_usd = 2 for a 2 SOL close).
+  const suspiciousUnitMix =
+    Number.isFinite(perf.initial_value_usd) &&
+    Number.isFinite(perf.final_value_usd) &&
+    Number.isFinite(perf.amount_sol) &&
+    perf.initial_value_usd >= 20 &&
+    perf.amount_sol >= 0.25 &&
+    perf.final_value_usd > 0 &&
+    perf.final_value_usd <= perf.amount_sol * 2;
+
+  if (suspiciousUnitMix) {
+    log("lessons_warn", `Skipped suspicious performance record for ${perf.pool_name || perf.pool}: initial=${perf.initial_value_usd}, final=${perf.final_value_usd}, amount_sol=${perf.amount_sol}`);
+    return;
+  }
+
+  const pnl_usd = (perf.final_value_usd + perf.fees_earned_usd) - perf.initial_value_usd;
+  const pnl_pct = perf.initial_value_usd > 0
+    ? (pnl_usd / perf.initial_value_usd) * 100
+    : 0;
+  const range_efficiency = perf.minutes_held > 0
+    ? (perf.minutes_in_range / perf.minutes_held) * 100
+    : 0;
+
+  const closeReasonText = String(perf.close_reason || "").toLowerCase();
+  const suspiciousAbsurdClosedPnl =
+    Number.isFinite(pnl_pct) &&
+    perf.initial_value_usd >= 20 &&
+    pnl_pct <= -90 &&
+    !closeReasonText.includes("stop loss");
+
+  if (suspiciousAbsurdClosedPnl) {
+    log("lessons_warn", `Skipped absurd closed PnL record for ${perf.pool_name || perf.pool}: pnl_pct=${pnl_pct.toFixed(2)} reason=${perf.close_reason}`);
+    return;
+  }
+
+  const signalSnapshot = buildSignalSnapshot(perf);
+  const entry = {
+    ...perf,
+    signal_snapshot: signalSnapshot,
+    pnl_usd: Math.round(pnl_usd * 100) / 100,
+    pnl_pct: Math.round(pnl_pct * 100) / 100,
+    range_efficiency: Math.round(range_efficiency * 10) / 10,
+    recorded_at: new Date().toISOString(),
+  };
+
+  data.performance.push(entry);
+
+  // Derive and store a lesson
+  const lesson = derivLesson(entry);
+  if (lesson) {
+    data.lessons.push(lesson);
+    log("lessons", `New lesson: ${lesson.rule}`);
+  }
+
+  save(data);
+  if (lesson) {
+    void pushHiveLesson(lesson);
+  }
+
+  // Update pool-level memory
+  if (perf.pool) {
+    const { recordPoolDeploy } = await import("./pool-memory.js");
+    recordPoolDeploy(perf.pool, {
+      pool_name: perf.pool_name,
+      base_mint: perf.base_mint,
+      deployed_at: perf.deployed_at,
+      closed_at: entry.recorded_at,
+      pnl_pct: entry.pnl_pct,
+      pnl_usd: entry.pnl_usd,
+      range_efficiency: entry.range_efficiency,
+      minutes_held: perf.minutes_held,
+      fees_earned_usd: perf.fees_earned_usd,
+      fees_earned_sol: perf.fees_earned_sol,
+      fee_earned_pct: perf.initial_value_usd > 0 ? ((perf.fees_earned_usd || 0) / perf.initial_value_usd) * 100 : null,
+      close_reason: perf.close_reason,
+      strategy: perf.strategy,
+      volatility: perf.volatility,
+      entry_mcap: perf.entry_mcap,
+      entry_tvl: perf.entry_tvl,
+      entry_volume: perf.entry_volume,
+      exit_mcap: perf.exit_mcap,
+      exit_tvl: perf.exit_tvl,
+      exit_volume: perf.exit_volume,
+    });
+  }
+
+  // Evolve thresholds every 5 closed positions
+  if (data.performance.length % MIN_EVOLVE_POSITIONS === 0) {
+    const { config, reloadScreeningThresholds } = await import("./config.js");
+    const result = evolveThresholds(data.performance, config);
+    if (result?.changes && Object.keys(result.changes).length > 0) {
+      reloadScreeningThresholds();
+      log("evolve", `Auto-evolved thresholds: ${JSON.stringify(result.changes)}`);
+    }
+
+    // Darwinian signal weight recalculation
+    if (config.darwin?.enabled) {
+      const { recalculateWeights } = await import("./signal-weights.js");
+      const wResult = recalculateWeights(data.performance, config);
+      if (wResult.changes.length > 0) {
+        log("evolve", `Darwin: adjusted ${wResult.changes.length} signal weight(s)`);
+      }
+    }
+  }
+
+  void pushHivePerformanceEvent({
+    ...entry,
+    base_mint: perf.base_mint || null,
+    fees_earned_sol: perf.fees_earned_sol || 0,
+    eventId: `close:${perf.position}:${entry.recorded_at}`,
+  });
+
+}
