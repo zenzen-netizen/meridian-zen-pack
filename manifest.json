@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "6.5",
+  "stage": "6.6",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -38,7 +38,9 @@
     "23-telegram-reports",
     "25a-lessons-record-live",
     "25b-lessons-evolve-cleanup",
-    "25c-lessons-writers-prompt"
+    "25c-lessons-writers-prompt",
+    "26a-pool-memory-deployed-addresses",
+    "26b-briefing-full-parity"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -63,7 +65,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.5 closes the lessons read/write extraction with live-only learning isolation.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.6 closes Stage 6 with byte-exact briefing parity; former 6.7 orchestration moves to Stage 7.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -263,6 +265,18 @@
     "lessons_raw_diff_contract": "Empat hunk tersisa hanya marker/routing: marker paths; relokasi binding/time helper rumah Patch 04a/21; marker kosong penghapusan W4; marker read-layer. recordPerformance, evolveThresholds, dan addLesson→fmt byte-identik fork.",
     "scope_negative": "tools/pnl.js tetap empat hunk propagasi Jupiter display; state.js tetap utang 7.8/7.9; file target lain tidak diubah oleh 6.5.",
     "gate": "Syntax PASS; uninstall verify clean + porcelain 0 + git clean -fd; fresh reinstall + Patch 25a-c idempotent; lessons-write 5/5 (paper config/weights byte-sama, live threshold+Darwin bergerak, suspect/dedup/remove/prompt filter); full harness PASS; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side diff=[]; prompt parity 8/8; smoke v0.2 PASS.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_6_6": {
+    "summary": "briefing.js full-file byte-exact parity dengan experimental@643e954; 6.7 lama dilebur ke 6.6 dan Stage 6 selesai.",
+    "patch_26a": "getDeployedPoolAddresses tiga baris diport verbatim melalui rumah pool-memory existing; utang pool-memory lunas.",
+    "patch_26b": "briefing.js post-Patch-02 diganti utuh memakai snip RAW; SHA-256 target/fork 699e669db314e15699a50873e479d7cd5629bbb4eb8a96c2c0098feda250b403; raw diff kosong tanpa marker terpasang.",
+    "imports": "Seluruh 17 import module dan 11 named report exports hidup. Empat drop-in yang diminta sudah ada dan byte-identik fork; tidak ada drop-in baru.",
+    "pool_memory_debt": "LUNAS via Patch 26a.",
+    "defer_7x": "orkestrasi briefing index.js (cron/dedup/lastSent/milestone-call, fork index L223–461) → 7.x.",
+    "dead_exports_expected": "generatePeriodicBriefing, buildMilestoneReport, dan varian argumen generateBriefing menunggu konsumen index.js Stage 7.",
+    "gate": "Syntax PASS; uninstall briefing kembali vanilla committed 72 baris + verify clean + porcelain 0; reinstall lalu reinstall-idempotent; smoke briefing 4/4; full harness PASS; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side diff=[]; prompt parity 8/8; golden SHA/diff exact.",
+    "stage_6_complete": true,
     "nol_sentuh_bot_live": true
   }
 }

@@ -10,7 +10,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 - ✅ F1 — verifikasi import + lunasi pool-memory
 - ✅ F2 — replace briefing.js byte-exact
 - ✅ F3 — gate penuh
-- ⬜ F4 — manifest + tutup Stage 6
+- ✅ F4 — manifest + tutup Stage 6
 
 ## F0 — bukti satu baris
 
@@ -82,3 +82,13 @@ Patch 26a seluruh rantai lengkap dan pekerjaan boleh lanjut F2.
   DLMM-PAPER 6/6; dual-side `diff: []`; prompt parity 8/8.
 - Golden raw diff briefing vs fork: kosong; SHA target tetap
   `699e669db314e15699a50873e479d7cd5629bbb4eb8a96c2c0098feda250b403`.
+
+## F4 — tutup Stage 6
+
+- Manifest naik ke 6.6 dan mencatat Patch 26a/26b serta SHA briefing.
+- Drop-in baru: tidak ada. Utang `getDeployedPoolAddresses`: LUNAS via
+  Patch 26a.
+- 6.7 lama resmi dilebur ke 6.6; Stage 6 SELESAI.
+- Utang baru Stage 7: orkestrasi briefing `index.js`
+  (cron/dedup/lastSent/milestone-call, fork L223–461). Dead exports briefing
+  tetap sah sampai pemanggil tersebut diport.

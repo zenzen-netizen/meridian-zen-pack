@@ -148,7 +148,8 @@
    B/C/D deferred (see debt table). No patch, no plugin.
 
 ✅ 4.4 pool-memory.js — verdict-only. Routing covered patch 02;
-   getDeployedPoolAddresses additive, consumer briefing.js only → DEFER 6.5/6.6.
+   getDeployedPoolAddresses additive, consumer briefing.js only → LUNAS 6.6
+   via Patch 26a; briefing full-parity menjadi konsumen aktif.
 
 ✅ 4.5 smart-wallets.js — verdict-only. Routing-only, covered patch 02. No debt.
 
@@ -534,10 +535,14 @@ Utang terkonsolidasi:
 |---|---|---|
 | Stage 6.4/6.5 | `classifyNarrative`, `classifySession`, `sessionLabel`, reports/lessons helpers, `estimateGasSol` in notifyClose | `reports.js` import chain still unsafe; patch 18 uses `gasSol=null` |
 | Stage 6.4/6.5 | time/narrative prompt profile helpers | prompt profile signals still deferred |
-| Stage 6.5/6.6 | pool-memory deployed pool consumer / briefing linkage | additive helper landed but core consumer not ported |
+| LUNAS 6.6 | pool-memory deployed pool consumer / briefing linkage | Patch 26a helper + Patch 26b briefing full-parity |
 | Stage 7.x | `computeDeployAmount(mode=maximize)`, `persistConfigChange`, update_config split persistence | consumers are index/executor paths not safely ported in Stage 5 |
 | Stage 7.x | agent `runToolCall` dedup/CHAT_CONFIRM/recordLlmCost/generalMaxTokens | patch 11 intentionally limited to fallback + salvage |
+| Stage 7.x | orkestrasi briefing `index.js` (cron/dedup/lastSent/milestone-call, fork L223–461) | 6.7 lama dilebur ke 6.6; dead exports briefing siap, pemanggil ditunda |
 | Stage 7.2 | settings menu machine and `cfg:` callbacks | money-adjacent config mutation |
 | Stage 7.x | executor fork auto-swap variant | vanilla local auto-swap exists; fork replacement deferred |
 | Stage 8 | `tools/study.js` experimental API wiring decision-basis | not Stage 5 extraction |
 | Stage 8.4 | opportunity poller adoption validation | upstream vanilla behavior kept intentionally |
+
+Roadmap: 6.7 dilebur ke 6.6. Stage 6 SELESAI pada full-parity briefing;
+orkestrasi `index.js` resmi masuk Stage 7.x.
