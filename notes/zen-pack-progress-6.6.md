@@ -9,7 +9,7 @@ hanya `/home/ubuntu/meridian-lab/vanilla-test`.
 - ✅ F0 — pre-flight
 - ✅ F1 — verifikasi import + lunasi pool-memory
 - ✅ F2 — replace briefing.js byte-exact
-- ⬜ F3 — gate penuh
+- ✅ F3 — gate penuh
 - ⬜ F4 — manifest + tutup Stage 6
 
 ## F0 — bukti satu baris
@@ -55,3 +55,30 @@ ambigu.
 Tidak ada drop-in baru yang perlu disalin. Temuan absen hanya helper
 pool-memory yang sudah punya keputusan owner eksplisit untuk diport; setelah
 Patch 26a seluruh rantai lengkap dan pekerjaan boleh lanjut F2.
+
+## F2 — full-file replace
+
+- Patch `26b-briefing-full-parity.mjs` mengganti sumber post-Patch-02 utuh
+  memakai dua snip RAW, sehingga template literal tidak disentuh shell.
+- SHA-256 target = fork:
+  `699e669db314e15699a50873e479d7cd5629bbb4eb8a96c2c0098feda250b403`.
+- `node --check briefing.js`: PASS. Raw `diff` terhadap `git show` kosong;
+  file terpasang tidak membutuhkan marker tambahan.
+
+## F3 — gate penuh
+
+- Syntax: seluruh file pack/target yang disentuh PASS.
+- Siklus: uninstall mengembalikan briefing vanilla committed 72 baris, SHA
+  `da43bac6edd7a5d4fa537926a746798bcc68d81596ddee20ba14a30b207fdd20`,
+  verify clean dan porcelain kosong; reinstall pertama sukses; reinstall kedua
+  no-op untuk routing briefing, Patch 26a, dan Patch 26b.
+- Idempotensi full-replace membutuhkan routing Patch 02 mengenali import yang
+  sudah hadir tanpa marker. `applyPatch({ already })` ditambah secara minimal
+  dan diuji: patcher 16/16.
+- Smoke briefing sintetis: `generateBriefing`,
+  `generatePeriodicBriefing("week")`, `buildMilestoneReport`, serta dataset
+  kosong/varian argumen: 4/4 PASS.
+- Harness penuh + `npm test`: PASS; Telegram 19/19 + ext 5/5;
+  DLMM-PAPER 6/6; dual-side `diff: []`; prompt parity 8/8.
+- Golden raw diff briefing vs fork: kosong; SHA target tetap
+  `699e669db314e15699a50873e479d7cd5629bbb4eb8a96c2c0098feda250b403`.

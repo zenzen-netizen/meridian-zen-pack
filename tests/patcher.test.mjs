@@ -34,6 +34,14 @@ t("idempotent: patch kedua kali -> skipped (tak dobel)", () => {
   assert.strictEqual((out.match(/hook-bus/g) || []).length, 2); // cuma 1 blok (2 tag: begin+end)
 });
 
+t("idempotent: inject sudah ada tanpa marker -> skipped via already", () => {
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = applyPatch({ ...cfg(), anchor: "// ANCHOR:INIT",
+    inject: 'console.log("vanilla boot");', already: 'console.log("vanilla boot");', marker: "ZENPACK:adopted" });
+  assert.strictEqual(r.status, "skipped-idempotent");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
+});
+
 t("anchor tak ketemu -> lapor, file TIDAK berubah", () => {
   const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
   const r = applyPatch({ ...cfg(), anchor: "// ANCHOR:TIDAK-ADA", inject: "x", marker: "ZENPACK:x" });

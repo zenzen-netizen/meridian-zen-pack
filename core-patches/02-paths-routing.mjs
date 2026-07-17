@@ -21,7 +21,7 @@ export default [
     { old: `const CACHE_PATH = repoPath("hivemind-cache.json");`, new: `const CACHE_PATH = paths.hivemindCachePath;` },
     // hivemind.js:9 PACKAGE_JSON_PATH sengaja TIDAK diubah (identitas kode, bukan data)
   ]},
-  { file: "briefing.js", marker: M, anchor: ANCHOR, inject: IMP, replaces: [
+  { file: "briefing.js", marker: M, anchor: ANCHOR, inject: IMP, already: IMP, replaces: [
     { old: `const STATE_FILE = repoPath("state.json");`, new: `const STATE_FILE = paths.statePath;` },
     { old: `const LESSONS_FILE = repoPath("lessons.json");`, new: `const LESSONS_FILE = paths.lessonsPath;` },
   ]},
