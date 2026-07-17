@@ -1,0 +1,3 @@
+        const pMinBinId = activeBin.binId - activeBinsBelow;
+        // ZP-6.2: !dualSide ditunda — dipulihkan patch dual-side 6.3
+        const pMaxBinId = isSingleSidedSol ? activeBin.binId : activeBin.binId + activeBinsAbove;

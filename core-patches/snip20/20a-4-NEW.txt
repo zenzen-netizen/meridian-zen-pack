@@ -1,0 +1,2 @@
+        const pMinBinId = activeBin.binId - activeBinsBelow;
+        const pMaxBinId = (isSingleSidedSol && !dualSide) ? activeBin.binId : activeBin.binId + activeBinsAbove;

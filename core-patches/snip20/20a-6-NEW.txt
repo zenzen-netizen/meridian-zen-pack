@@ -1,0 +1,29 @@
+  // Read base fee directly from pool — baseFactor * binStep / 10^6 gives fee in %
+  const baseFactor = pool.lbPair.parameters?.baseFactor ?? 0;
+  const actualBaseFee = base_fee ?? (baseFactor > 0 ? parseFloat((baseFactor * actualBinStep / 1e6 * 100).toFixed(4)) : null);
+
+  // ─── Dual-side (E1) pre-swap (Cara B, lokal): tukar porsi token dari SOL ───
+  let dualSideSwapped = false;
+  if (dualSide && dualSideTokenPct > 0) {
+    const swapSol = finalAmountY * dualSideTokenPct;
+    const dsBaseMint = pool.lbPair.tokenXMint.toString();
+    const dsSwap = await swapToken({ input_mint: config.tokens.SOL, output_mint: dsBaseMint, amount: swapSol });
+    const dsTokenOutRaw = Number(dsSwap?.amount_out ?? 0);
+    if (!dsSwap?.success || !Number.isFinite(dsTokenOutRaw) || dsTokenOutRaw <= 0) {
+      throw new Error(`Dual-side pre-swap gagal / 0 token diterima: ${JSON.stringify(dsSwap).slice(0, 160)}`);
+    }
+    // amount_out dari swapToken() adalah RAW base units (mis. Jupiter outputAmountResult) —
+    // konversi ke human-readable dulu, karena finalAmountX & totalXLamports di bawah (dan
+    // cleanup di catch) mengasumsikan amount human-readable (sama seperti amount_y/amount_sol).
+    const dsMintInfo = await getConnection().getParsedAccountInfo(new PublicKey(dsBaseMint));
+    const dsDecimals = dsMintInfo.value?.data?.parsed?.info?.decimals ?? 9;
+    const dsTokenOut = dsTokenOutRaw / Math.pow(10, dsDecimals);
+    finalAmountX = dsTokenOut;
+    finalAmountY = finalAmountY - swapSol;
+    dualSideSwapped = true;
+    log("deploy", `Dual-side pre-swap: ${swapSol} SOL → ${dsTokenOut} token (sisi atas)`);
+  }
+
+  const totalYLamports = new BN(Math.floor(finalAmountY * 1e9));
+  // For X, we assume it's also 9 decimals for now, or we'd need to fetch mint decimals.
+  // Most Meteora pools base tokens are 6 or 9. To be safe, we should fetch.

@@ -4,8 +4,7 @@
     if (isPaperMode()) {
       try {
         const pMinBinId = activeBin.binId - activeBinsBelow;
-        // ZP-6.2: !dualSide ditunda — dipulihkan patch dual-side 6.3
-        const pMaxBinId = isSingleSidedSol ? activeBin.binId : activeBin.binId + activeBinsAbove;
+        const pMaxBinId = (isSingleSidedSol && !dualSide) ? activeBin.binId : activeBin.binId + activeBinsAbove;
         const pMinPrice = Number(getPriceOfBinByBinId(pMinBinId, actualBinStep).toString());
         const pMaxPrice = Number(getPriceOfBinByBinId(pMaxBinId, actualBinStep).toString());
         const baseFactor = pool.lbPair.parameters?.baseFactor ?? 0;

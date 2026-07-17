@@ -1,0 +1,2 @@
+  if (process.env.DRY_RUN === "true") {
+    // 🧪 Paper trading: track the would-deploy as a virtual position so the full

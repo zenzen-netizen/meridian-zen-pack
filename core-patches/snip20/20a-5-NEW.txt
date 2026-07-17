@@ -1,0 +1,6 @@
+  const maxBinId = (isSingleSidedSol && !dualSide) ? activeBin.binId : activeBin.binId + activeBinsAbove;
+
+  if (minBinId > maxBinId) {
+    throw new Error(`Invalid bin range: ${minBinId} -> ${maxBinId}`);
+  }
+  if (isSingleSidedSol && !dualSide && maxBinId !== activeBin.binId) {
