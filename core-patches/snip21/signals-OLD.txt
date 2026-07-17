@@ -1,0 +1,15 @@
+const PERFORMANCE_SIGNAL_FIELDS = [
+  "organic_score",
+  "fee_tvl_ratio",
+  "volume",
+  "mcap",
+  "holder_count",
+  "smart_wallets_present",
+  "narrative_quality",
+  "study_win_rate",
+  "hive_consensus",
+  "volatility",
+  "entry_mcap",
+  "entry_tvl",
+  "entry_volume",
+];

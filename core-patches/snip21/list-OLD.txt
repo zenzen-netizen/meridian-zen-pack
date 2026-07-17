@@ -1,0 +1,24 @@
+/**
+ * List lessons with optional filters — for agent browsing via Telegram.
+ */
+export function listLessons({ role = null, pinned = null, tag = null, limit = 30 } = {}) {
+  const data = load();
+  let lessons = [...data.lessons];
+
+  if (pinned !== null) lessons = lessons.filter((l) => !!l.pinned === pinned);
+  if (role)            lessons = lessons.filter((l) => !l.role || l.role === role);
+  if (tag)             lessons = lessons.filter((l) => l.tags?.includes(tag));
+
+  return {
+    total: lessons.length,
+    lessons: lessons.slice(-limit).map((l) => ({
+      id: l.id,
+      rule: l.rule.slice(0, 120),
+      tags: l.tags,
+      outcome: l.outcome,
+      pinned: !!l.pinned,
+      role: l.role || "all",
+      created_at: l.created_at?.slice(0, 10),
+    })),
+  };
+}
