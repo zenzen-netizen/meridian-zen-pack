@@ -87,6 +87,17 @@ t("replace: idempotent -> kedua kali skipped", () => {
   assert.strictEqual(r2.status, "skipped-idempotent");
 });
 
+t("replace: NEW diperlakukan literal, bukan replacement pattern ($ aman)", () => {
+  const c = cfg();
+  const newLine = 'console.log(`price $${amount}`);';
+  const r = replaceLine({ ...c, oldLine: 'console.log("vanilla boot");', newLine });
+  assert.strictEqual(r.status, "replaced");
+  const out = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  assert.ok(out.includes(newLine));
+  const r2 = replaceLine({ ...c, oldLine: 'console.log("vanilla boot");', newLine });
+  assert.strictEqual(r2.status, "skipped-idempotent");
+});
+
 t("replace: OLD ganda -> old-not-unique, file utuh", () => {
   writeFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "const a = 1;\nconst a2 = 1;\n// const a = 1;\n");
   const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");

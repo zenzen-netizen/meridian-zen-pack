@@ -1,0 +1,32 @@
+  // Multi-category discovery: fetch each configured category and merge + dedupe by
+  // pool_address. Same `filters` + `timeframe` apply to every category, so this widens
+  // the candidate pool (breadth) without loosening any quality gate. null/[] → single
+  // category (factory behavior). Fail-open: a failing category just contributes nothing.
+  const categories = Array.isArray(s.categories) && s.categories.length
+    ? [...new Set(s.categories.map((c) => String(c).trim()).filter(Boolean))]
+    : [s.category];
+
+  const pages = await Promise.all(
+    categories.map((category) =>
+      fetchPoolDiscoveryPage({ page_size, filters, timeframe: s.timeframe, category })
+        .then((d) => (Array.isArray(d?.data) ? d.data : []))
+        .catch((error) => {
+          log("screening", `Category "${category}" fetch failed: ${error.message}`);
+          return [];
+        })
+    )
+  );
+
+  const seenPoolAddresses = new Set();
+  let rawPools = [];
+  for (const page of pages) {
+    for (const pool of page) {
+      const addr = pool?.pool_address;
+      if (!addr || seenPoolAddresses.has(addr)) continue;
+      seenPoolAddresses.add(addr);
+      rawPools.push(pool);
+    }
+  }
+  if (categories.length > 1) {
+    log("screening", `Multi-category merge [${categories.join(", ")}]: ${rawPools.length} distinct pools`);
+  }
