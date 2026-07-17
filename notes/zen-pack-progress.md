@@ -499,7 +499,7 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 - Boot DRY_RUN: `[zen-pack] loaded 6 plugins (skipped 0, errors 0)`.
 - Cycle: uninstall restored patched files verify clean + porcelain 0; reinstall final OK; post-reinstall telegram-ext 5/5 + telegram-cmds 19/19; scoped artifacts cleaned.
 
-✅ FASE D manifest + Stage 5 close commit TBD.
+✅ FASE D manifest + Stage 5 close commit `6781316`.
 - Manifest stage -> 5.10; patches +`18-telegram-ext`; `stage_5_10` records reports.js trap and `estimateGasSol` defer 6.4/6.5.
 - Stage 5 closed: patch 08-18, plugin 50-config-ext, `zenpack-lib/sizing.js`, deviasi-sadar poller + degenScore, and consolidated debt below.
 
@@ -516,7 +516,7 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 | 5.7 | wallet full parity patch 14 + executor exit patch 15 | `4218be0`, `73ad3c0`, `51158a7`, `3e86275` |
 | 5.8 | screening patch 16 + chart-indicators patch 17 | `ddcaca5`, `9ac80c7`, `9a2feb2`, `1b1c1b5` |
 | 5.9 | token/study verdict-only | `140759a` |
-| 5.10 | telegram display/notif patch 18 | `50cde43`, `83d8bf1`, `3d04757`, FASE D TBD |
+| 5.10 | telegram display/notif patch 18 | `50cde43`, `83d8bf1`, `3d04757`, `6781316` |
 
 Patch Stage 5: `08-config-reload-hook`, `09-dryrun-userconfig-wins`, `10-agent-constants`, `11-agentloop-fallback-salvage`, `12-executor-money-blocks`, `13-deploy-schema-conviction`, `14-wallet-ext`, `15-executor-exit`, `16-screening-multicategory`, `17-chart-indicators-smi`, `18-telegram-ext`.
 
