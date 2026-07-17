@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.10,
+  "stage": "5.10",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
