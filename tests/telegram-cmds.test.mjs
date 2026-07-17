@@ -1,16 +1,34 @@
 // Gerbang 3.3 + 3.4: sandbox tanpa token Telegram -> invoke hook "telegram:command"
 // langsung terhadap TARGET ter-install, assert handled + efek file nyata.
 //   node tests/telegram-cmds.test.mjs <path-target>
-// CATATAN: /preset save/use MENULIS user-config.json (stamp activeSetup) —
-// caller wajib backup/restore user-config.json di sekitar run (lihat gerbang bash).
+// CATATAN: /preset save/use MENULIS user-config.json (stamp activeSetup);
+// test ini backup/restore sendiri supaya suite idempotent.
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import assert from "node:assert";
 
 const target = process.argv[2];
 if (!target) { console.error("pakai: node tests/telegram-cmds.test.mjs <path-target>"); process.exit(1); }
 process.chdir(target); // path relatif profil/export dihitung dari repo target
+
+const userConfigPath = join(target, "user-config.json");
+const hadUserConfig = existsSync(userConfigPath);
+const originalUserConfig = hadUserConfig ? readFileSync(userConfigPath) : null;
+const presetArtifacts = ["presets/sandboxset.json", "presets/_backup.json"].map((rel) => {
+  const path = join(target, rel);
+  return { path, had: existsSync(path), data: existsSync(path) ? readFileSync(path) : null };
+});
+function restoreUserConfig() {
+  if (hadUserConfig) writeFileSync(userConfigPath, originalUserConfig);
+  else rmSync(userConfigPath, { force: true });
+  for (const item of presetArtifacts) {
+    if (item.had) writeFileSync(item.path, item.data);
+    else rmSync(item.path, { force: true });
+  }
+}
+for (const item of presetArtifacts) rmSync(item.path, { force: true });
+process.on("exit", restoreUserConfig);
 
 const hooks = await import(pathToFileURL(join(target, "zenpack-lib/hooks.js")).href);
 const { loadPlugins } = await import(pathToFileURL(join(target, "zenpack-lib/loader.js")).href);

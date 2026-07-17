@@ -491,3 +491,10 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 - Ported: `splitText`, multi-chunk `sendMessage`/`sendHTML` with HTML fallback, `flushFinal`, 2 summarize cases, dispatch polling, fork bot command descriptions, render-based `notify*`.
 - Path block skipped (covered by patch 02). `reports.js` not imported; `notifyClose` uses `const gasSol = null` with `[zen-pack] estimateGasSol deferred to 6.4/6.5`.
 - Validation: `node --check telegram.js`, count `splitText=1 flushFinal=1 dispatch=1 reportsImport=0 gasNull=1`; apply pass 2 = 11 skipped-idempotent.
+
+✅ FASE C test/gate commit TBD.
+- New `tests/telegram-ext.test.mjs` 5/5: splitText long/short, sendHTML HTML→plain fallback, notifyClose `gasSol=null`, live labels `check_smart_wallets_on_pool` + `get_active_bin`. All network stubbed, no Telegram/Jupiter real call.
+- Test hygiene fixed: `tests/telegram-cmds.test.mjs` backs up/restores `user-config.json` plus preset artifacts; telegram suite restored to 19/19.
+- Full harness PASS: hooks 8, patcher 15, paths 12, profile 10, prompt 8, config 15, agent constants 8, agentloop 14, definitions 4, sizing 14, executor-ext 13, executor-exit 10, wallet 5, screening 4, smi 4, telegram-cmds 19, telegram-ext 5, smoke PASS.
+- Boot DRY_RUN: `[zen-pack] loaded 6 plugins (skipped 0, errors 0)`.
+- Cycle: uninstall restored patched files verify clean + porcelain 0; reinstall final OK; post-reinstall telegram-ext 5/5 + telegram-cmds 19/19; scoped artifacts cleaned.
