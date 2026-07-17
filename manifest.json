@@ -176,7 +176,7 @@
     "summary": "telegram.js display/notif extension: patch 18 ports fork display chunks/live flush/notif render wrappers while avoiding reports.js boot trap.",
     "patch_18": "11 replaceLine exact via snip18: splitText, multi-chunk sendMessage/sendHTML with HTML fallback, pin/unpin/escapeHtml exports, summarize cases for check_smart_wallets_on_pool/get_active_bin, flushFinal, ICON live status, dispatch polling, BOT_COMMANDS fork descriptions, renderDeploy/renderClose/renderSwap/renderOOR wrappers.",
     "path_routing": "Skipped in patch 18 because patch 02 already routes USER_CONFIG_PATH to paths.userConfigPath.",
-    "reports_trap": "No import from reports.js. reports.js still fails static import because lessons lacks classifyNarrative/classifySession/sessionLabel. notifyClose sets gasSol=null with comment; estimateGasSol deferred to 6.4/6.5.",
+    "reports_trap": "LUNAS 6.4: reports.js bootable; telegram notifyClose memakai estimateGasSol dan pnlBlock /status+/wallet hidup.",
     "gate": "telegram-ext 5/5, telegram-cmds 19/19 restored, full harness PASS, npm test smoke PASS, boot DRY_RUN loaded 6 plugins skipped 0 errors 0. Cycle uninstall -> porcelain 0 -> reinstall OK.",
     "stage_5_closed": true,
     "nol_sentuh_bot_live": true
@@ -203,7 +203,7 @@
     "patch_20e": "Non-atomic wide-range orphan cleanup, dual-side swap-back cleanup, signal logging fallback, retry 8s, PnL sanity, empirical rent fallback, display fallback, dan close_reason; ensureDeployedAt backfill dikeluarkan.",
     "patch_20f": "Enam helper display/string fork tools/pnl.js dipasang verbatim dan diimport dlmm.js; hanya pemakaian G row posisi dan I final close non-tracked yang diaktifkan.",
     "dual_side_restore_paid": "LUNAS 6.3 — !dualSide pulih; blok paper sekarang memakai bentuk fork penuh.",
-    "defer_6_4_6_5": "Kategori H tetap utuh: F9-light close notification/recorded PnL dan re-point estimateGasSol ke reports.js.",
+    "defer_6_4_6_5": "Bagian 6.4 LUNAS: kategori H F9-light + re-point reports. Sisa 6.5 hanya lessons write-layer.",
     "defer_7_8_7_9": "ensureDeployedAt/deployed_at backfill ditunda bersama utang state/exit fields stage 6.2; state.js tidak ditambah fungsi pada 6.3.",
     "baseline_transport_deltas": {
       "items": [
@@ -216,14 +216,37 @@
     },
     "dlmm_raw_diff_contract": [
       "marker zen-pack",
-      "import shim estimateGasSol dari ../zenpack-lib/gas-est.js",
-      "kategori H utuh — utang 6.4/6.5",
       "deployed_at/ensureDeployedAt backfill — utang 7.8/7.9",
       "empat baseline_transport_deltas yang disahkan owner"
     ],
     "pnl_raw_diff_contract": "Blok enam helper 20f identik fork. Empat hunk sisa adalah propagasi Jupiter symbol/display F6 lain yang addendum owner eksplisit larang ikut karena di luar scope.",
     "raw_diff_audit": "Sapu-tuntas full-file: 16 hunk semantik dlmm.js seluruhnya terklasifikasi oleh dlmm_raw_diff_contract; 4 hunk pnl.js seluruhnya terklasifikasi oleh pnl_raw_diff_contract; kandidat baseline delta baru = 0.",
     "gate": "node --check semua file tersentuh PASS; fresh uninstall seluruh hash clean + porcelain 0 + git clean -fd; fresh reinstall PASS dan install kedua seluruh op idempotent; dual-side OFF diff=[]; ON+DRY_RUN shape hidup dan ZERO-TX=0; DLMM-PAPER 6/6; Telegram 19/19+5/5; full regression harness dan smoke PASS; 25 snippet NEW golden terhadap committed fork.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_6_4": {
+    "summary": "lessons.js read-layer Patch 21; reports.js aktif; gas shim dihapus; dlmm kategori H Patch 22; Telegram/report consumers Patch 23; prompt profiles Patch 24.",
+    "patch_21": "Tiga exact replacements via snip21: enam PERFORMANCE_SIGNAL_FIELDS, listLessons full, dan complete read-layer fork. 17 function export read tersedia; getPerformanceSummary membawa invested+ROI. Existing Patch 03a/04a marker dipertahankan untuk reinstall idempotent. Tidak menyentuh write-layer 6.5.",
+    "reports_dropin": "plugins/reports.js sudah full-file byte-identik experimental@643e954 (SHA-256 23b792d8129e438ae64e3dc91b568cef02791e37b897eb52c07768fc4c4de8f9); setelah Patch 21 static import dan smoke hidup.",
+    "gas_est_shim_paid": "LUNAS: Patch 19a dlmm.js mengimpor ../reports.js; lib/gas-est.js dihapus; estimator constants/hasil identik; DLMM-PAPER 6/6 tetap hijau.",
+    "patch_22": "Dua close path relay+lokal: capture derivedLesson1/2 dan return F9-light recorded_pnl_usd/pct, resolved pair, fee, reason, peak, lesson. NEW return blocks byte-verbatim fork via snip22.",
+    "patch_23": "telegram.js mengimpor estimateGasSol dan notifyClose memakai lifecycle estimate 0.00006 SOL; plugin 30 mengisi pnlBlock /status dan /wallet melalui formatPnlTracker(getModePerformance()). Patch 18 final NEW diselaraskan agar upgrade+reinstall idempotent.",
+    "patch_24": "plugin 40 existing prompt:build house mengimpor getTimeProfileForPrompt/getNarrativeProfileForPrompt dan menyisipkannya ke SCREENER dalam urutan fork; narrative tetap gated narrativeProfileSignal. Core prompt.js tidak disentuh.",
+    "debts_paid": [
+      "gas-est repoint + shim removal",
+      "dlmm kategori H close notification/recorded PnL",
+      "telegram notifyClose gasSol",
+      "/status dan /wallet Realized pnlBlock",
+      "prompt timeProfile + narrativeProfile"
+    ],
+    "debts_remaining": [
+      "6.5 lessons write-layer: recordPerformance suspect/paper/time fields, evolve isolation, addLesson dedup, prompt paper filter, fmt sim marker",
+      "7.8/7.9 state deployed_at/ensureDeployedAt dan exit fields",
+      "7.x executor/index/config/gmgn dan workstream lain yang sudah tercatat",
+      "tools/pnl.js empat hunk propagasi Jupiter display"
+    ],
+    "raw_diff_contract": "dlmm: marker + ensureDeployedAt 7.8/7.9 + empat baseline transport deltas; gas shim dan kategori H dicabut. lessons: marker/relokasi Patch 21 + write-layer 6.5. Tidak ada hunk tak terklasifikasi.",
+    "gate": "Syntax seluruh touched PASS; uninstall hash-clean + git clean -fd porcelain 0; fresh install + reinstall idempotent; full harness pasca-reinstall hijau; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side LAPIS diff=[]; lessons 17 exports empty/legacy/synthetic; reports/pnlBlock smoke; prompt parity 8/8 + profile functional; close notif memuat gas/PnL/fee/give-back/lesson.",
     "nol_sentuh_bot_live": true
   }
 }

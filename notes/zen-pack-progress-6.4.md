@@ -14,7 +14,7 @@ Sumber kebenaran: committed fork `experimental@643e954` dari
 - ✅ F5 — Patch 22 kategori H dlmm
 - ✅ F6 — Patch 23 telegram/render + Patch 24 prompt
 - ✅ F7 — gate lengkap
-- ⬜ F8 — manifest + tutup
+- ✅ F8 — manifest + tutup
 
 ## F0 — bukti satu baris
 
