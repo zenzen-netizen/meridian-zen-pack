@@ -1,0 +1,46 @@
+// ─── Display-name resolution (F6) ──────────────────────────────
+// A position's display name ("BONK-SOL") is "unresolved" when the base-token
+// symbol never came back from the API at track time, leaving a bare "?" (or
+// "undefined"/"null"). These helpers heal the DISPLAY string only — no trading,
+// PnL, exit, or persisted record field is touched. Quote side (tokenY) is kept
+// when sane; only the base (tokenX) is what fails to resolve.
+const UNRESOLVED_TOKENS = new Set(["?", "undefined", "null", ""]);
+
+function badNamePart(part) {
+  return UNRESOLVED_TOKENS.has(String(part ?? "").trim().toLowerCase());
+}
+
+export function isUnresolvedName(name) {
+  if (!name || typeof name !== "string") return true;
+  return name.split("-").some(badNamePart);
+}
+
+function mintPrefix(mint) {
+  return typeof mint === "string" && mint.length > 5 ? `${mint.slice(0, 5)}…` : null;
+}
+
+// "GTAVi…-SOL" — a mint-prefixed fallback that's far more identifiable than "?".
+export function mintPrefixPair(mint, quote = "SOL") {
+  const pre = mintPrefix(mint);
+  return pre ? `${pre}-${quote}` : null;
+}
+
+// Returns the first candidate name that is already resolved, else null.
+export function firstResolvedName(...names) {
+  for (const n of names) if (!isUnresolvedName(n)) return n;
+  return null;
+}
+
+// Heal a position's DISPLAY name. `name` already resolved → returned untouched
+// (factory). Otherwise: a freshly re-resolved `symbol` wins, else a mint prefix,
+// else the original (so the worst case is still today's "?").
+export function resolveDisplayPair(name, baseMint, symbol) {
+  if (!isUnresolvedName(name)) return name;
+  const quote = typeof name === "string" && name.includes("-") && !badNamePart(name.split("-").pop())
+    ? name.split("-").pop().trim()
+    : "SOL";
+  if (symbol && !badNamePart(symbol)) return `${String(symbol).trim()}-${quote}`;
+  return mintPrefixPair(baseMint, quote) || name || `?-${quote}`;
+}
+
+// ─── Meteora /pnl per pool (deposit history) ────────────────────
