@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": 5.9,
+  "stage": 5.10,
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -22,7 +22,8 @@
     "14-wallet-ext",
     "15-executor-exit",
     "16-screening-multicategory",
-    "17-chart-indicators-smi"
+    "17-chart-indicators-smi",
+    "18-telegram-ext"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -47,7 +48,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 5.8 mengaktifkan tools/smi.js via chart-indicators full parity; gmgn.js consumer wiring deferred ke fase gmgn.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 5 closed with patch 18 telegram display/notif parity; reports.js import trap avoided.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -160,6 +161,15 @@
     "token_js": "vanilla-test/tools/token.js == fork-ref/tools/token.js byte-identical (diff 0), no custom extraction needed.",
     "study_js": "vanilla-test/tools/study.js remains vanilla-main; fork-ref/tools/study.js differs by experimental API wiring (direct config.api fetch vs agent-meridian helper). Owner verdict: decision-basis debt for Stage 8, not Stage 5 extraction.",
     "evidence": "token cmp exit=0; study vanilla-test==vanilla true; study vanilla-test!=fork-ref; fork study 159 lines vs vanilla 152.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_5_10": {
+    "summary": "telegram.js display/notif extension: patch 18 ports fork display chunks/live flush/notif render wrappers while avoiding reports.js boot trap.",
+    "patch_18": "11 replaceLine exact via snip18: splitText, multi-chunk sendMessage/sendHTML with HTML fallback, pin/unpin/escapeHtml exports, summarize cases for check_smart_wallets_on_pool/get_active_bin, flushFinal, ICON live status, dispatch polling, BOT_COMMANDS fork descriptions, renderDeploy/renderClose/renderSwap/renderOOR wrappers.",
+    "path_routing": "Skipped in patch 18 because patch 02 already routes USER_CONFIG_PATH to paths.userConfigPath.",
+    "reports_trap": "No import from reports.js. reports.js still fails static import because lessons lacks classifyNarrative/classifySession/sessionLabel. notifyClose sets gasSol=null with comment; estimateGasSol deferred to 6.4/6.5.",
+    "gate": "telegram-ext 5/5, telegram-cmds 19/19 restored, full harness PASS, npm test smoke PASS, boot DRY_RUN loaded 6 plugins skipped 0 errors 0. Cycle uninstall -> porcelain 0 -> reinstall OK.",
+    "stage_5_closed": true,
     "nol_sentuh_bot_live": true
   }
 }

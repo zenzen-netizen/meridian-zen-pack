@@ -479,22 +479,65 @@ Verdict 04b: hunk 1-2 (get_time_profile/get_narrative_profile) **SKIP** — sche
 
 ## Stage 5.10 telegram.js
 
-✅ FASE A recon commit TBD (`notes/fase-5.10-recon.md`).
+✅ FASE A recon commit `50cde43` (`notes/fase-5.10-recon.md`).
 - Anchor telegram.js count=1: `sendMessage`, `sendHTML`, `toolLabel`, `summarizeToolResult`, semua `notify*`. `splitText`/`flushFinal` absent.
 - Patch 03b hidup di `index.js:1431-1435`, bukan `telegram.js`; order runner `03b` sebelum future `18`; verdict no-overlap.
 - Path routing sudah hidup di `telegram.js` (`paths.userConfigPath`), jadi blok path patch 18 skip.
 - `views/notifs.js` + `views/format.js` self-contained/import OK.
 - `reports.js` trap valid: import gagal karena lessons belum export `classifyNarrative`; patch 18 dilarang import reports, pakai `gasSol = null`.
 
-✅ FASE B patch commit TBD.
+✅ FASE B patch commit `83d8bf1`.
 - Patch 18 `core-patches/18-telegram-ext.mjs` + `snip18/*`: 11 replaceLine exact over `telegram.js`.
 - Ported: `splitText`, multi-chunk `sendMessage`/`sendHTML` with HTML fallback, `flushFinal`, 2 summarize cases, dispatch polling, fork bot command descriptions, render-based `notify*`.
 - Path block skipped (covered by patch 02). `reports.js` not imported; `notifyClose` uses `const gasSol = null` with `[zen-pack] estimateGasSol deferred to 6.4/6.5`.
 - Validation: `node --check telegram.js`, count `splitText=1 flushFinal=1 dispatch=1 reportsImport=0 gasNull=1`; apply pass 2 = 11 skipped-idempotent.
 
-✅ FASE C test/gate commit TBD.
+✅ FASE C test/gate commit `3d04757`.
 - New `tests/telegram-ext.test.mjs` 5/5: splitText long/short, sendHTML HTML→plain fallback, notifyClose `gasSol=null`, live labels `check_smart_wallets_on_pool` + `get_active_bin`. All network stubbed, no Telegram/Jupiter real call.
 - Test hygiene fixed: `tests/telegram-cmds.test.mjs` backs up/restores `user-config.json` plus preset artifacts; telegram suite restored to 19/19.
 - Full harness PASS: hooks 8, patcher 15, paths 12, profile 10, prompt 8, config 15, agent constants 8, agentloop 14, definitions 4, sizing 14, executor-ext 13, executor-exit 10, wallet 5, screening 4, smi 4, telegram-cmds 19, telegram-ext 5, smoke PASS.
 - Boot DRY_RUN: `[zen-pack] loaded 6 plugins (skipped 0, errors 0)`.
 - Cycle: uninstall restored patched files verify clean + porcelain 0; reinstall final OK; post-reinstall telegram-ext 5/5 + telegram-cmds 19/19; scoped artifacts cleaned.
+
+✅ FASE D manifest + Stage 5 close commit TBD.
+- Manifest stage -> 5.10; patches +`18-telegram-ext`; `stage_5_10` records reports.js trap and `estimateGasSol` defer 6.4/6.5.
+- Stage 5 closed: patch 08-18, plugin 50-config-ext, `zenpack-lib/sizing.js`, deviasi-sadar poller + degenScore, and consolidated debt below.
+
+## Stage 5 penutup
+
+| Fase | Vonis | Commit |
+|---|---|---|
+| 5.1 | config custom keys via plugin 50 + patch 08/09 | `5717946`, `3417ef3`, `3be072c`, `1e325b7` |
+| 5.2 | config.js closed verdict-only; sizing fn deferred | `b402484` |
+| 5.3 | agent constants/intent patch 10 | `357aa82`, `e9bfdb8`, `d47e0b5` |
+| 5.4 | agent loop fallback + salvage patch 11 | `c7c32fb`, `560e6a7`, `d60029a` |
+| 5.5 | executor money/display blocks patch 12 + sizing lib | `f79798e`, `f2752e6`, `b692690` |
+| 5.6 | definitions deploy schema patch 13 | `787068c`, `fdcbf4d`, `fa22dc9` |
+| 5.7 | wallet full parity patch 14 + executor exit patch 15 | `4218be0`, `73ad3c0`, `51158a7`, `3e86275` |
+| 5.8 | screening patch 16 + chart-indicators patch 17 | `ddcaca5`, `9ac80c7`, `9a2feb2`, `1b1c1b5` |
+| 5.9 | token/study verdict-only | `140759a` |
+| 5.10 | telegram display/notif patch 18 | `50cde43`, `83d8bf1`, `3d04757`, FASE D TBD |
+
+Patch Stage 5: `08-config-reload-hook`, `09-dryrun-userconfig-wins`, `10-agent-constants`, `11-agentloop-fallback-salvage`, `12-executor-money-blocks`, `13-deploy-schema-conviction`, `14-wallet-ext`, `15-executor-exit`, `16-screening-multicategory`, `17-chart-indicators-smi`, `18-telegram-ext`.
+
+Plugin/lib Stage 5:
+- `zenpack-plugins/50-config-ext.js`
+- `zenpack-lib/sizing.js`
+
+Deviasi-sadar:
+- Opportunity poller vanilla retained (`config.opportunity.enabled === true`) despite fork absence; validate in Stage 8.4.
+- `degenScore` retained though fork removes it because vanilla opportunity poller still imports/calls it.
+
+Utang terkonsolidasi:
+
+| Target | Utang | Alasan |
+|---|---|---|
+| Stage 6.4/6.5 | `classifyNarrative`, `classifySession`, `sessionLabel`, reports/lessons helpers, `estimateGasSol` in notifyClose | `reports.js` import chain still unsafe; patch 18 uses `gasSol=null` |
+| Stage 6.4/6.5 | time/narrative prompt profile helpers | prompt profile signals still deferred |
+| Stage 6.5/6.6 | pool-memory deployed pool consumer / briefing linkage | additive helper landed but core consumer not ported |
+| Stage 7.x | `computeDeployAmount(mode=maximize)`, `persistConfigChange`, update_config split persistence | consumers are index/executor paths not safely ported in Stage 5 |
+| Stage 7.x | agent `runToolCall` dedup/CHAT_CONFIRM/recordLlmCost/generalMaxTokens | patch 11 intentionally limited to fallback + salvage |
+| Stage 7.2 | settings menu machine and `cfg:` callbacks | money-adjacent config mutation |
+| Stage 7.x | executor fork auto-swap variant | vanilla local auto-swap exists; fork replacement deferred |
+| Stage 8 | `tools/study.js` experimental API wiring decision-basis | not Stage 5 extraction |
+| Stage 8.4 | opportunity poller adoption validation | upstream vanilla behavior kept intentionally |
