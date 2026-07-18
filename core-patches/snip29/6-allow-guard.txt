@@ -1,0 +1,5 @@
+        // allowNoToolFinal: caller (e.g. the screening cron) treats "no action / skip"
+        // as a valid terminal answer. A no-tool final response is the legitimate ⛔ NO
+        // DEPLOY path, so accept it instead of looping to the canned retry message. The
+        // caller is responsible for guarding against a claimed-success-without-tool report.
+        if (mustUseRealTool && !sawToolCall && !allowNoToolFinal) {

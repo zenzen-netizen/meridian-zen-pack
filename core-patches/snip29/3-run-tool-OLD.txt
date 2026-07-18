@@ -1,0 +1,79 @@
+      // Execute each tool call in parallel
+      const toolResults = await Promise.all(msg.tool_calls.map(async (toolCall) => {
+        const functionName = toolCall.function.name.replace(/<.*$/, "").trim();
+        let functionArgs;
+
+        if (invalidToolArgErrors.has(toolCall.id)) {
+          const result = {
+            success: false,
+            error: invalidToolArgErrors.get(toolCall.id),
+            blocked: true,
+          };
+          await onToolFinish?.({ name: functionName, args: {}, result, success: false, step });
+          return {
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(result),
+          };
+        }
+
+        try {
+          functionArgs = JSON.parse(toolCall.function.arguments);
+        } catch {
+          try {
+            functionArgs = JSON.parse(jsonrepair(toolCall.function.arguments));
+            log("warn", `Repaired malformed JSON args for ${functionName}`);
+          } catch (parseError) {
+            log("error", `Failed to parse args for ${functionName}: ${parseError.message}`);
+            const result = {
+              success: false,
+              error: `Invalid tool arguments for ${functionName}`,
+              blocked: true,
+            };
+            await onToolFinish?.({ name: functionName, args: {}, result, success: false, step });
+            return {
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: JSON.stringify(result),
+            };
+          }
+        }
+
+        // Block once-per-session tools from firing a second time
+        if (ONCE_PER_SESSION.has(functionName) && firedOnce.has(functionName)) {
+          log("agent", `Blocked duplicate ${functionName} call — already executed this session`);
+          await onToolFinish?.({
+            name: functionName,
+            args: functionArgs,
+            result: { blocked: true, reason: `${functionName} already attempted this session — do not retry. If it failed, report the error and stop.` },
+            success: false,
+            step,
+          });
+          return {
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify({ blocked: true, reason: `${functionName} already attempted this session — do not retry. If it failed, report the error and stop.` }),
+          };
+        }
+
+        await onToolStart?.({ name: functionName, args: functionArgs, step });
+        const result = await executeTool(functionName, functionArgs);
+        await onToolFinish?.({
+          name: functionName,
+          args: functionArgs,
+          result,
+          success: result?.success !== false && !result?.error && !result?.blocked,
+          step,
+        });
+
+        // Lock deploy_position after first attempt regardless of outcome — retrying is never right
+        // For close/swap: only lock on success so genuine failures can be retried
+        if (NO_RETRY_TOOLS.has(functionName)) firedOnce.add(functionName);
+        else if (ONCE_PER_SESSION.has(functionName) && result.success === true) firedOnce.add(functionName);
+
+        return {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: JSON.stringify(result),
+        };
+      }));

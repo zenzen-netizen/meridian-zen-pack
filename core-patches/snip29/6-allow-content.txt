@@ -1,0 +1,3 @@
+              content: allowNoToolFinal
+                ? "⛔ NO DEPLOY\n\nCycle finished with no valid entry.\n(Model emitted tool calls as text instead of executing them — treated as a skip.)"
+                : "I couldn't complete that reliably — the model emitted tool definitions as text instead of calling them. Please retry.",

@@ -39,11 +39,11 @@ export default [
     replaces: [
       { old: B1A_OLD, new: snip("1a-fallbackclient.txt") }, // blok 1a decl
       { old: B1B_OLD, new: snip("1b-activeclient.txt") },   // blok 1b routing
-      { old: B1C_OLD, new: B1C_NEW },                        // blok 1c client→activeClient
+      { old: B1C_OLD, new: B1C_NEW, already: "if (u) recordLlmCost({ role: agentType" }, // blok 1c; patch29 final form
       { old: B1D_OLD, new: snip("1d-failover.txt") },        // blok 1d failover elif
       { old: B2C_OLD, new: snip("2c-counters.txt") },        // blok 2c counters
       { old: B2B_OLD, new: snip("2b-salvage.txt") },         // blok 2b salvage
-      { old: B2D_OLD, new: snip("2d-reject.txt") },          // blok 2b reject-dump (minus blok 6)
+      { old: B2D_OLD, new: snip("2d-reject.txt"), already: "if (mustUseRealTool && !sawToolCall && !allowNoToolFinal)" }, // patch29 final form
     ],
   },
 ];

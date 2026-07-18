@@ -41,15 +41,36 @@ await t("blok 1d: failover elif ke fallbackClient dalam error-block", () => {
   assert.ok(/\} else if \(attempt === 1 && usedModel !== FALLBACK_MODEL\) \{/.test(src), "elif model-fallback lama harus jadi else-if");
 });
 
-// ── BLOK 6 DEFER: pastikan TIDAK ikut terbawa (kode, bukan komentar) ─────────
-await t("blok 6 DEFER: allowNoToolFinal TIDAK jadi kode (signature/return bersih)", () => {
-  assert.ok(!/allowNoToolFinal\s*=/.test(src), "allowNoToolFinal muncul sbg param/assignment (harusnya DEFER)");
-  assert.ok(!/content: allowNoToolFinal/.test(src), "ternary allowNoToolFinal masih ada (harusnya dilepas)");
+// ── BLOK 3-6: patch 29 ─────────────────────────────────────────────────────
+await t("blok 3 dedup: satu Promise per signature dan fan-out per tool_call_id", () => {
+  assert.ok(src.includes("const runToolCall = async (toolCall) =>"));
+  assert.ok(src.includes("const execCache = new Map()"));
+  assert.ok(src.includes("if (!execCache.has(signature)) execCache.set(signature, runToolCall(toolCall));"));
+  assert.ok(src.includes("content: await execCache.get(signature)"));
+  assert.ok(!src.includes("invalidToolArgErrors"), "map arg-error lama harus hilang bersama refactor fork");
 });
-await t("blok 3/4/5 DEFER: runToolCall/execCache/recordLlmCost/CHAT_CONFIRM absen", () => {
-  for (const gone of ["runToolCall", "execCache", "recordLlmCost", "CHAT_CONFIRM_TOOLS", "generalMaxTokens"]) {
-    assert.ok(!src.includes(gone), `${gone} harusnya DEFER (tak diport 5.4)`);
+
+await t("blok 4 confirm default inert dan hanya menjaga 5 tool mutasi", () => {
+  assert.ok(src.includes("onConfirmRequired = null"));
+  assert.ok(src.includes("if (interactive && onConfirmRequired && CHAT_CONFIRM_TOOLS.has(functionName))"));
+  const set = src.match(/const CHAT_CONFIRM_TOOLS = new Set\(\[([^\]]+)\]\)/)?.[1] || "";
+  for (const name of ["update_config", "deploy_position", "close_position", "claim_fees", "swap_token"]) {
+    assert.ok(set.includes(`"${name}"`), `${name} absen dari confirm set`);
   }
+});
+
+await t("blok 5 cost always-on fail-open", () => {
+  assert.ok(src.includes('import { recordLlmCost } from "./llm-cost-tracker.js";'));
+  assert.ok(src.includes("usage: { include: true }"));
+  assert.ok(/try \{\s*const u = response\?\.usage;[\s\S]*recordLlmCost/.test(src));
+  assert.ok(src.includes("} catch { /* never break the call */ }"));
+});
+
+await t("blok 6 option defaults inert; baseline GENERAL 8192 delta eksplisit", () => {
+  assert.ok(src.includes("allowNoToolFinal = false"));
+  assert.ok(src.includes("if (mustUseRealTool && !sawToolCall && !allowNoToolFinal)"));
+  assert.ok(src.includes('content: allowNoToolFinal'));
+  assert.ok(src.includes('max_tokens: maxOutputTokens ?? (agentType === "GENERAL" ? config.llm.generalMaxTokens : config.llm.maxTokens)'));
 });
 
 // ── BLOK 2 salvage (fungsional) ─────────────────────────────────────────────

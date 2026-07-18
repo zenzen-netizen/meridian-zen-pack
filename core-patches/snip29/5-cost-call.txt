@@ -1,0 +1,6 @@
+          response = await activeClient.chat.completions.create(reqParams);
+          // Record this call's cost per role (local, no external feed needed). Fail-open.
+          try {
+            const u = response?.usage;
+            if (u) recordLlmCost({ role: agentType, model: usedModel, cost: u.cost ?? u.total_cost ?? null, tokens: u.total_tokens ?? 0 });
+          } catch { /* never break the call */ }

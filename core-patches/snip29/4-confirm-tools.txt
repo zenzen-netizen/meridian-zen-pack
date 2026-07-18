@@ -1,0 +1,6 @@
+// Tools that MUST be confirmed before executing in the interactive (casual-chat) path.
+// update_config = mutates settings; the four on-chain trade actions move real capital /
+// live positions, so an ambiguous chat message must never fire them unprompted. This set
+// only bites when the caller wires { interactive, onConfirmRequired } (see runToolCall) —
+// the autonomous SCREENER/MANAGER cron loops pass neither, so they keep auto-trading.
+const CHAT_CONFIRM_TOOLS = new Set(["update_config", "deploy_position", "close_position", "claim_fees", "swap_token"]);
