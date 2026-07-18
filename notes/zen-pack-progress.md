@@ -693,3 +693,43 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.2-C | Plugin 60 settings menu + GMGN gate | ✅ |
 | 7.2-D | Patch 28 early settings hook conditional | ✅ |
 | 7.2-E | Full gate, uninstall/reinstall idempotent, manifest/progress | ✅ |
+
+# Stage 7.3 — render call-sites: helper display index-local → plugin 30 + buka gerbang DEFER
+
+✅ 7.3-A recon read-only.
+- Sumber fork `643e954` tidak ada di repo pack, ada di `/home/ubuntu/meridianzen`
+  dan `/home/ubuntu/meridian-lab/vanilla`; vanilla-test tetap HEAD
+  `5ab14b4`.
+- Verifikasi helper fork: `racikanScopeDisclosure` index.js L290-L298;
+  `fmtAgeMin` L1619-L1622; `buildRangeEfficiencyLines` L1633-L1660;
+  `buildOpenRouterLines` L1669-L1690; `condenseRule` L1696-L1712;
+  `formatIdentityLines` L1719-L1721. Versi briefing.js untuk disclosure
+  berbeda newline/export dan tidak dipakai.
+- Call-site fork: `buildOpenRouterLines` dipakai di TG `/status` L3171,
+  TG `/wallet` L3210, REPL `/status` L3691, helper-defined site; sumber data
+  `getOpenRouterBalance()` + `getOpenRouterCredits()` dari
+  `openrouter-usage.js`. `condenseRule` dipakai untuk `lastGoodRule` dan
+  `lastBadRule` di TG `/status` L3173-L3174 dan REPL `/status` L3693-L3694;
+  sumber `listLessons({ limit: 10, full: true })`. `formatIdentityLines`
+  sudah ada di plugin 30 dan dipakai L2007/L2025/L2043 fork-equivalent.
+  `buildRangeEfficiencyLines` dipakai `/pool` L3287 dengan tracked record dari
+  `getTrackedPosition(pos.position)`.
+- Data-fetch field VM fork: `/status` dan `/wallet` ambil wallet, positions,
+  orBalance, orCredits via `Promise.all`; rent dihitung dengan
+  `getPositionsRentSol(positions.positions.map(...))` dan total `rentInfo`.
+  `/positions` ambil rent map per posisi + `getSolMarketRegime().usdPrice`.
+  `/pool` ambil tracked, rent satu posisi, regime price, lalu range-eff lines.
+- Parity `/config`: `buildConfigRowMap` plugin 30 byte-equal fork setelah
+  normalisasi `export function`; `formatFullConfig` hanya beda komentar inline
+  `subgroupDesc` dan wrapper export plugin, tidak ada drift row/data.
+- Export sandbox pasca-install terverifikasi: `tools/dlmm.js` export
+  `getPositionsRentSol` L1887; `tools/wallet.js` export
+  `getSolMarketRegime` L213; `openrouter-usage.js` export
+  `getOpenRouterBalance` L7 dan `getOpenRouterCredits` L79; `state.js`
+  export `getTrackedPosition` L319. Hidden dep baru: tidak ada.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.3-A | Recon helper/call-site/parity/export | ✅ |
+| 7.3-B | Port helper + buka field DEFER plugin 30 | ⬜ |
+| 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ⬜ |
