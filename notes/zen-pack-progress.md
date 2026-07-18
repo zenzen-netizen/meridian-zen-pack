@@ -734,6 +734,51 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.3-B | Port helper + buka field DEFER plugin 30 | ✅ |
 | 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ✅ |
 
+# Stage 7.4 — commands display telegramHandler → plugin 10
+
+⛔ 7.4-A recon read-only — STOP hidden deps.
+- Sumber fork `643e954:index.js` telegramHandler L3002-L3502 terbaca dari
+  `/home/ubuntu/meridianzen`; vanilla baseline `5ab14b4:index.js` L1390-L1676
+  terbaca dari `/home/ubuntu/meridian-lab/vanilla`.
+- Verifikasi tabel:
+  `/guide` fork L3072-L3075; `/report` fork L3099-L3105; `/help` sebenarnya
+  L3108-L3111 saja. Range brief `/help :3108–3142` melebar sampai cabang
+  `/wallet trackstart` L3113-L3142, yang bukan isi help dan tidak disentuh.
+  `/screen` L3389-L3395; `/pause` L3426-L3430; `/resume` L3433-L3443;
+  `/hive` L3446-L3468.
+- Plugin 10 saat recon hanya menangani `/addprofil`, `/export`, `/preset`.
+  `/report` belum tertangani oleh plugin; patch 23/18 hanya menyediakan report
+  consumers/command registration, bukan handler `/report`. `/guide` juga belum
+  tertangani; drop-in `guide.js` export `renderGuide`, tetapi belum ada wiring.
+- Hidden deps di luar daftar brief (dep list hanya menyebut `systemView`):
+  `/screen` perlu `runDeterministicScreen(5)` lokal `index.js` (tidak diekspor);
+  `/pause` perlu `stopCronJobs`, `cronStarted` closure; `/resume` perlu
+  `cronStarted`, `timers`, `startCronJobs` closure; `/report` perlu helper lokal
+  `buildReportForArg` plus `computeReportCostDrag`/`racikanScopeDisclosure` dan
+  import laporan terkait. Mem-port display branch saja akan mematikan dead-path
+  vanilla dan menghilangkan efek asli command.
+- `/hive` deps tersedia/importable (`isHiveMindEnabled`, `ensureAgentId`,
+  `getHiveMindPullMode`, `registerHiveMindAgent`, `pullHiveMindLessons`,
+  `pullHiveMindPresets`, `config`, `systemView`). `/help` deps tersedia
+  (`systemView.renderHelp`). `/guide` deps tersedia (`renderGuide`) tetapi
+  belum masuk karena fase STOP berlaku untuk scope batch.
+- REPL fork punya cabang tambahan: `/status`, `/briefing` + `alltime`,
+  `/report`, `/guide`, `/candidates`, `/thresholds`, `/learn`, `/evolve` +
+  `force`, `/preset`, `/addprofil`, `/export`, selain number-pick/auto/go.
+  Pack belum punya hook REPL; vanilla-test masih inline `rl.on("line")`.
+  Vonis: REPL wiring tetap DEFER ke 7.7 boot-wiring, daftar lengkap tercatat
+  di sini; tidak dip port di 7.4.
+- Sesuai aturan brief "Hidden dep = STOP-LAPOR sapu-tuntas, JANGAN auto-DEFER",
+  fase B/C tidak dijalankan sampai ada keputusan owner: tambah patch/wiring untuk
+  command side-effect, atau turunkan scope menjadi purely-display dengan sadar
+  kehilangan side-effect vanilla.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.4-A | Recon command display + hidden deps | ⛔ STOP |
+| 7.4-B | Port plugin 10 | ⛔ blocked |
+| 7.4-C | Gate + push | ⛔ blocked |
+
 ✅ 7.3-B port helper + un-gate.
 - `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
   `getPositionsRentSol`, `getSolMarketRegime`, `getOpenRouterBalance`,
