@@ -317,5 +317,12 @@
     "raw_diff_contract": "Intentional raw diff is zenpack-plugins/10-telegram-cmds.js extension plus telegram-cmds test/manifest/notes. Accepted display delta: /screen /pause /resume remain vanilla; /report deferred 7.7.",
     "gate": "node --check all pack js/mjs PASS; fresh uninstall hash-verify clean + git clean -fd porcelain 0; fresh install + reinstall idempotent PASS; full harness PASS including telegram-cmds 26/26, settings-menu installed 4/4, settings-menu vanilla 1/1, telegram-cmds vanilla 1/1; npm smoke PASS; boot DRY_RUN loaded 7 plugins errors 0. Golden read-only: fork index call-sites L3072-L3075/L3108-L3142/L3446-L3468 verified, renderer/drop-ins guide.js sol-tracker.js views/system.js SHA match fork. Raw diff sapu-tuntas: only plugin 10/test/manifest/notes intentional.",
     "nol_sentuh_bot_live": true
+  },
+  "stage_7_5": {
+    "summary": "/preset /export /addprofil dispatch already paid by Stage 3.3/3.4.",
+    "parity_note": "Seven wrapper functions checked against fork 643e954:index.js. Identical: presetUsageText, runPresetCommand, underPm2, exportUsageText, runExportCommand, runAddProfilCommand. Toleran-wrapper: finishPresetApply only replaces index-local sendMessage(note).catch with plugin reply(note) arg; restart behavior and text remain same. Drift: none.",
+    "dispatch": "Patch 03b runs telegram:command before vanilla /briefing; plugin 10 handles /addprofil, /export, /preset and sets ctx.handled. Active regression test telegram-cmds 26/26 covers these branches.",
+    "gate": "read-only parity/docs stage; no code port required, no sandbox mutation required.",
+    "nol_sentuh_bot_live": true
   }
 }

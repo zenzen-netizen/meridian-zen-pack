@@ -839,6 +839,27 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.4-B | Port plugin 10 slim + tests | ✅ |
 | 7.4-C | Gate + push | ✅ |
 
+# Stage 7.5 — `/preset` `/export` `/addprofil` dispatch
+
+✅ 7.5 parity note — already paid by Stage 3.3/3.4.
+- Scope cek: tujuh fungsi wrapper dari fork `643e954:index.js`.
+- Identik: `presetUsageText` L2708-L2719, `runPresetCommand` L2722-L2785,
+  `underPm2` L2886-L2888, `exportUsageText` L2788-L2799,
+  `runExportCommand` L2803-L2847, `runAddProfilCommand` L2853-L2884.
+- Toleran-wrapper: `finishPresetApply` L2893-L2900. Satu deviasi sengaja:
+  fork memanggil `sendMessage(note).catch(() => {})`; plugin 10 menerima
+  argumen `reply` dan memanggil `reply(note)` karena tidak punya closure
+  `sendMessage`. Teks note, deteksi pm2, dan `setTimeout(process.exit)` sama.
+- Dispatch hidup: patch 03b menjalankan hook `telegram:command` sebelum
+  `/briefing`; plugin 10 menangani `/addprofil`, `/export`, `/preset` dan set
+  `ctx.handled`. Test aktif `telegram-cmds` 26/26 mencakup usage/scaffold,
+  export profil/racikan, dan seluruh family preset.
+- Vonis: **LUNAS**; drift semantik = 0; tidak ada port 7.5 baru.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.5 | Diff 7 fungsi + dispatch parity note | ✅ |
+
 ✅ 7.3-B port helper + un-gate.
 - `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
   `getPositionsRentSol`, `getSolMarketRegime`, `getOpenRouterBalance`,
