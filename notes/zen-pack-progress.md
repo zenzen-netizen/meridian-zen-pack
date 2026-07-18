@@ -921,3 +921,23 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.3-A | Recon helper/call-site/parity/export | ✅ |
 | 7.3-B | Port helper + buka field DEFER plugin 30 | ✅ |
 | 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ✅ |
+
+# Stage 7.6 - confirm-flow + agentLoop money + deploy/closeall
+
+✅ 7.6-B-E selesai.
+- Patch migration `already` membuat Patch 11/29 upgrade dan reinstall ketat serta
+  idempoten. Patch 29 menutup agentLoop blok 3-6; dua baseline delta permanen
+  dicatat: cost tracking fail-open dan GENERAL max tokens 8192.
+- Sizing maximize fork hidup melalui Plugin 70. Plugin itu memiliki history cap
+  20, two-phase confirm hook, intent fallback, `/screen`/cache/`/candidates`,
+  `/deploy <n>`, dan `/closeall`; `/set`/`/setcfg` tidak disentuh.
+- Gate: full harness hijau; paper OFF diff `[]`, ON `paper_*`, ZERO-TX 0;
+  uninstall hash-clean + vanilla parity; reinstall kedua seluruhnya skip;
+  boot DRY_RUN 8 plugin/0 error; golden fork dan raw-diff unknown 0.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.6-B | Patcher migration + Patch 29 | ✅ |
+| 7.6-C | Maximize sizing + deploy wiring | ✅ |
+| 7.6-D | Plugin 70 money cluster | ✅ |
+| 7.6-E | Full money gate + golden/raw diff | ✅ |

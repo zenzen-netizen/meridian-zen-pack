@@ -327,5 +327,29 @@
     "dispatch": "Patch 03b runs telegram:command before vanilla /briefing; plugin 10 handles /addprofil, /export, /preset and sets ctx.handled. Active regression test telegram-cmds 26/26 covers these branches.",
     "gate": "read-only parity/docs stage; no code port required, no sandbox mutation required.",
     "nol_sentuh_bot_live": true
+  },
+  "stage_7_6": {
+    "summary": "Money confirm-flow, agentLoop blocks 3-6, maximize sizing, and the complete Telegram candidate/deploy/close cluster are live through Patch 29 and Plugin 70.",
+    "patcher_migration": "replaceLine accepts optional already and apply.mjs passes it through. Patch 11 recognizes the post-Patch-29 recordLlmCost and allowNoToolFinal forms, so upgrade and reinstall remain strict instead of ignoring old-not-found.",
+    "patch_29": "Nine exact replacements port CHAT_CONFIRM_TOOLS, option controls, GENERAL max tokens, usage/cost recording, argument repair, allowNoToolFinal recovery, runToolCall confirmation, and per-turn duplicate fan-out. Six complex NEW regions are byte-identical snippets from fork 643e954.",
+    "sizing": "zenpack-lib/sizing.js extends the existing extracted module with fork computeDeployAmount(walletSol, opts) verbatim, including maximize adaptive slots and literal 0.03 floor. Plugin 70 passes slotsRemaining to it; vanilla config.js remains untouched.",
+    "plugin_70": "Owns /screen, candidate cache, /candidates, /deploy <n>, deployLatestCandidate, /closeall, confirmation prompts/callbacks, and non-slash intent fallback. /set and /setcfg remain outside this plugin.",
+    "adaptations_minimal": [
+      "Telegram sessionHistory is plugin-owned and capped at 20 messages verbatim. TTY/REPL history remains separate by accepted owner decision.",
+      "Recovery path: re-unify Plugin 70 history with core state when index.js exports a stable session-history facade in a later phase.",
+      "Patch 28 marks an early hook pass. Plugin 70 consumes only confirm: callbacks there; ordinary text defers to Patch 03b after the busy queue, where intent routing wins before vanilla fallback.",
+      "Runtime dependency injection exists only as the __test seam; production defaults bind the real imported functions."
+    ],
+    "hook_contract": "telegram:command now has two phases for applicable input: ctx.early=true before the busy queue for callback completion, then the existing normal Patch-03b pass for ordinary text. Earlier handled contexts remain authoritative.",
+    "baseline_deltas": [
+      "recordLlmCost is always-on and fail-open after each response with usage; this is a permanent non-option default delta.",
+      "GENERAL default maxTokens changes from vanilla 4096 to generalMaxTokens 8192; this is a permanent transport delta."
+    ],
+    "parity_contract": "Vanilla parity applies only when onConfirmRequired=null, allowNoToolFinal=false, and maxOutputTokens=null: the option-controlled paths remain dormant. The two baseline_deltas above are explicitly excluded.",
+    "defer_7_8_7_9": "Other computeDeployAmount consumers in index.js cycle/display/REPL and tools/dlmm.js remain deferred; 7.6 wires only Plugin 70 deployLatestCandidate.",
+    "golden": "Fork snippets 4-confirm-tools, 5-cost-call, 3-arg-repair-NEW, 6-allow-content, 6-allow-guard, and 3-run-tool-NEW plus four inline agent anchors all occur exactly in fork and installed agent.js. minDeployAmount and computeDeployAmount function text is byte-identical to fork config.js.",
+    "raw_diff_audit": "Installed target has 22 modified tracked files matched one-for-one by 22 vanilla backups; every backup equals git HEAD; 47 copied files match install-manifest exactly; unknown files/hunks = 0. Pack worktree was clean before this gate documentation.",
+    "gate": "All JS/MJS syntax PASS; npm smoke PASS; full installed harness PASS including agentloop 16/16, patcher 17/17, money 13/13, and DLMM paper 6/6. Confirmation accept/deny/timeout/duplicate single-flight, six intent routes, closeall render, paper deploy, lone-no-deploy zero tools, and scope negatives pass. Paper OFF diff=[]; ON paper_* lifecycle live; ZERO-TX=0. Uninstall restored all hashes clean and vanilla settings/Telegram parity passed; fresh install and second install were fully idempotent; DRY_RUN boot loaded 8 plugins with 0 errors.",
+    "nol_sentuh_bot_live": true
   }
 }

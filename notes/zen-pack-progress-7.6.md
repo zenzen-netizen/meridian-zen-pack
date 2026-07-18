@@ -1,6 +1,6 @@
 # Stage 7.6 - commands money / agentLoop blocks 3-6
 
-## 7.6-A recon checkpoint - STOP
+## 7.6-A recon checkpoint - resolved
 
 Recon only. No build patch, plugin, sizing change, or test was written.
 
@@ -171,3 +171,64 @@ Open owner decisions before build:
 3. early/normal hook phase handling for queue-safe fallback plus live callbacks;
 4. scope expansion for plugin-owned `/screen` and candidate cache.
 5. resolution of the impossible all-blocks-dormant default-parity assertion.
+
+Owner locked all five decisions before build. Resolution: migration-aware
+`already`, plugin-owned history cap 20, two-phase hook, full Plugin 70 money
+cluster, and narrowed option-path parity with two permanent baseline deltas.
+
+## 7.6-B - Patch 29 agentLoop money
+
+- `replaceLine` and `apply.mjs` now support `already`; Patch 11 recognizes both
+  post-Patch-29 migrated regions. Patcher harness: 17/17.
+- Patch 29 applies nine replacements after Patch 11. Six complex snippets and
+  four inline anchors were checked against fork `643e954`; all golden checks
+  pass. AgentLoop harness: 16/16.
+- Default option behavior remains vanilla for `onConfirmRequired=null`,
+  `allowNoToolFinal=false`, and `maxOutputTokens=null`. Permanent exceptions:
+  fail-open `recordLlmCost` and GENERAL `generalMaxTokens` 8192.
+
+## 7.6-C - sizing and deploy wiring
+
+- `zenpack-lib/sizing.js` now contains fork `minDeployAmount` and
+  `computeDeployAmount` byte-identically, including the literal `0.03` floor,
+  maximize adaptive slots, rent reserve, and zero return below floor.
+- Plugin 70 `deployLatestCandidate` passes `slotsRemaining`; vanilla
+  `config.js::computeDeployAmount` remains untouched.
+- Other fork consumers in cycle/display/REPL and `tools/dlmm.js` remain explicit
+  7.8/7.9 debt.
+
+## 7.6-D - Plugin 70 money cluster
+
+- Owns `/screen`, candidate cache, `/candidates`, `/deploy <n>`, deploy helper,
+  `/closeall`, confirm-flow/callback, and non-slash intent routing. `/set` and
+  `/setcfg` remain outside scope.
+- History is plugin-owned, capped to 20 exactly like fork. TTY/REPL history is
+  separate by owner acceptance. Recovery: re-unify when core exports a stable
+  history facade.
+- Hook contract is two-phase: Patch 28 sends `ctx.early=true`; Plugin 70 handles
+  only `confirm:` there. Ordinary text defers to normal Patch 03b after the busy
+  queue and still wins before vanilla fallback. Earlier handled input wins.
+- Stage 7.4 decision to drop `/screen` interception is officially superseded;
+  `/pause` and `/resume` remain vanilla.
+
+## 7.6-E - money gate complete
+
+- Syntax all JS/MJS PASS; `npm test` smoke PASS; full installed harness PASS.
+  Key counts: patcher 17/17, agentLoop 16/16, money 13/13, DLMM paper 6/6,
+  Telegram commands 26/26, settings 4/4, prompt golden 8/8.
+- Confirm accept/deny/timeout/duplicate single-flight, six EN/ID intent cases,
+  candidate cache, deploy sizing/floor, closeall tree/PnL, and negative scope
+  `/set`/`/setcfg` all pass.
+- Paper two-layer: OFF baseline diff `[]`; ON creates/lists/closes `paper_*`;
+  both report `ZERO-TX: 0`. Lone no-deploy executes zero tools.
+- Cycle: uninstall restored 22 patched files with hash `clean`; sandbox porcelain
+  was zero after scoped artifact cleanup; vanilla `/settings` and Telegram
+  command parity passed. Fresh install passed; second install performed no
+  mutation, including Patch 28 2/2 and Patch 29 9/9 `skipped-idempotent`.
+- Boot with dummy env was `DRY RUN`, loaded 8 plugins, skipped 0, errors 0;
+  timeout sent SIGTERM and shutdown found zero open positions.
+- Golden: six Patch-29 snippets + four inline agent anchors match fork and
+  installed source; both sizing functions match fork byte-for-byte.
+- Raw-diff: 22 modified tracked files = 22 vanilla backups; every backup equals
+  HEAD; 47 copied files = install manifest; unknown delta 0; `diff --check`
+  clean. No live bot and no live transaction path was used.
