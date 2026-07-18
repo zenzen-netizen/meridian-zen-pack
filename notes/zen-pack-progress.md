@@ -731,5 +731,22 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | Fase | Isi | Status |
 |---|---|---|
 | 7.3-A | Recon helper/call-site/parity/export | ✅ |
-| 7.3-B | Port helper + buka field DEFER plugin 30 | ⬜ |
+| 7.3-B | Port helper + buka field DEFER plugin 30 | ✅ |
 | 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ⬜ |
+
+✅ 7.3-B port helper + un-gate.
+- `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
+  `getPositionsRentSol`, `getSolMarketRegime`, `getOpenRouterBalance`,
+  `getOpenRouterCredits`, `listLessons`, `getExcludedRacikanStats`,
+  `getTrackedPosition`.
+- Helper display index-local fork diport ke plugin 30: `fmtAgeMin`,
+  `buildRangeEfficiencyLines`, `buildOpenRouterLines`, `condenseRule`,
+  `racikanScopeDisclosure` (copy dari index.js, bukan briefing.js). Diff helper
+  vs fork bersih kecuali komentar tetangga yang tidak ikut dipindah.
+- Field DEFER hidup: `/status` dan `/wallet` kini isi `heldSol/heldEst`,
+  `orLines`, `disclosure`; `/status` juga isi `lastGoodRule/lastBadRule`.
+  `/positions` kini kirim rent map + `solPrice`; `/pool` kini kirim rent satu
+  posisi, tracked range-eff lines, dan `solPrice`.
+- Fetch opsional fail-open: OpenRouter/regime/rent dibungkus catch lokal
+  sehingga field baru degrade ke kosong/null/map kosong tanpa menjatuhkan render.
+- `node --check zenpack-plugins/30-render-views.js` PASS.

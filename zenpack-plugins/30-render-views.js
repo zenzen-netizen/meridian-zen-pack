@@ -10,24 +10,21 @@
 //       /config bare (1464 formatConfigSnapshot), /pool <n> (1486). CATATAN:
 //       vanilla TAK punya "/config core" & "/config origin" → dua sub-cmd itu
 //       PLUGIN-ADDITIVE (uninstall → jadi unknown lagi, jatuh ke LLM).
-//   (c) DEFER subsistem yang belum ada di vanilla (dep fork-only / index.js-local):
-//         getPositionsRentSol (held) — fork tools/dlmm.js, absen dlmm.js vanilla.
-//         getSolMarketRegime (solPrice→fail-open) — fork wallet.js, absen vanilla.
-//         buildOpenRouterLines (orLines), condenseRule (Insight) — index.js-local fork.
-//         racikanScopeDisclosure (disclosure) — briefing.js-local (tak di-export).
-//         buildRangeEfficiencyLines (/pool rangeEff) — index.js-local fork.
-//       Seksi digerbang null di views/ → degrade bersih. Vonis dep per item:
-//       notes/zen-pack-progress.md "Stage 3.7".
+//   (c) Stage 7.3 melunasi DEFER Stage 3.7: held/rent, solPrice, OpenRouter,
+//       condensed Insight, disclosure, dan /pool rangeEff kini hidup via dep yang
+//       sudah tersedia pasca patch/drop-in; fetch optional fail-open.
 //   (d) Patch 23: pnlBlock hidup setelah reports.js + lessons read-layer tersedia.
-import { getMyPositions } from "../tools/dlmm.js";
-import { getWalletBalances } from "../tools/wallet.js";
+import { getMyPositions, getPositionsRentSol } from "../tools/dlmm.js";
+import { getWalletBalances, getSolMarketRegime } from "../tools/wallet.js";
 import { config, computeDeployAmount } from "../config.js";
-import { getPerformanceSummary, getModePerformance } from "../lessons.js";
+import { getPerformanceSummary, getModePerformance, getExcludedRacikanStats, listLessons } from "../lessons.js";
 import { formatSolTracker } from "../sol-tracker.js";
 import { formatPnlTracker } from "../pnl-tracker.js";
 import { formatIdentity, getActiveSetupStatus } from "../preset-manager.js";
+import { getOpenRouterBalance, getOpenRouterCredits } from "../openrouter-usage.js";
 import { CORE_GROUPS } from "../config-origin.js";
 import { isHiveMindEnabled } from "../hivemind.js";
+import { getTrackedPosition } from "../state.js";
 import { sendHTML, sendMessage } from "../telegram.js";
 import { render } from "../views/render.js";
 import * as statusView from "../views/status.js";
@@ -59,6 +56,110 @@ function splitText(text, limit = 4096) {
 
 async function sendPlain(text) {
   for (const chunk of splitText(text)) await sendMessage(chunk);
+}
+
+// utang 3.7 LUNAS di 7.3 — helper display index-local fork, render-only.
+// Compact age label from minutes: <60 → "Xm", else "Y.yh".
+function fmtAgeMin(m) {
+  if (m == null || !Number.isFinite(m)) return "?";
+  return m >= 60 ? `${(m / 60).toFixed(1)}h` : `${m}m`;
+}
+
+/**
+ * RENDER-ONLY range-efficiency lines for /pool, derived from live position data
+ * (lower/upper/active bin, in_range, age, current OOR spell) + the tracked record
+ * (bin_step). Shows the bin range + width, where active sits within it (a bar +
+ * distance to each edge), the live in/OOR state, and a live in-range estimate.
+ * NOTE: minutes_out_of_range is the CURRENT OOR spell only (state resets it on
+ * re-entry), so the live in-range % is labelled an approximation (see
+ * notes/routput-progress.md RECON range-tracking).
+ */
+function buildRangeEfficiencyLines(pos, tracked) {
+  const out = [];
+  const lo = pos.lower_bin, hi = pos.upper_bin, act = pos.active_bin;
+  const binStep = tracked?.bin_step ?? null;
+  if (Number.isFinite(lo) && Number.isFinite(hi)) {
+    const width = hi - lo + 1;
+    const stepStr = binStep != null ? ` · bin_step ${binStep}` : "";
+    out.push(`Range bins: ${lo} → ${hi} (${width} bins${stepStr})`);
+    if (Number.isFinite(act)) {
+      // Position of active bin within the range (0% = lower edge, 100% = upper).
+      const span = hi - lo;
+      const posPct = span > 0 ? Math.max(0, Math.min(100, ((act - lo) / span) * 100)) : (act >= hi ? 100 : 0);
+      const filled = Math.round((posPct / 100) * 20);
+      const bar = "█".repeat(Math.max(0, Math.min(20, filled))) + "░".repeat(Math.max(0, 20 - filled));
+      out.push(`Active bin ${act}: [${bar}] ${posPct.toFixed(0)}% (${act - lo} dari bawah / ${hi - act} ke atas)`);
+    }
+  } else {
+    out.push(`Range bins: ${lo ?? "?"} → ${hi ?? "?"} | active ${act ?? "?"}`);
+  }
+  // Live state (exact) + a live in-range estimate from age & current OOR spell.
+  const state = pos.in_range ? "✅ IN RANGE" : `⚠️ OOR ${pos.minutes_out_of_range ?? 0}m`;
+  out.push(`State: ${state}`);
+  const age = pos.age_minutes, oor = pos.minutes_out_of_range ?? 0;
+  if (Number.isFinite(age) && age > 0) {
+    const inRangePct = Math.max(0, Math.min(100, ((age - oor) / age) * 100));
+    out.push(`In-range (approx): ~${inRangePct.toFixed(0)}% · in ~${fmtAgeMin(Math.max(0, age - oor))} / OOR-spell ${fmtAgeMin(oor)}`);
+  }
+  return out;
+}
+
+// OpenRouter balance/usage → array baris (logika verbatim dari /status+/wallet lama).
+// Array (bukan string) supaya tree() di views/ bisa kasih prefix per baris (incl
+// baris ⚠️ "menipis"). USD by-design — tetap `$`. Kosong → [].
+function buildOpenRouterLines(orBalance, orCredits) {
+  const lines = [];
+  if (orCredits?.balance != null) {
+    // Actual purchased-credit balance — the number to watch for top-ups.
+    let l = `💳 OpenRouter saldo: $${orCredits.balance.toFixed(2)}`;
+    if (orBalance?.usageDaily != null) l += ` | hari ini $${orBalance.usageDaily.toFixed(4)}`;
+    else if (orBalance?.usageMonthly != null) l += ` | bln ini $${orBalance.usageMonthly.toFixed(2)}`;
+    lines.push(l);
+    if (orCredits.balance < 5) lines.push(`⚠️ Saldo OpenRouter menipis — pertimbangkan top up`);
+  } else if (orBalance) {
+    if (orBalance.remaining != null) {
+      let l = `💳 OpenRouter: $${orBalance.remaining.toFixed(2)} remaining`;
+      if (orBalance.usageMonthly != null) l += ` | $${orBalance.usageMonthly.toFixed(2)} this month`;
+      else if (orBalance.usage != null) l += ` | $${orBalance.usage.toFixed(4)} total spent`;
+      lines.push(l);
+    } else if (orBalance.usageDaily != null) {
+      lines.push(`💳 OpenRouter: $${orBalance.usageDaily.toFixed(4)} today | $${(orBalance.usageMonthly ?? 0).toFixed(2)} this month`);
+    } else if (orBalance.usage != null) {
+      lines.push(`💳 OpenRouter: $${orBalance.usage.toFixed(4)} total spent`);
+    }
+  }
+  return lines;
+}
+
+// Condense a learning rule into a short, COMPLETE one-liner for /status.
+// Keeps the subject + headline metric, drops the verbose advisory tail, and
+// never cuts mid-word (the old raw slice(0,120) chopped at "PnL +").
+function condenseRule(rule) {
+  let s = String(rule || "").replace(/\s+/g, " ").trim();
+  if (!s) return s;
+  // Round noisy volatility floats: volatility=2.4598 → vol=2.5
+  s = s.replace(/volatility=(\d+\.\d+)/g, (_, n) => `vol=${(+n).toFixed(1)}`);
+  // Split "<subject> — <explanation>" (or "→") and keep only the first
+  // sentence of the explanation, dropping advisory boilerplate.
+  const m = s.match(/^(.*?)\s([—→])\s(.*)$/);
+  if (m) {
+    const tail = m[3].split(/\.\s/)[0].replace(/\.$/, "").trim();
+    s = `${m[1].trim()} ${m[2]} ${tail}`;
+  } else {
+    s = s.split(/\.\s/)[0].replace(/\.$/, "").trim();
+  }
+  // Safety net: hard cap on a word boundary with an ellipsis.
+  if (s.length > 140) s = s.slice(0, 140).replace(/\s+\S*$/, "") + "…";
+  return s;
+}
+
+function racikanScopeDisclosure() {
+  try {
+    const { count, net_usd } = getExcludedRacikanStats();
+    if (!count) return "";
+    const s = `${net_usd >= 0 ? "+" : "-"}$${Math.abs(net_usd).toFixed(2)}`;
+    return `\n\n⚠️ ${count} trade live di luar racikan ini dikecualikan (PnL ${s}) — /report all buat semua.`;
+  } catch { return ""; }
 }
 
 // buildConfigRowMap: fork index.js:1733 VERBATIM. Pure atas config + isHiveMindEnabled.
@@ -340,38 +441,59 @@ export function formatFullConfig() {
 }
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
-// /status — komposit Wallet + Performa + Sistem. pnlBlock DIAKTIFKAN (koreksi 3.6);
-// held/orLines/insight/disclosure tetap DEFER (dep fork-only / index.js-local).
+// /status — komposit Wallet + Performa + Sistem.
 async function handleStatus() {
-  const [wallet, positions] = await Promise.all([
+  const [wallet, positions, orBalance, orCredits] = await Promise.all([
     getWalletBalances(),
     getMyPositions({ force: true }),
+    getOpenRouterBalance().catch(() => null),
+    getOpenRouterCredits().catch(() => null),
   ]);
+  // Held rent across open positions → total tertahan (info; SOL bebas tak dikurangi).
+  let rentInfo = null;
+  if (positions.total_positions > 0) {
+    const rentMap = await getPositionsRentSol(positions.positions.map((p) => p.position)).catch(() => ({}));
+    const vals = Object.values(rentMap);
+    rentInfo = { totalRentSol: vals.reduce((s, r) => s + (r?.sol ?? 0), 0), estimated: vals.some((r) => r?.estimated) };
+  }
   const slotsRemaining = Math.max(1, config.risk.maxPositions - (positions?.total_positions ?? 0));
+  const { lessons } = listLessons({ limit: 10, full: true });
+  const lastBad = lessons.filter((l) => l.outcome === "bad" || l.outcome === "poor").slice(-1)[0];
+  const lastGood = lessons.filter((l) => l.outcome === "good").slice(-1)[0];
   const vm = statusView.buildView({
     cfg: config,
     sol: wallet.sol, solUsd: wallet.sol_usd, solPrice: wallet.sol_price,
     totalPositions: positions.total_positions, maxPositions: config.risk.maxPositions,
     deployAmount: computeDeployAmount(wallet.sol, { slotsRemaining }),
     gasReserve: config.management?.gasReserve ?? 0,
-    heldSol: 0, heldEst: false,                              // DEFER getPositionsRentSol
+    heldSol: rentInfo?.totalRentSol ?? 0, heldEst: rentInfo?.estimated ?? false,
     dryRun: process.env.DRY_RUN === "true", hive: isHiveMindEnabled(),
-    orLines: undefined,                                      // DEFER buildOpenRouterLines
+    orLines: buildOpenRouterLines(orBalance, orCredits),
     perf: getPerformanceSummary(),
-    lastGoodRule: null, lastBadRule: null,                   // DEFER condenseRule
+    lastGoodRule: lastGood ? condenseRule(lastGood.rule) : null,
+    lastBadRule: lastBad ? condenseRule(lastBad.rule) : null,
     pnlBlock: formatPnlTracker(getModePerformance(), { solPriceUsd: wallet?.sol_price ?? null }),
-    disclosure: null,                                        // DEFER racikanScopeDisclosure
+    disclosure: racikanScopeDisclosure(),
   });
   await sendHTML(render(vm, "telegram"));
 }
 
 // /wallet — blok wallet + Sistem + tracker SOL + realized PnL. solTracker & pnlBlock
-// AKTIF (dep tersedia); held/orLines/disclosure DEFER.
+// AKTIF (dep tersedia).
 async function handleWallet() {
-  const [wallet, positions] = await Promise.all([
+  const [wallet, positions, orBalance, orCredits] = await Promise.all([
     getWalletBalances(),
     getMyPositions({ force: true }),
+    getOpenRouterBalance().catch(() => null),
+    getOpenRouterCredits().catch(() => null),
   ]);
+  // Held rent across open positions → total tertahan (info; SOL bebas tak dikurangi).
+  let rentInfo = null;
+  if (positions.total_positions > 0) {
+    const rentMap = await getPositionsRentSol(positions.positions.map((p) => p.position)).catch(() => ({}));
+    const vals = Object.values(rentMap);
+    rentInfo = { totalRentSol: vals.reduce((s, r) => s + (r?.sol ?? 0), 0), estimated: vals.some((r) => r?.estimated) };
+  }
   const slotsRemaining = Math.max(1, config.risk.maxPositions - (positions?.total_positions ?? 0));
   const vm = walletView.buildView({
     cfg: config,
@@ -379,12 +501,12 @@ async function handleWallet() {
     totalPositions: positions.total_positions, maxPositions: config.risk.maxPositions,
     deployAmount: computeDeployAmount(wallet.sol, { slotsRemaining }),
     gasReserve: config.management?.gasReserve ?? 0,
-    heldSol: 0, heldEst: false,                              // DEFER getPositionsRentSol
+    heldSol: rentInfo?.totalRentSol ?? 0, heldEst: rentInfo?.estimated ?? false,
     dryRun: process.env.DRY_RUN === "true", hive: isHiveMindEnabled(),
-    orLines: undefined,                                      // DEFER buildOpenRouterLines
+    orLines: buildOpenRouterLines(orBalance, orCredits),
     solTracker: formatSolTracker(wallet.sol),
     pnlBlock: formatPnlTracker(getModePerformance(), { solPriceUsd: wallet?.sol_price ?? null }),
-    disclosure: null,                                        // DEFER racikanScopeDisclosure
+    disclosure: racikanScopeDisclosure(),
   });
   await sendHTML(render(vm, "telegram"));
 }
@@ -399,8 +521,7 @@ async function handleConfig(text) {
   await sendPlain(out);
 }
 
-// /pool <n> — detail satu posisi. heldSol/rangeEffLines/solPrice DEFER (dep fork-only
-// / index.js-local) → view menggerbang null (degrade bersih).
+// /pool <n> — detail satu posisi.
 async function handlePool(text) {
   const m = text.match(/^\/pool\s+(\d+)$/i);
   const idx = parseInt(m[1]) - 1;
@@ -410,6 +531,9 @@ async function handlePool(text) {
     return;
   }
   const pos = positions[idx];
+  const tracked = (() => { try { return getTrackedPosition(pos.position); } catch { return null; } })();
+  const rent = (await getPositionsRentSol([pos.position]).catch(() => ({})))[pos.position];
+  const solPrice = (await getSolMarketRegime().catch(() => null))?.usdPrice || null;
   const vm = poolView.buildView({
     cfg: config, idx, pair: pos.pair, inRange: !!pos.in_range,
     poolAddr: pos.pool, positionAddr: pos.position,
@@ -417,10 +541,10 @@ async function handlePool(text) {
     value: pos.total_value_usd, fees: pos.unclaimed_fees_usd,
     collectedFees: pos.collected_fees_usd, unclaimedFees: pos.unclaimed_fees_usd,
     ageMin: pos.age_minutes,
-    heldSol: null, heldEst: false,                           // DEFER getPositionsRentSol
+    heldSol: rent ? rent.sol : null, heldEst: rent ? rent.estimated : false,
     note: pos.instruction || null,
-    rangeEffLines: null,                                     // DEFER buildRangeEfficiencyLines
-    solPrice: null,                                          // DEFER getSolMarketRegime
+    rangeEffLines: buildRangeEfficiencyLines(pos, tracked),
+    solPrice,
   });
   await sendHTML(render(vm, "telegram"));
 }
@@ -429,7 +553,9 @@ async function handlePool(text) {
 async function handlePositions() {
   const { positions, total_positions } = await getMyPositions({ force: true });
   if (total_positions === 0) { await sendMessage(`${ICON.position} No open positions.`); return; }
-  const vm = positionsView.buildView(positions, config, {}, null);  // DEFER rent + solPrice
+  const rentMap = await getPositionsRentSol(positions.map((p) => p.position)).catch(() => ({}));
+  const solPrice = (await getSolMarketRegime().catch(() => null))?.usdPrice || null;
+  const vm = positionsView.buildView(positions, config, rentMap, solPrice);
   await sendHTML(render(vm, "telegram"));
 }
 
