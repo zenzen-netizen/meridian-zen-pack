@@ -309,5 +309,13 @@
     "raw_diff_contract": "Stage 7.3 intentional raw diff is zenpack-plugins/30-render-views.js extension plus manifest/notes only. No new patch and no drop-in rewrite.",
     "gate": "node --check all pack js/mjs PASS; install/reinstall idempotent; full harness PASS; telegram-cmds 19/19; settings-menu installed 4/4 and vanilla 1/1; render probes for /status /positions /pool /config fields and empty-source degrade PASS; uninstall hash-verify clean followed by git clean -fd porcelain 0; final reinstall + boot loaded 7 errors 0.",
     "nol_sentuh_bot_live": true
+  },
+  "stage_7_4": {
+    "summary": "Plugin 10 command display slim port after owner override.",
+    "owner_override": "Port only /help, /guide, /wallet trackstart, and /hive where deps are importable. Drop /screen, /pause, /resume intercepts as accepted display delta; vanilla dead-path stays active. Defer /report to 7.7 with buildReportForArg/briefing orchestration.",
+    "plugin_10": "Adds renderGuide, systemView.renderHelp, sol-tracker get/setTrackStart, and hivemind renderHive branches. No money command, no new core patch.",
+    "raw_diff_contract": "Intentional raw diff is zenpack-plugins/10-telegram-cmds.js extension plus telegram-cmds test/manifest/notes. Accepted display delta: /screen /pause /resume remain vanilla; /report deferred 7.7.",
+    "gate": "pending 7.4-C",
+    "nol_sentuh_bot_live": true
   }
 }

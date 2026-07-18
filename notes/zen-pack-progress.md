@@ -779,6 +779,35 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.4-B | Port plugin 10 | ⛔ blocked |
 | 7.4-C | Gate + push | ⛔ blocked |
 
+✅ 7.4-A override owner — scope slim terkunci.
+- Keputusan owner pasca-STOP: lanjut hanya cabang deps importable. Port ke plugin
+  10: `/help` fork L3108-L3111, `/guide` L3071-L3087, `/wallet trackstart`
+  L3113-L3142 (deps hanya `sol-tracker.js`, verified), dan `/hive` L3446-L3476
+  (deps `hivemind.js` + `systemView` + `config`, verified).
+- Accepted display delta: `/screen`, `/pause`, `/resume` TIDAK diintercept
+  plugin 10; cabang vanilla tetap jalan. Jalur pemulihan: port parity penuh
+  kelak kalau locals index (`runDeterministicScreen`, cron/timer closures)
+  diekspor/wired oleh fase index lain.
+- `/report` DEFER 7.7: klaster `buildReportForArg` + orkestrasi briefing/report.
+- REPL wiring tetap DEFER 7.7 boot-wiring sesuai daftar recon 7.4-A.
+
+✅ 7.4-B port slim.
+- `zenpack-plugins/10-telegram-cmds.js` menambah branch `/help`, `/guide`,
+  `/wallet trackstart`, `/hive` sesuai keputusan owner. Tidak ada patch core
+  baru dan tidak ada money command.
+- `/wallet trackstart` memakai `getTrackStart`/`setTrackStart` dari drop-in
+  `sol-tracker.js`; fetch/state gagal tetap terbatas ke reply error, render
+  command lain tidak crash.
+- Test `telegram-cmds` diperluas: branch baru hijau, `/screen` `/pause`
+  `/resume` tidak handled, `/report` tetap tidak handled, dan mode vanilla
+  uninstall membuktikan command fallback kembali ke index vanilla.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.4-A | Recon + owner override slim | ✅ |
+| 7.4-B | Port plugin 10 slim + tests | ✅ |
+| 7.4-C | Gate + push | ⬜ |
+
 ✅ 7.3-B port helper + un-gate.
 - `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
   `getPositionsRentSol`, `getSolMarketRegime`, `getOpenRouterBalance`,

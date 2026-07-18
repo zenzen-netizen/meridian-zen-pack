@@ -4,12 +4,20 @@
 // VERBATIM fork-ref index.js:2708-2788 + :2888-2900. Adaptasi HANYA: (a) jadi handler
 // hook, (b) balasan via ctx.reply (finishPresetApply terima `reply` sbg argumen),
 // (c) path import relatif dari zenpack-plugins/.
+// Stage 7.4 slim: port display-only/importable command branches. Accepted display
+// delta: /screen, /pause, /resume stay on vanilla dead-path until index locals are
+// exported/wired in a later phase; /report stays with briefing/report 7.7.
+import { config } from "../config.js";
 import { exportRacikan, listExportableRacikan } from "../racikan-export.js";
 import { exportProfil } from "../profil-export.js";
 import { scaffoldProfil, listProfil } from "../addprofil.js";
 import { listPresets, savePreset, applyPreset, getPresetDiff, deletePreset, validName, presetExists, getActiveSetupStatus } from "../preset-manager.js";
 import { listRacikanInPerformance } from "../lessons.js";
+import { ensureAgentId, getHiveMindPullMode, isHiveMindEnabled, pullHiveMindLessons, pullHiveMindPresets, registerHiveMindAgent } from "../hivemind.js";
+import { renderGuide } from "../guide.js";
+import { setTrackStart, getTrackStart } from "../sol-tracker.js";
 import { ICON, SEP, tree, header } from "../views/format.js";
+import * as systemView from "../views/system.js";
 
 export const manifest = { name: "zenpack-telegram-cmds", priority: 100 };
 
@@ -211,6 +219,49 @@ function runAddProfilCommand(argStr) {
 export function register(hooks) {
   hooks.on("telegram:command", async (ctx) => {
     const text = String(ctx.text || "");
+    if (text === "/guide" || text.startsWith("/guide ")) {
+      // Pure file read — answer instantly even while the agent is busy.
+      await ctx.reply(renderGuide(text.slice(6)));
+      ctx.handled = true;
+      return;
+    }
+    if (text === "/help") {
+      await ctx.reply(systemView.renderHelp());
+      ctx.handled = true;
+      return;
+    }
+    // SOL tracker anchor: "/wallet trackstart YYYY-MM-DD" (or off|clear to remove).
+    const trackStartMatch = text.match(/^\/wallet\s+trackstart\b\s*(.*)$/i);
+    if (trackStartMatch) {
+      const arg = trackStartMatch[1].trim().toLowerCase();
+      if (!arg) {
+        const cur = getTrackStart();
+        await ctx.reply(cur
+          ? [header(ICON.yield, "SOL tracker anchor", cur), tree([
+              "Ganti: /wallet trackstart YYYY-MM-DD",
+              "Hapus: /wallet trackstart off",
+            ])].join("\n")
+          : [header(ICON.yield, "SOL tracker anchor", "belum diset"), tree([
+              `Set: /wallet trackstart YYYY-MM-DD (mis. ${new Date().toISOString().slice(0, 10)})`,
+            ])].join("\n"));
+        ctx.handled = true;
+        return;
+      }
+      if (["off", "clear", "hapus", "reset"].includes(arg)) {
+        setTrackStart(null);
+        await ctx.reply(`${ICON.yield} SOL tracker anchor dihapus — /wallet pakai window 1D/7D/30D saja.`);
+        ctx.handled = true;
+        return;
+      }
+      const res = setTrackStart(arg);
+      await ctx.reply(res.ok
+        ? [header(ICON.ok, "SOL tracker anchor", `diset ke ${res.dateKey}`), tree([
+            `/wallet sekarang nampilin baris "SINCE ${res.dateKey}"`,
+          ])].join("\n")
+        : systemView.renderError(res.error));
+      ctx.handled = true;
+      return;
+    }
     if (text === "/addprofil" || text.startsWith("/addprofil ")) {
       const res = runAddProfilCommand(text.slice("/addprofil".length));
       await ctx.reply(res.text);
@@ -227,6 +278,32 @@ export function register(hooks) {
       const res = runPresetCommand(text.slice("/preset".length));
       await ctx.reply(res.text);
       if (res.applied) await finishPresetApply({ viaTelegram: true, reply: ctx.reply });
+      ctx.handled = true;
+      return;
+    }
+    if (text === "/hive" || text === "/hive pull") {
+      try {
+        const enabled = isHiveMindEnabled();
+        const agentId = ensureAgentId();
+        if (!enabled) {
+          await ctx.reply(systemView.renderHive({ enabled: false, agentId }));
+          ctx.handled = true;
+          return;
+        }
+        const isManualPull = text === "/hive pull";
+        const pullMode = getHiveMindPullMode();
+        const [registerResult, lessons, presets] = await Promise.all([
+          registerHiveMindAgent({ reason: isManualPull ? "telegram_pull" : "telegram_status" }),
+          (pullMode === "auto" || isManualPull) ? pullHiveMindLessons(12) : Promise.resolve(null),
+          (pullMode === "auto" || isManualPull) ? pullHiveMindPresets() : Promise.resolve(null),
+        ]);
+        await ctx.reply(systemView.renderHive({
+          enabled: true, agentId, url: config.hiveMind.url, pullMode,
+          register: registerResult, lessons, presets, manualPull: isManualPull,
+        }));
+      } catch (e) {
+        await ctx.reply(systemView.renderError(e.message, "HiveMind"));
+      }
       ctx.handled = true;
       return;
     }
