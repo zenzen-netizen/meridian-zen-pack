@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.6",
+  "stage": "7.7",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -43,7 +43,8 @@
     "26b-briefing-full-parity",
     "27-executor-config-map",
     "28-telegram-settings-hook",
-    "29-agentloop-money"
+    "29-agentloop-money",
+    "30-briefing-wiring"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -53,7 +54,8 @@
     "40-prompt-racikan",
     "50-config-ext",
     "60-settings-menu",
-    "70-money-commands"
+    "70-money-commands",
+    "80-briefing-orch"
   ],
   "drop_ins": {
     "root": 18,
@@ -61,7 +63,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 8,
+    "zenpack_plugins": 9,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",
@@ -350,6 +352,18 @@
     "golden": "Fork snippets 4-confirm-tools, 5-cost-call, 3-arg-repair-NEW, 6-allow-content, 6-allow-guard, and 3-run-tool-NEW plus four inline agent anchors all occur exactly in fork and installed agent.js. minDeployAmount and computeDeployAmount function text is byte-identical to fork config.js.",
     "raw_diff_audit": "Installed target has 22 modified tracked files matched one-for-one by 22 vanilla backups; every backup equals git HEAD; 47 copied files match install-manifest exactly; unknown files/hunks = 0. Pack worktree was clean before this gate documentation.",
     "gate": "All JS/MJS syntax PASS; npm smoke PASS; full installed harness PASS including agentloop 16/16, patcher 17/17, money 13/13, and DLMM paper 6/6. Confirmation accept/deny/timeout/duplicate single-flight, six intent routes, closeall render, paper deploy, lone-no-deploy zero tools, and scope negatives pass. Paper OFF diff=[]; ON paper_* lifecycle live; ZERO-TX=0. Uninstall restored all hashes clean and vanilla settings/Telegram parity passed; fresh install and second install were fully idempotent; DRY_RUN boot loaded 8 plugins with 0 errors.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_7": {
+    "summary": "Plugin 80 owns fork briefing/report orchestration; Patch 30 wires persistence, cron, management after-cycle, briefing override, and REPL dispatch while retaining vanilla fallbacks.",
+    "plugin_80": "Eight scoped functions from fork 643e954:index.js are body-identical after removing the additive export keyword: sendAndPinBriefing, maybeFireLearningReport, computeReportCostDrag, buildReportForArg, runPeriodicBriefing, maybeAutoTuneGasReserve, runBriefing, maybeRunMissedBriefing. Telegram /briefing and /report plus REPL equivalents use shared handlers.",
+    "patch_30": "Seven exact replacements: persistConfigChange in config.js; six briefing dedup getters/setters in state.js; index.js briefing override, fail-open management:afterCycle hook, weekly/monthly UTC schedules, _cronTasks membership, and repl:command hook.",
+    "hook_contract": "repl:command mirrors telegram:command with mutable ctx.handled and adds channel=repl, runBusy, and async reply(text) to stdout. briefing:run sets handled for enhanced daily briefing; briefing:periodic receives period=week|month; management:afterCycle runs only after the full management cycle settles and is catch-wrapped fail-open in core.",
+    "debt_paid": "persistConfigChange debt from Stage 5.2 is paid for the index/briefing consumer. /report debt from 7.4 and REPL wiring debt from 7.4/7.5 are paid.",
+    "defer_7_8_7_9": "State trough/peak fields and ensureDeployedAt/deployed_at remain absent and deferred. update_config split-persistence remains separate. Screening throttle, emergency/direct-close fork changes, and fork PnL poller changes remain out of scope.",
+    "golden": "Eight Plugin-80 function bodies plus persistConfigChange and all six state helpers match fork byte-for-byte. Patch 30 schedules retain fork cron expressions and UTC timezone; only call transport is adapted to hooks.",
+    "raw_diff_audit": "Patch 30 replacements occur exactly once (7/7). Installed target: 22 tracked modifications = 22 backups, all backups equal HEAD; 48 copied files equal pack; unknown untracked files 0 after scoped test-artifact cleanup. Opportunity poller and confirmTicks/registerExitSignal remain present; 7.8/7.9 scope-negative symbols remain absent.",
+    "gate": "All JS/MJS syntax and npm smoke PASS. Full installed harness PASS after fresh reinstall, including briefing-orch 7/7, briefing-full 4/4, Telegram commands 26/26, settings 4/4, DLMM paper 6/6, and all prior suites. Uninstall restored every hash clean and exact 5ab14b4; vanilla command/settings parity passed; fresh install and second install were idempotent. DRY_RUN boot loaded 9 plugins with 0 errors and retained the expected dummy 401 baseline.",
     "nol_sentuh_bot_live": true
   }
 }

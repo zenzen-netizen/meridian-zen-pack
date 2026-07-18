@@ -219,9 +219,9 @@ await t("/resume -> TIDAK handled (accepted display delta; vanilla)", async () =
   const r = await fire("/resume");
   assert.strictEqual(r.handled, false);
 });
-await t("/report -> TIDAK handled (defer 7.7)", async () => {
+await t("/report -> handled plugin 80 (utang 7.4 lunas di 7.7)", async () => {
   const r = await fire("/report");
-  assert.strictEqual(r.handled, false);
+  assert.strictEqual(r.handled, true);
 });
 
 // Bukti "TIDAK exit": proses masih hidup sampai sini (finishPresetApply non-pm2
