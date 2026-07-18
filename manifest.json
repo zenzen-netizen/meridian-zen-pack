@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.2",
+  "stage": "7.3",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -68,7 +68,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 7.2 ports /settings display/menu pages via plugin 60, extends update_config whitelist for non-GMGN custom keys only, and gates GMGN menu edits until update_config split persistence lands.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 7.3 extends plugin 30 render views only: index-local display helpers moved into plugin and prior DEFER fields for held rent, SOL price, OpenRouter lines, condensed insight, racikan disclosure, and pool range-efficiency are live fail-open.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -293,6 +293,21 @@
       "requestActionConfirmation/requestConfirmation remain out of scope 7.2."
     ],
     "gate": "settings-menu installed 4/4, telegram-cmds 19/19 after /settings expectation update; full final gate recorded in notes/zen-pack-progress.md Stage 7.2.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_3": {
+    "summary": "Plugin 30 render call-sites paid Stage 3.7 display debt without new core patch.",
+    "plugin_30": "Ports fmtAgeMin, buildRangeEfficiencyLines, buildOpenRouterLines, condenseRule, and racikanScopeDisclosure from fork index.js 643e954. formatIdentityLines was already present.",
+    "ungated_fields": [
+      "status/wallet heldSol + heldEst via getPositionsRentSol",
+      "status/wallet orLines via getOpenRouterBalance + getOpenRouterCredits",
+      "status lastGoodRule + lastBadRule via listLessons + condenseRule",
+      "status/wallet disclosure via getExcludedRacikanStats",
+      "positions rent map + solPrice via getSolMarketRegime",
+      "pool held/rangeEffLines/solPrice via getPositionsRentSol + getTrackedPosition + getSolMarketRegime"
+    ],
+    "raw_diff_contract": "Stage 7.3 intentional raw diff is zenpack-plugins/30-render-views.js extension plus manifest/notes only. No new patch and no drop-in rewrite.",
+    "gate": "node --check all pack js/mjs PASS; install/reinstall idempotent; full harness PASS; telegram-cmds 19/19; settings-menu installed 4/4 and vanilla 1/1; render probes for /status /positions /pool /config fields and empty-source degrade PASS; uninstall hash-verify clean followed by git clean -fd porcelain 0; final reinstall + boot loaded 7 errors 0.",
     "nol_sentuh_bot_live": true
   }
 }

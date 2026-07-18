@@ -732,7 +732,7 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 |---|---|---|
 | 7.3-A | Recon helper/call-site/parity/export | ✅ |
 | 7.3-B | Port helper + buka field DEFER plugin 30 | ✅ |
-| 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ⬜ |
+| 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ✅ |
 
 ✅ 7.3-B port helper + un-gate.
 - `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
@@ -750,3 +750,43 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 - Fetch opsional fail-open: OpenRouter/regime/rent dibungkus catch lokal
   sehingga field baru degrade ke kosong/null/map kosong tanpa menjatuhkan render.
 - `node --check zenpack-plugins/30-render-views.js` PASS.
+
+✅ 7.3-C gate + tutup.
+- Syntax: `node --check` semua `.js/.mjs` pack PASS.
+- Sandbox reset: uninstall hash-verify clean untuk semua patched file; artifact
+  test `exports/`/`presets/` dibersihkan via `git clean -fd` (tanpa `-x`);
+  porcelain kosong sebelum reinstall.
+- Install/reinstall: fresh install PASS; install kedua idempotent
+  `skipped-idempotent`; plugin 30 import PASS dengan export
+  `buildConfigRowMap,formatCoreConfig,formatFullConfig,formatFunctionConfig,manifest,register`.
+  Catatan: probe import pertama tanpa `process.exit` dibiarkan mencetak export lalu
+  dihentikan karena handle transitif terbuka; probe ulang exit 0 bersih.
+- Full harness PASS: agent-constants 8, agentloop 14, briefing-full 4,
+  config-ext 15, definitions-ext 4, dlmm-paper 6, executor-exit 10,
+  executor-ext 13, executor-sizing 14, hooks 8, lessons-read, lessons-write 5,
+  loader, patcher 16, paths 12, profile-tools 10, prompt-racikan 8,
+  reports-smoke, screening-ext 4, settings-menu installed 4, smi-chain 4,
+  telegram-cmds 19, telegram-ext 5, wallet-ext 5, `npm test` smoke PASS.
+- Render probes: synthetic `/status` shows held rent, OpenRouter line,
+  disclosure, condensed good/bad rules; `/positions` shows per-position held +
+  total-held; `/pool` shows range-eff lines + dual `$`/`◎` with solPrice;
+  `/config` renders existing function config. Empty-source degrade probe PASS
+  for status/positions/pool with no `undefined`.
+- Cycle: uninstall after harness restored patched files verify clean; `git clean -fd`
+  removed test artifacts; settings-menu vanilla-mode 1/1 PASS; final reinstall PASS;
+  final reinstall kedua idempotent PASS.
+- Boot DRY_RUN pendek: `[zen-pack] loaded 7 plugins (skipped 0, errors 0)`.
+  Timeout SIGTERM exit 124 accepted; only expected dummy-env baseline 401.
+- Golden/read-only: `/config` parity recon remains valid (`buildConfigRowMap`
+  byte-equal fork after export normalization). Raw-diff sapu-tuntas:
+  intentional Stage 7.3 diff is `zenpack-plugins/30-render-views.js` extension
+  plus `manifest.json`/notes only. Nol patch baru, nol drop-in rewrite, bot live
+  tidak disentuh.
+
+## Stage 7.3 laporan final
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.3-A | Recon helper/call-site/parity/export | ✅ |
+| 7.3-B | Port helper + buka field DEFER plugin 30 | ✅ |
+| 7.3-C | Gate penuh, render checks, raw-diff, laporan final | ✅ |
