@@ -546,3 +546,70 @@ Utang terkonsolidasi:
 
 Roadmap: 6.7 dilebur ke 6.6. Stage 6 SELESAI pada full-parity briefing;
 orkestrasi `index.js` resmi masuk Stage 7.x.
+
+## Stage 7.2 — /settings menu pages (display) → plugin 60-settings-menu
+
+✅ 7.2-A recon (read-only).
+- Sumber valid: fork `/home/ubuntu/meridianzen` punya `643e954`; sandbox basis
+  `/home/ubuntu/meridian-lab/vanilla-test` berada di `5ab14b4`.
+- Line map fork `643e954:index.js` cocok brief: `_pendingInput` L1594,
+  `_settingsView` L1596, `buildConfigRowMap` L1733, `renderSubclusterRows`
+  L1960, `subgroupDesc` L1991, `activeRacikanName` L2032,
+  `formatFunctionConfig` L2039, fork `parseConfigValue` L2049,
+  `getConfigValue` L2061, confirm-flow out-of-scope L2076-L2209,
+  `MENU_CONTROLS` L2210-L2447, `MENU_KEY_TO_PAGE` L2452,
+  `returnTokenForKey` L2498-L2506, `initSettingsViews(...)` L2512,
+  `showSettingsMenu` L2514, `normalizeMenuValue` L2524,
+  `applySettingsMenuCallback` L2535-L2703, pending-input text path
+  L3023-L3059.
+- Drop-in deps valid: `views/settings.js` SHA-256
+  `33486af50921350db745e8cf05090956dc4e56c3cea5a2ee06f953509a723115`
+  dan byte-identik fork; `plugins/preset-manager.js` dan
+  `plugins/config-origin.js` juga byte-identik fork. Vanilla `telegram.js`
+  exports `sendMessageWithButtons`, `editMessageWithButtons`,
+  `answerCallbackQuery`, `sendMessage`, `editMessage`.
+- Executor `CONFIG_MAP` diff fork-vs-vanilla: `NONGMGN` 35 key:
+  `screeningSource`, `screeningCategories`, `gasReserveAutoTune`,
+  `gasReserveBufferDays`, `gasReserveFloorSol`, `sizingMode`,
+  `rentPerPositionSol`, `adaptiveScreening`, `maxScreeningIntervalMin`,
+  `generalMaxTokens`, `strategyLock`, `indicatorExitEnabled`,
+  `indicatorRejectAtBottom`, `smiPdLookback`, `smiPaLookback`,
+  `smiCrossWindow`, `exitLiquidityCheck`, `exitLiquidityMaxSlippagePct`,
+  `marketRegimeGate`, `marketRegimeMaxDrop24hPct`, `candidateMomentum`,
+  `narrativeProfileSignal`, `expectedYieldSignal`, `convictionSizing`,
+  `convictionSizingMaxAdjustPct`, `counterfactualReview`,
+  `counterfactualMinMcapGainPct`, `smartWalletMomentum`,
+  `idleScreeningCooldown`, `idleScreeningCooldownMin`, `paperTrading`,
+  `usePaperHistoryWhenLive`, `learningReportEvery`, `learningReportTrendN`,
+  `evolveEnabled`.
+- Executor `GMGN` diff fork-vs-vanilla: 44 key:
+  `gmgnBaseUrl`, `gmgnInterval`, `gmgnOrderBy`, `gmgnDirection`,
+  `gmgnLimit`, `gmgnEnrichLimit`, `gmgnRequestDelayMs`, `gmgnMaxRetries`,
+  `gmgnHoldersLimit`, `gmgnKlineResolution`, `gmgnKlineLookbackMinutes`,
+  `gmgnFilters`, `gmgnPlatforms`, `gmgnMinMcap`, `gmgnMaxMcap`,
+  `gmgnMinVolume`, `gmgnMinHolders`, `gmgnMinTokenAgeHours`,
+  `gmgnMaxTokenAgeHours`, `gmgnAthFilterPct`, `gmgnMaxTop10HolderRate`,
+  `gmgnMaxBundlerRate`, `gmgnMaxRatTraderRate`, `gmgnMaxFreshWalletRate`,
+  `gmgnMaxDevTeamHoldRate`, `gmgnMaxBotDegenRate`, `gmgnMaxSniperCount`,
+  `gmgnMaxSniperHoldRate`, `gmgnPreferredKolNames`,
+  `gmgnPreferredKolMinHoldPct`, `gmgnDumpKolNames`,
+  `gmgnDumpKolMinHoldPct`, `gmgnRequireKol`, `gmgnMinKolCount`,
+  `gmgnMinSmartDegenCount`, `gmgnMinTotalFeeSol`, `gmgnIndicatorFilter`,
+  `gmgnIndicatorInterval`, `gmgnRequireBullishSt`, `gmgnRejectAtBottom`,
+  `gmgnRequireAboveSt`, `gmgnMinRsi`, `gmgnMaxRsi`,
+  `gmgnRequireBbPosition`. Catatan: jumlah aktual 44, bukan “±24”; ini hasil
+  ekstraksi exact dari `CONFIG_MAP` fork.
+- Cakupan menu: `MENU_CONTROLS` punya 134 setting edit key unik. Semua key yang
+  tidak ada di CONFIG_MAP vanilla tercakup oleh dua daftar di atas; gap = 0.
+- Hook 03b saat ini TIDAK cukup: anchor-nya berada sebelum `/briefing`, tetapi
+  sesudah cabang vanilla `cfg:*` dan `/settings`; teks non-command juga jatuh ke
+  fallback agent tanpa hook. Usulan Patch 28: replace exact block awal
+  `telegramHandler` (`const text = msg?.text?.trim();` + `if (!text) return;`,
+  count=1 di `5ab14b4:index.js`) untuk emit `telegram:command` sebelum cabang
+  callback/settings vanilla. Ini mencakup callback `cfg:*`, `/settings`, dan teks
+  pending input. Patch 03b tetap dead/redundan aman untuk command lain.
+- `finishPresetApply` fork L2893-L2900 hanya menyentuh `underPm2`, `sendMessage`,
+  dan `process.exit`; `refreshPrompt` adalah fungsi lokal lain L2989 dan bukan dep
+  jalur preset. Pack sudah punya pola adaptasi di plugin 10: `reply` mengganti
+  `sendMessage`, auto-exit pm2 dipertahankan. Hook `config:reload`/`prompt:build`
+  tidak diperlukan untuk fungsi ini.
