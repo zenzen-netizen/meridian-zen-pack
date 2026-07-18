@@ -627,3 +627,23 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 - Test penulis dibungkus backup/restore `user-config.json`; artifact
   `lessons.json` self-tune test dibersihkan setelah terbukti hanya berisi rule
   `7.2-B test`.
+
+✅ 7.2-C plugin 60 settings menu.
+- `zenpack-plugins/60-settings-menu.js` menambahkan handler `telegram:command`
+  untuk `/settings`/`/menu`/`/configmenu`, callback `cfg:*`, dan teks non-command
+  saat `_pendingInput` aktif. Semua jalur yang dikonsumsi set `ctx.handled=true`.
+- `MENU_CONTROLS`, `MENU_KEY_TO_PAGE`, `MENU_KEY_TO_FNGROUP`,
+  `returnTokenForKey`, `showSettingsMenu`, `normalizeMenuValue`, dan
+  `applySettingsMenuCallback` diport dari fork. State modul: `_pendingInput` dan
+  `_settingsView`.
+- Adaptasi minimal: `buildConfigRowMap` dan `formatFullConfig` di-reuse dari
+  plugin 30 (sudah port display fork); plugin 60 tetap menginjeksi
+  `renderSubclusterRows` + `subgroupDesc` ke `views/settings.js` saat `register()`.
+- Gerbang GMGN aktif berdasarkan prefix `gmgn` sebelum value computation dan
+  sebelum dua jalur `executeTool("update_config")`: callback edit dan input text.
+  Toast/message: `⏳ setelan gmgn belum aktif (menunggu port update_config blok 1)`.
+- Smoke sandbox: loader `loaded=7 errors=0`; `/settings` handled dan render
+  fn-landing; `cfg:toggle:gmgnRequireKol` menghasilkan satu
+  `answerCallbackQuery` gate tanpa update_config; `cfg:toggle:paperTrading`
+  update_config sukses dan persist (vanilla normalizer menyimpan `1`), dengan
+  backup/restore `user-config.json` + `lessons.json`.
