@@ -808,6 +808,37 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 | 7.4-B | Port plugin 10 slim + tests | ✅ |
 | 7.4-C | Gate + push | ⬜ |
 
+✅ 7.4-C gate + tutup.
+- Syntax: `node --check` semua `.js/.mjs` pack PASS.
+- Sandbox cycle: uninstall hash-verify clean; `git clean -fd` membersihkan
+  artefak test; porcelain 0 sebelum reinstall. Fresh install PASS; install
+  kedua idempotent (`skipped-idempotent`).
+- Harness penuh PASS: agent-constants 8, agentloop 14, briefing-full 4,
+  config-ext 15, definitions-ext 4, dlmm-paper 6, executor-exit 10,
+  executor-ext 13, executor-sizing 14, hooks 8, lessons-read, lessons-write 5,
+  loader, patcher 16, paths 12, profile-tools 10, reports-smoke,
+  screening-ext 4, settings-menu installed 4, smi-chain 4, telegram-cmds 26,
+  telegram-ext 5, wallet-ext 5, prompt-racikan 8, `npm test` smoke PASS.
+- Uninstall fallback PASS: settings-menu vanilla 1/1 dan telegram-cmds vanilla
+  1/1; `/help` kembali ke cabang index vanilla, plugin marker 7.4 hilang.
+- Boot final: DRY_RUN dummy env `timeout 6s node index.js` memuat 7 plugin,
+  skipped 0, errors 0; timeout hanya menghentikan proses cron yang tetap hidup.
+- Golden read-only: fork `643e954:index.js` call-site L3072-L3075, L3108-L3142,
+  L3446-L3468 dicek; plugin 10 memakai call-site sama dengan adaptasi hook
+  `ctx.reply`/`ctx.handled`. Drop-in `views/system.js`, `guide.js`, dan
+  `sol-tracker.js` SHA-256 sama dengan fork.
+- Raw-diff sapu-tuntas: perubahan pack Stage 7.4 hanya
+  `zenpack-plugins/10-telegram-cmds.js`, `tests/telegram-cmds.test.mjs`,
+  `manifest.json`, `notes/zen-pack-progress.md`. Pengecualian eksplisit:
+  plugin 10 extended; `/screen` `/pause` `/resume` accepted display delta;
+  `/report` DEFER 7.7.
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.4-A | Recon + owner override slim | ✅ |
+| 7.4-B | Port plugin 10 slim + tests | ✅ |
+| 7.4-C | Gate + push | ✅ |
+
 ✅ 7.3-B port helper + un-gate.
 - `zenpack-plugins/30-render-views.js` menambahkan import tersedia:
   `getPositionsRentSol`, `getSolMarketRegime`, `getOpenRouterBalance`,

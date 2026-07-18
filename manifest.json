@@ -315,7 +315,7 @@
     "owner_override": "Port only /help, /guide, /wallet trackstart, and /hive where deps are importable. Drop /screen, /pause, /resume intercepts as accepted display delta; vanilla dead-path stays active. Defer /report to 7.7 with buildReportForArg/briefing orchestration.",
     "plugin_10": "Adds renderGuide, systemView.renderHelp, sol-tracker get/setTrackStart, and hivemind renderHive branches. No money command, no new core patch.",
     "raw_diff_contract": "Intentional raw diff is zenpack-plugins/10-telegram-cmds.js extension plus telegram-cmds test/manifest/notes. Accepted display delta: /screen /pause /resume remain vanilla; /report deferred 7.7.",
-    "gate": "pending 7.4-C",
+    "gate": "node --check all pack js/mjs PASS; fresh uninstall hash-verify clean + git clean -fd porcelain 0; fresh install + reinstall idempotent PASS; full harness PASS including telegram-cmds 26/26, settings-menu installed 4/4, settings-menu vanilla 1/1, telegram-cmds vanilla 1/1; npm smoke PASS; boot DRY_RUN loaded 7 plugins errors 0. Golden read-only: fork index call-sites L3072-L3075/L3108-L3142/L3446-L3468 verified, renderer/drop-ins guide.js sol-tracker.js views/system.js SHA match fork. Raw diff sapu-tuntas: only plugin 10/test/manifest/notes intentional.",
     "nol_sentuh_bot_live": true
   }
 }
