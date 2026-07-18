@@ -32,7 +32,7 @@ for (const f of defs) {
       if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); continue; }
     }
     for (const rep of item.replaces ?? []) {
-      const r = replaceLine({ targetRoot, backupsDir, hashDbPath, file: item.file, oldLine: rep.old, newLine: rep.new });
+      const r = replaceLine({ targetRoot, backupsDir, hashDbPath, file: item.file, oldLine: rep.old, newLine: rep.new, already: rep.already });
       console.log(`[zen-pack patch] ${f} ${item.file} replace: ${r.status}`);
       if (!OK.has(r.status)) { failed++; if (r.err) console.error(r.err); }
     }

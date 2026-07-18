@@ -95,6 +95,18 @@ t("replace: idempotent -> kedua kali skipped", () => {
   assert.strictEqual(r2.status, "skipped-idempotent");
 });
 
+t("replace: post-patch form skipped via already", () => {
+  const before = readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8");
+  const r = replaceLine({
+    ...cfg(),
+    oldLine: 'console.log("TIDAK ADA");',
+    newLine: 'console.log("NEW LAMA");',
+    already: 'console.log("vanilla boot");',
+  });
+  assert.strictEqual(r.status, "skipped-idempotent");
+  assert.strictEqual(readFileSync("/home/ubuntu/meridian-zen-pack/sandbox-target/core.js", "utf8"), before);
+});
+
 t("replace: NEW diperlakukan literal, bukan replacement pattern ($ aman)", () => {
   const c = cfg();
   const newLine = 'console.log(`price $${amount}`);';
