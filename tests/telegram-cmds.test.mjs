@@ -97,10 +97,10 @@ await t("/pool 1 -> handled (no positions -> Invalid number, graceful)", async (
   const r = await fire("/pool 1");
   assert.strictEqual(r.handled, true);
 });
-// /settings TETAP jatuh ke vanilla (money-adjacent, ditunda ke Stage 7.2).
-await t("/settings -> TIDAK handled (jatuh ke vanilla, ditunda 7.2)", async () => {
+// Stage 7.2: /settings di-intercept plugin 60-settings-menu.
+await t("/settings -> handled oleh 60-settings-menu", async () => {
   const r = await fire("/settings");
-  assert.strictEqual(r.handled, false);
+  assert.strictEqual(r.handled, true);
 });
 // /config bogus (bukan core|origin) TETAP jatuh ke vanilla (tak match 3 bentuk eksak).
 await t("/config bogus -> TIDAK handled (jatuh ke vanilla)", async () => {

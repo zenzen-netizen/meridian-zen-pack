@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "6.6",
+  "stage": "7.2",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -40,7 +40,9 @@
     "25b-lessons-evolve-cleanup",
     "25c-lessons-writers-prompt",
     "26a-pool-memory-deployed-addresses",
-    "26b-briefing-full-parity"
+    "26b-briefing-full-parity",
+    "27-executor-config-map",
+    "28-telegram-settings-hook"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -48,7 +50,8 @@
     "20-profile-tools",
     "30-render-views",
     "40-prompt-racikan",
-    "50-config-ext"
+    "50-config-ext",
+    "60-settings-menu"
   ],
   "drop_ins": {
     "root": 18,
@@ -56,7 +59,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 6,
+    "zenpack_plugins": 7,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",
@@ -65,7 +68,7 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 6.6 closes Stage 6 with byte-exact briefing parity; former 6.7 orchestration moves to Stage 7.",
+  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 7.2 ports /settings display/menu pages via plugin 60, extends update_config whitelist for non-GMGN custom keys only, and gates GMGN menu edits until update_config split persistence lands.",
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -277,6 +280,19 @@
     "dead_exports_expected": "generatePeriodicBriefing, buildMilestoneReport, dan varian argumen generateBriefing menunggu konsumen index.js Stage 7.",
     "gate": "Syntax PASS; uninstall briefing kembali vanilla committed 72 baris + verify clean + porcelain 0; reinstall lalu reinstall-idempotent; smoke briefing 4/4; full harness PASS; Telegram 19/19+5/5; DLMM-PAPER 6/6; dual-side diff=[]; prompt parity 8/8; golden SHA/diff exact.",
     "stage_6_complete": true,
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_2": {
+    "summary": "/settings menu pages moved to zenpack-plugins/60-settings-menu.js; vanilla settings path remains for uninstall fallback.",
+    "patch_27": "tools/executor.js CONFIG_MAP extended additively with 35 custom non-GMGN keys extracted from fork 643e954. Handler/validation/persistence logic remains vanilla. No gmgn* key inserted.",
+    "patch_28": "index.js early conditional telegram hook for settings surfaces only: callback_query, /settings aliases, and non-command pending input text. General slash commands keep patch 03b position/queue semantics.",
+    "plugin_60": "Ports MENU_CONTROLS, page maps, return-token logic, showSettingsMenu, callback handler, and pending input consumer. Reuses buildConfigRowMap/formatFullConfig from plugin 30; injects renderSubclusterRows/subgroupDesc into views/settings.js at register().",
+    "adaptations": [
+      "GMGN menu edit keys are gated by prefix gmgn before executeTool; callback toast/message is `⏳ setelan gmgn belum aktif (menunggu port update_config blok 1)`.",
+      "Recovery path: remove GMGN gate when update_config block 1 split-persistence to gmgn-config.json is ported.",
+      "requestActionConfirmation/requestConfirmation remain out of scope 7.2."
+    ],
+    "gate": "settings-menu installed 4/4, telegram-cmds 19/19 after /settings expectation update; full final gate recorded in notes/zen-pack-progress.md Stage 7.2.",
     "nol_sentuh_bot_live": true
   }
 }

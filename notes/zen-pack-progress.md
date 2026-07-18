@@ -658,3 +658,38 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 - Install sandbox: patch 28 `replaced`, `index.js` `node --check` PASS, marker
   28 muncul sebelum cabang vanilla `cfg:*`/`/settings`, marker 03b tetap ada
   sebelum `/briefing`.
+
+✅ 7.2-E gate standar + tutup fase.
+- Syntax: `node --check` semua `.js/.mjs` pack PASS.
+- Test baru `tests/settings-menu.test.mjs`: installed 4/4 (`/settings` render
+  fn-landing, toggle non-GMGN persist, input non-GMGN persist, GMGN button gate
+  dan `user-config.json` tidak berubah) + vanilla-mode 1/1 setelah uninstall
+  (`/settings` branch vanilla pulih, marker 28/03b hilang).
+- Regression: full harness PASS — hooks 8, loader, patcher 16, paths 12,
+  profile-tools 10, prompt-racikan 8, config-ext 15, agent-constants 8,
+  agentloop-ext 14, definitions-ext 4, executor-sizing 14, executor-ext 13,
+  executor-exit 10, wallet-ext 5, screening-ext 4, smi-chain 4, dlmm-paper 6,
+  lessons-read, reports-smoke, lessons-write 5, telegram-ext 5,
+  telegram-cmds 19, briefing-full 4, settings-menu 4, `npm test` smoke PASS.
+- Cycle: uninstall hash-verify clean for patched files; `git clean -fd`
+  (tanpa `-x`) menghapus artifact `exports/`/`presets/`; porcelain 0; vanilla
+  `/settings` test 1/1; reinstall lalu reinstall kedua idempotent (`27` dan `28`
+  skipped-idempotent pada pass kedua); settings-menu installed 4/4; smoke PASS.
+- Boot DRY_RUN pendek: `[zen-pack] loaded 7 plugins (skipped 0, errors 0)`,
+  no plugin/runtime syntax errors; timeout SIGTERM exit 124 diterima.
+- Golden/read-only audit: `MENU_CONTROLS` plugin 60 byte-equal block fork
+  `643e954:index.js` L2210-L2447. `views/settings.js` tetap byte-identik fork
+  SHA `33486af5...3115`. Raw-diff fase ini terklasifikasi: patch 27
+  `tools/executor.js`, patch 28 `index.js`, plugin 60, test additions, manifest
+  + notes. Adaptasi GMGN gate tercatat manifest dengan recovery path dicabut saat
+  update_config blok 1 diport.
+
+## Stage 7.2 laporan final
+
+| Fase | Isi | Status |
+|---|---|---|
+| 7.2-A | Recon line map, key diff, hook coverage, finishPresetApply deps | ✅ |
+| 7.2-B | Patch 27 whitelist 35 non-GMGN key; GMGN tetap unknown | ✅ |
+| 7.2-C | Plugin 60 settings menu + GMGN gate | ✅ |
+| 7.2-D | Patch 28 early settings hook conditional | ✅ |
+| 7.2-E | Full gate, uninstall/reinstall idempotent, manifest/progress | ✅ |
