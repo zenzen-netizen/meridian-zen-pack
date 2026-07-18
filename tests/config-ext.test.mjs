@@ -36,8 +36,8 @@ for (const e of res.errors) console.error("  plugin error:", e.file, e.err);
 let pass = 0, fail = 0;
 async function t(name, fn) { try { await fn(); console.log("  ✅", name); pass++; } catch (e) { console.log("  ❌", name, "→", e.message); fail++; } }
 
-await t("loader: 7 plugin loaded, 0 skipped, 0 errors", () => {
-  assert.strictEqual(res.loaded.length, 7); // +60-settings-menu
+await t("loader: 8 plugin loaded, 0 skipped, 0 errors", () => {
+  assert.strictEqual(res.loaded.length, 8); // +70-money-commands
   assert.strictEqual(res.skipped.length, 0);
   assert.strictEqual(res.errors.length, 0);
 });

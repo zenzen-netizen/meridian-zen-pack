@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.3",
+  "stage": "7.6",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -42,7 +42,8 @@
     "26a-pool-memory-deployed-addresses",
     "26b-briefing-full-parity",
     "27-executor-config-map",
-    "28-telegram-settings-hook"
+    "28-telegram-settings-hook",
+    "29-agentloop-money"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -51,7 +52,8 @@
     "30-render-views",
     "40-prompt-racikan",
     "50-config-ext",
-    "60-settings-menu"
+    "60-settings-menu",
+    "70-money-commands"
   ],
   "drop_ins": {
     "root": 18,
@@ -59,7 +61,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 7,
+    "zenpack_plugins": 8,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",
@@ -316,7 +318,8 @@
     "plugin_10": "Adds renderGuide, systemView.renderHelp, sol-tracker get/setTrackStart, and hivemind renderHive branches. No money command, no new core patch.",
     "raw_diff_contract": "Intentional raw diff is zenpack-plugins/10-telegram-cmds.js extension plus telegram-cmds test/manifest/notes. Accepted display delta: /screen /pause /resume remain vanilla; /report deferred 7.7.",
     "gate": "node --check all pack js/mjs PASS; fresh uninstall hash-verify clean + git clean -fd porcelain 0; fresh install + reinstall idempotent PASS; full harness PASS including telegram-cmds 26/26, settings-menu installed 4/4, settings-menu vanilla 1/1, telegram-cmds vanilla 1/1; npm smoke PASS; boot DRY_RUN loaded 7 plugins errors 0. Golden read-only: fork index call-sites L3072-L3075/L3108-L3142/L3446-L3468 verified, renderer/drop-ins guide.js sol-tracker.js views/system.js SHA match fork. Raw diff sapu-tuntas: only plugin 10/test/manifest/notes intentional.",
-    "nol_sentuh_bot_live": true
+    "nol_sentuh_bot_live": true,
+    "superseded_7_6": "Owner override: keputusan drop /screen dicabut. Plugin 70 kini memiliki /screen + candidate cache + /candidates + /deploy sebagai satu klaster money; /pause dan /resume tetap vanilla."
   },
   "stage_7_5": {
     "summary": "/preset /export /addprofil dispatch already paid by Stage 3.3/3.4.",

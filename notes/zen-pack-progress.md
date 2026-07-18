@@ -791,6 +791,11 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
 - `/report` DEFER 7.7: klaster `buildReportForArg` + orkestrasi briefing/report.
 - REPL wiring tetap DEFER 7.7 boot-wiring sesuai daftar recon 7.4-A.
 
+⚠️ Override lanjutan owner Stage 7.6: keputusan 7.4 untuk tidak mengintercept
+`/screen` resmi digantikan. Plugin 70 memiliki `/screen` + candidate cache +
+`/candidates` + `/deploy <n>` sebagai satu klaster agar state tidak terbelah.
+`/pause` dan `/resume` tetap memakai cabang vanilla.
+
 ✅ 7.4-B port slim.
 - `zenpack-plugins/10-telegram-cmds.js` menambah branch `/help`, `/guide`,
   `/wallet trackstart`, `/hive` sesuai keputusan owner. Tidak ada patch core

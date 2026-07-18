@@ -63,6 +63,8 @@ const { loadPlugins } = await import(pathToFileURL(join(target, "zenpack-lib/loa
 const res = await loadPlugins(join(target, "zenpack-plugins"), hooks);
 console.log(`loader: loaded ${res.loaded.length}, skipped ${res.skipped.length}, errors ${res.errors.length}`);
 for (const e of res.errors) console.error("  plugin error:", e.file, e.err);
+const moneyPlugin = await import(pathToFileURL(join(target, "zenpack-plugins/70-money-commands.js")).href);
+moneyPlugin.__test.setRuntime({ getTopCandidates: async () => ({ candidates: [] }) });
 
 async function fire(text) {
   const replies = [];
@@ -205,9 +207,9 @@ await t("/preset xyz (sub tak dikenal) -> handled + usage", async () => {
   assert.ok(r.reply.includes("/preset save <nama>"), `reply: ${r.reply.slice(0, 120)}`);
 });
 
-await t("/screen -> TIDAK handled (jatuh ke vanilla)", async () => {
+await t("/screen -> handled plugin 70 (override keputusan 7.4)", async () => {
   const r = await fire("/screen");
-  assert.strictEqual(r.handled, false);
+  assert.strictEqual(r.handled, true);
 });
 await t("/pause -> TIDAK handled (accepted display delta; vanilla)", async () => {
   const r = await fire("/pause");

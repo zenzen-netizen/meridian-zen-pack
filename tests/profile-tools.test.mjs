@@ -28,7 +28,7 @@ let pass = 0, fail = 0;
 async function t(name, fn) { try { await fn(); console.log("  ✅", name); pass++; } catch (e) { console.log("  ❌", name, "→", e.message); fail++; } }
 
 await t("loader: 7 plugin loaded, 0 skipped, 0 errors", async () => {
-  assert.strictEqual(res.loaded.length, 7); // +60-settings-menu (Stage 7.2)
+  assert.strictEqual(res.loaded.length, 8); // +70-money-commands (Stage 7.6)
   assert.strictEqual(res.skipped.length, 0);
   assert.strictEqual(res.errors.length, 0);
 });
