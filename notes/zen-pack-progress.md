@@ -613,3 +613,17 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
   jalur preset. Pack sudah punya pola adaptasi di plugin 10: `reply` mengganti
   `sendMessage`, auto-exit pm2 dipertahankan. Hook `config:reload`/`prompt:build`
   tidak diperlukan untuk fungsi ini.
+
+✅ 7.2-B patch 27 executor CONFIG_MAP.
+- `core-patches/27-executor-config-map.mjs` additive via `applyPatch` marker
+  `zen-pack:27-executor-config-map`, anchor exact vanilla
+  `loneCandidateMinDegen`. Menyisipkan 35 key `NONGMGN` verbatim mapping fork,
+  tanpa menyentuh handler/validasi/persist.
+- `gmgn*` sengaja tidak dimasukkan. Bukti sandbox pasca-install:
+  `update_config({convictionSizing:true})` sukses dan persist
+  `user-config.json` (vanilla normalizer menyimpan `1`, bukan boolean; scope 7.2-B
+  tidak mengubah normalizer), sedangkan `gmgnMinVolume` tetap ditolak
+  `unknown:["gmgnMinVolume"]`.
+- Test penulis dibungkus backup/restore `user-config.json`; artifact
+  `lessons.json` self-tune test dibersihkan setelah terbukti hanya berisi rule
+  `7.2-B test`.
