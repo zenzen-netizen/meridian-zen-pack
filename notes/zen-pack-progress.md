@@ -647,3 +647,14 @@ orkestrasi `index.js` resmi masuk Stage 7.x.
   `answerCallbackQuery` gate tanpa update_config; `cfg:toggle:paperTrading`
   update_config sukses dan persist (vanilla normalizer menyimpan `1`), dengan
   backup/restore `user-config.json` + `lessons.json`.
+
+✅ 7.2-D patch 28 settings hook.
+- Dibutuhkan karena patch 03b berada sesudah cabang vanilla `cfg:*` dan
+  `/settings`, serta tidak melihat teks pending input sebelum fallback agent.
+- `core-patches/28-telegram-settings-hook.mjs` replace exact dua baris awal
+  `telegramHandler` (`const text...` + `if (!text) return;`, count=1). Patch
+  conditional: hanya callback, `/settings` alias, dan teks non-`/`; slash-command
+  lain tetap memakai hook 03b lama setelah queue/busy.
+- Install sandbox: patch 28 `replaced`, `index.js` `node --check` PASS, marker
+  28 muncul sebelum cabang vanilla `cfg:*`/`/settings`, marker 03b tetap ada
+  sebelum `/briefing`.
