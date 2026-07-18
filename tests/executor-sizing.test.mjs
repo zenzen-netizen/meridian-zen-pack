@@ -14,13 +14,13 @@ if (!target) { console.error("pakai: node tests/executor-sizing.test.mjs <path-t
 const src = readFileSync(join(target, "zenpack-lib", "sizing.js"), "utf8");
 // Buang baris import config + kata kunci export → jadikan badan yang bisa di-Function-wrap.
 const body = src.replace(/^import[^\n]*\n/m, "").replace(/export\s+/g, "");
-// Pabrik: suntik `config` per-kasus, kembalikan kedua fungsi.
+// Pabrik: suntik `config` per-kasus, kembalikan fungsi sizing.
 const make = (config) =>
-  new Function("config", body + "\n; return { minDeployAmount, applyConvictionSizing };")(config);
+  new Function("config", body + "\n; return { minDeployAmount, computeDeployAmount, applyConvictionSizing };")(config);
 
 const baseCfg = (over = {}) => ({
-  management: { deployAmountSol: 0.5, ...(over.management || {}) },
-  risk: { maxDeployAmount: 2.0, ...(over.risk || {}) },
+  management: { deployAmountSol: 0.5, gasReserve: 0.2, positionSizePct: 0.35, sizingMode: "fixed", rentPerPositionSol: 0, ...(over.management || {}) },
+  risk: { maxDeployAmount: 2.0, maxPositions: 3, ...(over.risk || {}) },
   experiments: over.experiments,
 });
 
@@ -39,6 +39,33 @@ t("minDeployAmount: deployAmountSol=0.01 → 0.03 (floor fork, BUKAN 0.1 lama)",
 t("minDeployAmount: deployAmountSol undefined → 0.03 (fallback ??)", () => {
   const { minDeployAmount } = make(baseCfg({ management: { deployAmountSol: undefined } }));
   assert.strictEqual(minDeployAmount(), 0.03);
+});
+
+// ── computeDeployAmount: fixed parity + maximize adaptive slots ─────────────
+t("fixed fixture: 2 SOL → vanilla 0.63, slotsRemaining diabaikan", () => {
+  const { computeDeployAmount } = make(baseCfg());
+  assert.strictEqual(computeDeployAmount(2, { slotsRemaining: 1 }), 0.63);
+  assert.strictEqual(computeDeployAmount(2, { slotsRemaining: 3 }), 0.63);
+});
+t("maximize fixture: pilih 3 slot terbesar yang tetap ≥ floor", () => {
+  const cfg = baseCfg({ management: { sizingMode: "maximize", rentPerPositionSol: 0.057 } });
+  const { computeDeployAmount } = make(cfg);
+  assert.strictEqual(computeDeployAmount(2, { slotsRemaining: 3 }), 0.543);
+});
+t("maximize fixture: 3 slot gagal floor lalu adapt ke 2 slot", () => {
+  const cfg = baseCfg({ management: { sizingMode: "maximize", rentPerPositionSol: 0.057 } });
+  const { computeDeployAmount } = make(cfg);
+  assert.strictEqual(computeDeployAmount(1.5, { slotsRemaining: 3 }), 0.593);
+});
+t("maximize modal kurang: satu slot pun di bawah floor → 0", () => {
+  const cfg = baseCfg({ management: { sizingMode: "maximize", rentPerPositionSol: 0.057 } });
+  const { computeDeployAmount } = make(cfg);
+  assert.strictEqual(computeDeployAmount(0.75, { slotsRemaining: 1 }), 0);
+});
+t("maximize tidak round-up dan clamp maxDeployAmount", () => {
+  const cfg = baseCfg({ management: { sizingMode: "maximize", rentPerPositionSol: 0 }, risk: { maxDeployAmount: 0.55 } });
+  const { computeDeployAmount } = make(cfg);
+  assert.strictEqual(computeDeployAmount(2, { slotsRemaining: 3 }), 0.55);
 });
 
 // ── applyConvictionSizing: experiment OFF/absent = unchanged ─────────────────
