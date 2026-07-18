@@ -1,0 +1,10 @@
+  // [zen-pack:30-management-after-cycle] report hook runs only after the full cycle settles.
+  try {
+    await __zenpackHooks.run("management:afterCycle", {});
+  } catch (error) {
+    log("cron_error", `Learning report hook failed (fail-open): ${error.message}`);
+  }
+  return mgmtReport;
+}
+
+export async function runScreeningCycle({ silent = false } = {}) {

@@ -1,0 +1,16 @@
+  // Every 6h — catch up if briefing was missed (agent restart, crash, etc.)
+  const briefingWatchdog = cron.schedule(`0 */6 * * *`, async () => {
+    await maybeRunMissedBriefing();
+  }, { timezone: 'UTC' });
+
+  // Weekly digest — Monday 01:30 UTC (staggered after the daily briefing).
+  const weeklyTask = cron.schedule(`30 1 * * 1`, async () => {
+    await __zenpackHooks.run("briefing:periodic", { period: "week" });
+  }, { timezone: 'UTC' });
+
+  // Monthly digest — 1st of month 02:00 UTC.
+  const monthlyTask = cron.schedule(`0 2 1 * *`, async () => {
+    await __zenpackHooks.run("briefing:periodic", { period: "month" });
+  }, { timezone: 'UTC' });
+
+  // Fast PnL poller — the real-time exit path between management cycles, no LLM.

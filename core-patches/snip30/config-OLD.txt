@@ -1,0 +1,5 @@
+  return parseFloat(result.toFixed(2));
+}
+
+/**
+ * Reload user-config.json and apply updated screening thresholds to the

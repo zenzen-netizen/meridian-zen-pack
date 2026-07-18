@@ -1,0 +1,4 @@
+    // ── Slash commands ───────────────────────
+    if (input === "/stop") { await shutdown("user command"); return; }
+
+    if (input === "/status") {

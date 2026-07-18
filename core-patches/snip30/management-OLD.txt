@@ -1,0 +1,4 @@
+  return mgmtReport;
+}
+
+export async function runScreeningCycle({ silent = false } = {}) {

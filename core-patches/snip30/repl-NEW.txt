@@ -1,0 +1,15 @@
+    // ── Slash commands ───────────────────────
+    if (input === "/stop") { await shutdown("user command"); return; }
+
+    // [zen-pack:30-repl-command] plugin commands mirror Telegram's handled contract.
+    {
+      const zpCtx = await __zenpackHooks.run("repl:command", {
+        text: input,
+        channel: "repl",
+        runBusy,
+        reply: async (text) => { console.log(`\n${text}\n`); },
+      });
+      if (zpCtx.handled) return;
+    }
+
+    if (input === "/status") {

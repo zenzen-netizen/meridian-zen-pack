@@ -1,0 +1,22 @@
+  return parseFloat(result.toFixed(2));
+}
+
+/**
+ * Update one live config value AND persist it to user-config.json (flat key, the
+ * shape config reads on startup). Used by auto-tuners outside the update_config
+ * tool path. Returns true on a successful write. Fail-open.
+ */
+export function persistConfigChange(section, field, flatKey, value) {
+  if (config[section]) config[section][field] = value;
+  try {
+    const u = fs.existsSync(USER_CONFIG_PATH) ? JSON.parse(fs.readFileSync(USER_CONFIG_PATH, "utf8")) : {};
+    u[flatKey] = value;
+    fs.writeFileSync(USER_CONFIG_PATH, JSON.stringify(u, null, 2));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Reload user-config.json and apply updated screening thresholds to the

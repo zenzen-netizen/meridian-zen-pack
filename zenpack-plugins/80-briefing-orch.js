@@ -277,24 +277,30 @@ async function handleCommand(ctx) {
   const text = String(ctx.text || "");
   const repl = ctx.channel === "repl";
   if (text === "/briefing" || text === "/briefing alltime") {
-    try {
-      const briefing = await generateBriefing({ allTimeDeep: text === "/briefing alltime" });
-      if (repl) await ctx.reply(plain(briefing));
-      else await sendAndPinBriefing(briefing);
-    } catch (e) {
-      await ctx.reply(systemView.renderError(e.message));
-    }
+    const run = ctx.runBusy || (async (fn) => fn());
+    await run(async () => {
+      try {
+        const briefing = await generateBriefing({ allTimeDeep: text === "/briefing alltime" });
+        if (repl) await ctx.reply(plain(briefing));
+        else await sendAndPinBriefing(briefing);
+      } catch (e) {
+        await ctx.reply(systemView.renderError(e.message));
+      }
+    });
     ctx.handled = true;
     return;
   }
   if (text === "/report" || text.startsWith("/report ")) {
-    try {
-      const report = await buildReportForArg(text.slice("/report".length));
-      if (repl) await ctx.reply(plain(report));
-      else await sendHTML(report);
-    } catch (e) {
-      await ctx.reply(systemView.renderError(e.message));
-    }
+    const run = ctx.runBusy || (async (fn) => fn());
+    await run(async () => {
+      try {
+        const report = await buildReportForArg(text.slice("/report".length));
+        if (repl) await ctx.reply(plain(report));
+        else await sendHTML(report);
+      } catch (e) {
+        await ctx.reply(systemView.renderError(e.message));
+      }
+    });
     ctx.handled = true;
   }
 }

@@ -1,0 +1,6 @@
+  // Every 6h — catch up if briefing was missed (agent restart, crash, etc.)
+  const briefingWatchdog = cron.schedule(`0 */6 * * *`, async () => {
+    await maybeRunMissedBriefing();
+  }, { timezone: 'UTC' });
+
+  // Fast PnL poller — the real-time exit path between management cycles, no LLM.

@@ -1,0 +1,53 @@
+export function setLastBriefingDate() {
+  const state = load();
+  state._lastBriefingDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
+  save(state);
+}
+
+/**
+ * Telegram message id of the currently-pinned daily briefing, so the next
+ * briefing can unpin it and keep only the latest one pinned. Survives restarts.
+ */
+export function getLastBriefingPinId() {
+  const state = load();
+  return state._lastBriefingPinId || null;
+}
+
+export function setLastBriefingPinId(messageId) {
+  const state = load();
+  state._lastBriefingPinId = messageId || null;
+  save(state);
+}
+
+/**
+ * Highest closed-position milestone already reported by the auto learning report,
+ * so we fire once per milestone (e.g. 10, 20, 30) and never duplicate on restart.
+ */
+export function getLastReportedMilestone() {
+  const state = load();
+  return state._lastReportedMilestone || 0;
+}
+
+export function setLastReportedMilestone(n) {
+  const state = load();
+  state._lastReportedMilestone = n;
+  save(state);
+}
+
+/**
+ * Dedup key for scheduled periodic briefings (week/month), so a restart near the
+ * cron tick doesn't re-send the same period. Key = identifier of that period
+ * (e.g. the week's Monday date, or "YYYY-MM").
+ */
+export function getLastPeriodicBriefing(period) {
+  return load()[`_lastBriefing_${period}`] || null;
+}
+
+export function setLastPeriodicBriefing(period, key) {
+  const state = load();
+  state[`_lastBriefing_${period}`] = key;
+  save(state);
+}
+
+/**
+ * Reconcile local state with actual on-chain positions.

@@ -1,0 +1,5 @@
+async function runBriefing() {
+  // [zen-pack:30-briefing-override] plugin owns enhanced briefing; vanilla remains fallback.
+  const zpCtx = await __zenpackHooks.run("briefing:run", {});
+  if (zpCtx.handled) return;
+  log("cron", "Starting morning briefing");

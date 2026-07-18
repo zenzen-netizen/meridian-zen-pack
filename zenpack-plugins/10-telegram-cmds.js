@@ -225,21 +225,30 @@ async function handleSharedCommand(ctx) {
     return;
   }
   if (text === "/addprofil" || text.startsWith("/addprofil ")) {
-    const res = runAddProfilCommand(text.slice("/addprofil".length));
-    await ctx.reply(res.text);
+    const run = ctx.runBusy || (async (fn) => fn());
+    await run(async () => {
+      const res = runAddProfilCommand(text.slice("/addprofil".length));
+      await ctx.reply(res.text);
+    });
     ctx.handled = true;
     return;
   }
   if (text === "/export" || text.startsWith("/export ")) {
-    const res = runExportCommand(text.slice("/export".length));
-    await ctx.reply(res.text);
+    const run = ctx.runBusy || (async (fn) => fn());
+    await run(async () => {
+      const res = runExportCommand(text.slice("/export".length));
+      await ctx.reply(res.text);
+    });
     ctx.handled = true;
     return;
   }
   if (text === "/preset" || text.startsWith("/preset ")) {
-    const res = runPresetCommand(text.slice("/preset".length));
-    await ctx.reply(res.text);
-    if (res.applied) await finishPresetApply({ viaTelegram: ctx.channel !== "repl", reply: ctx.reply });
+    const run = ctx.runBusy || (async (fn) => fn());
+    await run(async () => {
+      const res = runPresetCommand(text.slice("/preset".length));
+      await ctx.reply(res.text);
+      if (res.applied) await finishPresetApply({ viaTelegram: ctx.channel !== "repl", reply: ctx.reply });
+    });
     ctx.handled = true;
   }
 }

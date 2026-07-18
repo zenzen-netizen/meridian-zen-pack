@@ -1,0 +1,8 @@
+export function setLastBriefingDate() {
+  const state = load();
+  state._lastBriefingDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
+  save(state);
+}
+
+/**
+ * Reconcile local state with actual on-chain positions.
