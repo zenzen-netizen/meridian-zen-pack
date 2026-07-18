@@ -216,15 +216,40 @@ function runAddProfilCommand(argStr) {
   }
 }
 
+async function handleSharedCommand(ctx) {
+  const text = String(ctx.text || "");
+  if (text === "/guide" || text.startsWith("/guide ")) {
+    // Pure file read — answer instantly even while the agent is busy.
+    await ctx.reply(renderGuide(text.slice(6)));
+    ctx.handled = true;
+    return;
+  }
+  if (text === "/addprofil" || text.startsWith("/addprofil ")) {
+    const res = runAddProfilCommand(text.slice("/addprofil".length));
+    await ctx.reply(res.text);
+    ctx.handled = true;
+    return;
+  }
+  if (text === "/export" || text.startsWith("/export ")) {
+    const res = runExportCommand(text.slice("/export".length));
+    await ctx.reply(res.text);
+    ctx.handled = true;
+    return;
+  }
+  if (text === "/preset" || text.startsWith("/preset ")) {
+    const res = runPresetCommand(text.slice("/preset".length));
+    await ctx.reply(res.text);
+    if (res.applied) await finishPresetApply({ viaTelegram: ctx.channel !== "repl", reply: ctx.reply });
+    ctx.handled = true;
+  }
+}
+
 export function register(hooks) {
+  hooks.on("repl:command", handleSharedCommand, 100);
   hooks.on("telegram:command", async (ctx) => {
+    await handleSharedCommand(ctx);
+    if (ctx.handled) return;
     const text = String(ctx.text || "");
-    if (text === "/guide" || text.startsWith("/guide ")) {
-      // Pure file read — answer instantly even while the agent is busy.
-      await ctx.reply(renderGuide(text.slice(6)));
-      ctx.handled = true;
-      return;
-    }
     if (text === "/help") {
       await ctx.reply(systemView.renderHelp());
       ctx.handled = true;
@@ -259,25 +284,6 @@ export function register(hooks) {
             `/wallet sekarang nampilin baris "SINCE ${res.dateKey}"`,
           ])].join("\n")
         : systemView.renderError(res.error));
-      ctx.handled = true;
-      return;
-    }
-    if (text === "/addprofil" || text.startsWith("/addprofil ")) {
-      const res = runAddProfilCommand(text.slice("/addprofil".length));
-      await ctx.reply(res.text);
-      ctx.handled = true;
-      return;
-    }
-    if (text === "/export" || text.startsWith("/export ")) {
-      const res = runExportCommand(text.slice("/export".length));
-      await ctx.reply(res.text);
-      ctx.handled = true;
-      return;
-    }
-    if (text === "/preset" || text.startsWith("/preset ")) {
-      const res = runPresetCommand(text.slice("/preset".length));
-      await ctx.reply(res.text);
-      if (res.applied) await finishPresetApply({ viaTelegram: true, reply: ctx.reply });
       ctx.handled = true;
       return;
     }

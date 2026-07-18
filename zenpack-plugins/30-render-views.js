@@ -153,7 +153,7 @@ function condenseRule(rule) {
   return s;
 }
 
-function racikanScopeDisclosure() {
+export function racikanScopeDisclosure() {
   try {
     const { count, net_usd } = getExcludedRacikanStats();
     if (!count) return "";
