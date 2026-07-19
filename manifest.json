@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.7",
+  "stage": "7.8-B",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -44,7 +44,8 @@
     "27-executor-config-map",
     "28-telegram-settings-hook",
     "29-agentloop-money",
-    "30-briefing-wiring"
+    "30-briefing-wiring",
+    "31-screening-foundations"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -364,6 +365,15 @@
     "golden": "Eight Plugin-80 function bodies plus persistConfigChange and all six state helpers match fork byte-for-byte. Patch 30 schedules retain fork cron expressions and UTC timezone; only call transport is adapted to hooks.",
     "raw_diff_audit": "Patch 30 replacements occur exactly once (7/7). Installed target: 22 tracked modifications = 22 backups, all backups equal HEAD; 48 copied files equal pack; unknown untracked files 0 after scoped test-artifact cleanup. Opportunity poller and confirmTicks/registerExitSignal remain present; 7.8/7.9 scope-negative symbols remain absent.",
     "gate": "All JS/MJS syntax and npm smoke PASS. Full installed harness PASS after fresh reinstall, including briefing-orch 7/7, briefing-full 4/4, Telegram commands 26/26, settings 4/4, DLMM paper 6/6, and all prior suites. Uninstall restored every hash clean and exact 5ab14b4; vanilla command/settings parity passed; fresh install and second install were idempotent. DRY_RUN boot loaded 9 plugins with 0 errors and retained the expected dummy 401 baseline.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_8_B": {
+    "summary": "Bounded fork GMGN producer/formatter and one shared candidate cache are installed prerequisites for the screening-cycle override.",
+    "patch_31": "tools/gmgn.js is fork-verbatim because discoverGmgnPools closes over the module's producer helpers; tools/screening.js receives only the fork getTopCandidates source dispatch/funnel metadata plus discoverGmgnPools import. Vanilla degenScore and opportunity dependencies remain.",
+    "shared_cache": "zenpack-lib/candidate-cache.js is the single owner. Core index and Plugin 70 both import it; the two former private arrays/timestamps are gone. Scheduled runScreeningCycle does not write the interactive cache, matching fork.",
+    "gmgn_debt": "Fase gmgn debt paid partially: discovery, prompt formatter, source dispatch, and cycle funnel metadata are live. Non-cycle GMGN work remains debt.",
+    "golden": "Installed tools/gmgn.js equals fork 643e954 byte-for-byte; installed getTopCandidates equals the fork function byte-for-byte. Chart-indicator dead export is now consumed.",
+    "gate": "Syntax PASS; screening-foundations 3/3 and money-commands 13/13 PASS; GMGN and screening-dispatch golden checks PASS. Full lifecycle gate deferred to 7.8-D.",
     "nol_sentuh_bot_live": true
   }
 }

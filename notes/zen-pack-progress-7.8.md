@@ -252,3 +252,20 @@ owner acceptance.
    error report and never fall through to vanilla/retry deploy.
 
 STOP. Await owner decision; 7.8-B/C/D have not started.
+
+## 7.8-B — foundations (owner-approved)
+
+- Patch 31 installs fork-verbatim `tools/gmgn.js`; the full producer closure is
+  required by `discoverGmgnPools`, while its four public exports remain exactly
+  the fork producer/formatter plus the pre-existing token-fee API.
+- `tools/screening.js` ports only the cycle-consumed GMGN import,
+  `getTopCandidates` source dispatch, blacklist/occupancy filtering, and funnel
+  metadata. `degenScore` remains for the locked vanilla opportunity poller.
+- `zenpack-lib/candidate-cache.js` is now the single cache owner. Core index and
+  Plugin 70 both import it; neither retains a private candidates array/timestamp.
+  Scheduled screening still does not mutate the interactive cache, matching
+  fork behavior.
+- Fase-gmgn debt is paid partially: producer, formatter, dispatch, and funnel
+  fields are live; unrelated GMGN work remains debt.
+- Foundation fixture 3/3 and money command regression 13/13 pass. Installed
+  GMGN file and `getTopCandidates` function pass fork golden comparison.

@@ -1,0 +1,6 @@
+async function deployLatestCandidate(index) {
+  const candidate = _latestCandidates[index];
+  if (!candidate) {
+    throw new Error("Invalid candidate index. Run /screen first.");
+  }
+  if (_latestCandidates.length === 1) {

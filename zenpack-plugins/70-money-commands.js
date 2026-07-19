@@ -22,6 +22,9 @@ import { ICON, SEP, tree, header, fmtMoneySigned } from "../views/format.js";
 import * as systemView from "../views/system.js";
 import { settingValue } from "../views/settings.js";
 import { computeDeployAmount, minDeployAmount } from "../zenpack-lib/sizing.js";
+import {
+  getLatestCandidatesMeta, resetLatestCandidates, setLatestCandidates,
+} from "../zenpack-lib/candidate-cache.js";
 
 export const manifest = { name: "zenpack-money-commands", priority: 100 };
 
@@ -32,8 +35,6 @@ const runtime = {
 
 const sessionHistory = [];
 const MAX_HISTORY = 20;
-let _latestCandidates = [];
-let _latestCandidatesAt = null;
 let _pendingConfirmation = null;
 
 function appendHistory(userMsg, assistantMsg) {
@@ -45,14 +46,10 @@ function appendHistory(userMsg, assistantMsg) {
   }
 }
 
-function setLatestCandidates(candidates = []) {
-  _latestCandidates = Array.isArray(candidates) ? candidates : [];
-  _latestCandidatesAt = new Date().toISOString();
-}
-
 function describeLatestCandidates(limit = 5) {
-  if (!_latestCandidates.length) return buildNoCache();
-  return buildCandidateList(_latestCandidates.slice(0, limit), { updatedAt: _latestCandidatesAt });
+  const { candidates, updatedAt } = getLatestCandidatesMeta();
+  if (!candidates.length) return buildNoCache();
+  return buildCandidateList(candidates.slice(0, limit), { updatedAt });
 }
 
 function getConfigValue(key) {
@@ -204,9 +201,10 @@ async function runDeterministicScreen(limit = 5) {
 }
 
 async function deployLatestCandidate(index) {
-  const candidate = _latestCandidates[index];
+  const { candidates } = getLatestCandidatesMeta();
+  const candidate = candidates[index];
   if (!candidate) throw new Error("Invalid candidate index. Run /screen first.");
-  if (_latestCandidates.length === 1) {
+  if (candidates.length === 1) {
     const mint = candidate.base?.mint || candidate.base_mint || null;
     const [smartWallets, narrative, tokenInfo] = await Promise.allSettled([
       runtime.checkSmartWalletsOnPool({ pool_address: candidate.pool }),
@@ -345,5 +343,5 @@ export const __test = {
   appendHistory, requestConfirmation, requestActionConfirmation, handleConfirmCallback,
   deployLatestCandidate, setLatestCandidates, describeLatestCandidates, sessionHistory,
   setRuntime(overrides) { Object.assign(runtime, overrides); },
-  reset() { sessionHistory.length = 0; _latestCandidates = []; _latestCandidatesAt = null; _pendingConfirmation = null; },
+  reset() { sessionHistory.length = 0; resetLatestCandidates(); _pendingConfirmation = null; },
 };

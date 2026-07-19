@@ -1,0 +1,15 @@
+let _latestCandidates = [];
+let _latestCandidatesAt = null;
+
+function setLatestCandidates(candidates = []) {
+  _latestCandidates = Array.isArray(candidates) ? candidates : [];
+  _latestCandidatesAt = new Date().toISOString();
+}
+
+function getLatestCandidatesMeta() {
+  return {
+    candidates: _latestCandidates,
+    count: _latestCandidates.length,
+    updatedAt: _latestCandidatesAt,
+  };
+}
