@@ -10,6 +10,21 @@ import { execFileSync } from "node:child_process";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const failures = [];
 
+// install.sh dependency gate: shell-valid and before any target mutation.
+try {
+  execFileSync("bash", ["-n", join(ROOT, "install.sh")], { stdio: "pipe" });
+  const install = readFileSync(join(ROOT, "install.sh"), "utf8");
+  const deps = install.indexOf('if [[ "$NO_DEPS" == true ]]');
+  if (deps < 0 || !install.includes("npm --prefix \"$TARGET\" install --no-package-lock")
+      || deps > install.indexOf('mkdir -p "$TARGET/.zenpack"')) {
+    throw new Error("dependency gate absent or after target mutation");
+  }
+  console.log("  ✅ install.sh dependency gate before target mutation");
+} catch (e) {
+  failures.push(`install.sh dependency gate: ${e.message}`);
+  console.log("  ❌ install.sh dependency gate");
+}
+
 // 1. node --check semua .js di lib/
 for (const f of readdirSync(join(ROOT, "lib")).filter((x) => x.endsWith(".js"))) {
   try { execFileSync("node", ["--check", join(ROOT, "lib", f)], { stdio: "pipe" }); console.log("  ✅ node --check lib/" + f); }

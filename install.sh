@@ -1,15 +1,37 @@
 #!/usr/bin/env bash
-# install.sh v0 — copy-only, BELUM apply patch anchor (itu Stage 3).
-# Pakai: bash install.sh <path-target-vanilla>
+# Pakai: bash install.sh [--no-deps] <path-target-vanilla>
 set -euo pipefail
 
-TARGET="${1:?pakai: bash install.sh <path-target>}"
+NO_DEPS=false
+if [[ "${1:-}" == "--no-deps" ]]; then
+  NO_DEPS=true
+  shift
+fi
+TARGET="${1:?pakai: bash install.sh [--no-deps] <path-target>}"
+if [[ $# -ne 1 ]]; then
+  echo "pakai: bash install.sh [--no-deps] <path-target>"
+  exit 1
+fi
 PACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 1. Verifikasi target valid
 if [[ ! -f "$TARGET/index.js" ]] || ! grep -q '"name": "dlmm-agent"' "$TARGET/package.json"; then
   echo "BUKAN target meridian valid"
   exit 1
+fi
+
+# Dependency vanilla bukan milik pack, tetapi target fresh harus bisa boot sebelum dipatch.
+if [[ "$NO_DEPS" == true ]]; then
+  echo "[zen-pack deps] --no-deps: skip dependency install"
+elif [[ -d "$TARGET/node_modules" ]]; then
+  echo "[zen-pack deps] node_modules present: skip npm install"
+else
+  echo "[zen-pack deps] node_modules absent: running npm install --no-package-lock"
+  if ! npm --prefix "$TARGET" install --no-package-lock; then
+    echo "[zen-pack deps] npm install FAILED — STOP before copy/patch"
+    exit 1
+  fi
+  echo "[zen-pack deps] npm install OK"
 fi
 
 mkdir -p "$TARGET/.zenpack"
