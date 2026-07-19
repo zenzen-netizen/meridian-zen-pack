@@ -31,14 +31,17 @@ export default [
       {
         old: "  syncOpenPositions,\n  setPositionInstruction,",
         new: "  syncOpenPositions,\n  ensureDeployedAt,\n  setPositionInstruction,",
+        already: "  ensureDeployedAt,\n  setPositionInstruction,",
       },
       {
         old: "      for (const positionAddress of (pool.listPositions || [])) {\n        const tracked = getTrackedPosition(positionAddress);",
         new: "      for (const positionAddress of (pool.listPositions || [])) {\n        // Persist deployed_at on first sight so age / minutes-held survives a\n        // state reset and is always available for untracked on-chain positions.\n        ensureDeployedAt(positionAddress, { pool: pool.poolAddress, pool_name: `${pool.tokenX}-${pool.tokenY}` });\n        const tracked = getTrackedPosition(positionAddress);",
+        already: "        ensureDeployedAt(positionAddress, { pool: pool.poolAddress, pool_name: `${pool.tokenX}-${pool.tokenY}` });",
       },
       {
         old: "    base_mint: baseMint,\n    pnl_usd: pnlUsd,\n    pnl_pct: pnlPct,\n    fees_earned_usd: m?.fees_usd ?? 0,",
         new: "    base_mint: baseMint,\n    pnl_usd: pnlUsd,\n    pnl_pct: pnlPct,\n    peak_pnl_pct: tracked.peak_pnl_pct ?? null, // pack-side paper/live shape fidelity\n    fees_earned_usd: m?.fees_usd ?? 0,",
+        already: "    peak_pnl_pct: tracked.peak_pnl_pct ?? null, // pack-side paper/live shape fidelity",
       },
     ],
   },

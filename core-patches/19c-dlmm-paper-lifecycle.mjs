@@ -12,5 +12,8 @@ export default [{
   replaces: [{
     old: "// ─── Get My Positions ──────────────────────────────────────────\nexport async function getMyPositions({ force = false, silent = false, wallet_address = null } = {}) {",
     new: block,
+    // Patch 33 extends the paper-close return inside this whole-block replacement.
+    // Treat that final migrated shape as installed on subsequent upgrades.
+    already: "    peak_pnl_pct: tracked.peak_pnl_pct ?? null, // pack-side paper/live shape fidelity",
   }],
 }];

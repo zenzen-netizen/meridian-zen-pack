@@ -13,6 +13,8 @@ export default [{
     {
       old: "  syncOpenPositions,\n} from \"../state.js\";",
       new: "  syncOpenPositions,\n  setPositionInstruction,\n} from \"../state.js\";",
+      // Patch 33 inserts ensureDeployedAt into this final import shape.
+      already: "  ensureDeployedAt,\n  setPositionInstruction,\n} from \"../state.js\";",
     },
     { old: snip("20e-created-OLD.txt"), new: snip("20e-created-NEW.txt") },
     { old: snip("20e-mark-created-OLD.txt"), new: snip("20e-mark-created-NEW.txt") },

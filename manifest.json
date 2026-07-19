@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.9-C",
+  "stage": "7.9-D",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -386,6 +386,16 @@
     "poller_contract": "Only scheduled screenTask is throttled. Post-management, cli.js, and the preserved vanilla opportunity poller all call the exported choke point directly. degenScore and opportunity shutdown cleanup remain present.",
     "golden": "The full 501-line fork cycle source normalizes exactly to Plugin 90 after only lifecycle/test adapters; throttle helpers and cron strings are fork-verbatim.",
     "gate": "screening-cycle fixture 12/12 PASS with market regime, candidate momentum, expected yield, smart-wallet momentum, shadow recorders, funnel, fake deploy guard, paper success callback, five-stage GMGN producer, throttle, choke semantics, and golden. All fixtures report ZERO-TX.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_9_D": {
+    "summary": "Fork lifecycle metadata is installed on the byte-unchanged vanilla two-tick confirmation engine through Patch 33.",
+    "patch_33": "Adds state record metadata, persistent deployed_at/ensureDeployedAt, trough and price excursions, the DLMM fallback call-site, and paper-only peak_pnl_pct shape fidelity. Patch 19c/20e carry migration-aware final-shape anchors.",
+    "locked_drops": "The 15-second timer engine, emergencyCloseDirect, and _pollTriggeredAt are absent. Plugin 70 /closeall remains fork-verbatim; mutex/reroute is post-v1.0.0 safety backlog.",
+    "debt_7_10_pre_8": "Indicator-exit consumer and idle-screening cooldown call-sites remain explicit debt with exact fork evidence in notes/stage-7.9-recon.md.",
+    "golden": "Installed confirmPeak, registerExitSignal, and the complete fast PnL poller are byte-identical to pristine vanilla backups; tick-one/tick-two behavior is functionally locked.",
+    "raw_diff_audit": "All 23 backups equal vanilla HEAD, all 50 manifest drop-ins equal pack sources, git diff --check is clean, and forbidden 15s/emergency/cooldown symbols are absent.",
+    "gate": "All 29 test files and npm smoke PASS; paper two-layer lifecycle reports ZERO-TX and peak_pnl_pct; auto-swap failure is fail-open; uninstall restores exact 5ab14b4; repeat install skips Patch 19c 1/1, Patch 20e 9/9, and Patch 33 6/6; DRY_RUN boot loads 10 plugins with 0 errors.",
     "nol_sentuh_bot_live": true
   }
 }
