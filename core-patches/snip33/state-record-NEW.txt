@@ -1,0 +1,147 @@
+/**
+ * Build a fresh position record with all management fields defaulted. Shared by
+ * trackPosition (full deploy metadata) and ensureDeployedAt (on-chain backfill
+ * with unknown metadata) so the two record shapes never drift apart.
+ */
+function makePositionRecord({
+  position,
+  pool,
+  pool_name = null,
+  strategy = null,
+  bin_range = {},
+  amount_sol,
+  amount_x = 0,
+  active_bin,
+  bin_step,
+  volatility,
+  fee_tvl_ratio,
+  organic_score,
+  initial_value_usd,
+  signal_snapshot = null,
+  narrative_category = null,
+  shadow_signals = null,
+  deployed_at,
+  entry_mcap = null,
+  entry_tvl = null,
+  entry_volume = null,
+  entry_holders = null,
+  active_setup = null, // Racikan (saved snapshot) live at deploy; null = none/unknown
+  profile = null,      // wizard archetype (degen/moderate/safe/custom) at deploy
+}) {
+  return {
+    position,
+    pool,
+    pool_name,
+    strategy,
+    bin_range,
+    amount_sol,
+    amount_x,
+    active_bin_at_deploy: active_bin,
+    bin_step,
+    volatility,
+    fee_tvl_ratio,
+    initial_fee_tvl_24h: fee_tvl_ratio,
+    organic_score,
+    initial_value_usd,
+    narrative_category: narrative_category || null,
+    active_setup: active_setup || null,
+    profile: profile || null,
+    shadow_signals: shadow_signals || null,
+    entry_mcap,
+    entry_tvl,
+    entry_volume,
+    entry_holders,
+    signal_snapshot: signal_snapshot || null,
+    deployed_at: deployed_at || new Date().toISOString(),
+    out_of_range_since: null,
+    last_claim_at: null,
+    total_fees_claimed_usd: 0,
+    rebalance_count: 0,
+    closed: false,
+    closed_at: null,
+    notes: [],
+    peak_pnl_pct: 0,
+    trough_pnl_pct: 0, // lowest PnL% seen while open — for report movement analysis
+    // Raw PRICE excursion vs entry (from active-bin movement, exact in DLMM):
+    // highest/lowest % the token price moved while open. Unlike the PnL pair
+    // above this ignores fees/IL — it's the input for tuning stopLossPct against
+    // how deep entries actually dip before recovering.
+    price_peak_pct: 0,
+    price_trough_pct: 0,
+    pending_peak_pnl_pct: null,
+    pending_peak_confirm_count: 0,
+    pending_peak_started_at: null,
+    pending_exit_action: null,
+    pending_exit_count: 0,
+    pending_exit_started_at: null,
+    trailing_active: false,
+  };
+}
+
+/**
+ * Record a newly deployed position.
+ */
+export function trackPosition(fields) {
+  const state = load();
+  const existing = state.positions[fields.position];
+  // Protect deployed_at: re-tracking a position we already know must never reset
+  // its clock — that would corrupt minutes-held / age in PnL and performance.
+  const deployed_at = existing?.deployed_at ?? new Date().toISOString();
+  // Stamp the identity live at deploy so each trade is attributable to its
+  // Racikan/Profil. ensureDeployedAt backfills also stamp the CURRENT racikan now
+  // (an assumption, flagged by the "Backfilled from on-chain" note) so a
+  // tracking-lost position isn't orphaned out of the racikan-scoped report.
+  state.positions[fields.position] = makePositionRecord({
+    ...fields,
+    deployed_at,
+    active_setup: fields.active_setup ?? config.activeSetup ?? null,
+    profile: fields.profile ?? config.profile ?? null,
+  });
+  pushEvent(state, { action: "deploy", position: fields.position, pool_name: fields.pool_name || fields.pool });
+  save(state);
+  log("state", `Tracked new position: ${fields.position} in pool ${fields.pool}`);
+}
+
+/**
+ * Ensure an on-chain position has a persistent deployed_at — recorded once and
+ * never overwritten. Called for every position observed on-chain so age /
+ * minutes-held is always computable, even for positions that predate tracking
+ * or survive a state.json reset.
+ *
+ * - Known position missing deployed_at → stamp it (first-seen) and persist.
+ * - Untracked position → create a minimal backfilled record (deploy metadata
+ *   unknown; deployed_at = first-seen now) so the management loop can adopt it.
+ */
+export function ensureDeployedAt(position_address, meta = {}) {
+  if (!position_address) return;
+  const state = load();
+  const pos = state.positions[position_address];
+
+  if (pos) {
+    if (!pos.deployed_at) {
+      pos.deployed_at = new Date().toISOString();
+      save(state);
+      log("state", `Backfilled deployed_at for ${position_address.slice(0, 8)}`);
+    }
+    return;
+  }
+
+  const record = makePositionRecord({
+    position: position_address,
+    pool: meta.pool ?? null,
+    pool_name: meta.pool_name ?? null,
+    strategy: meta.strategy ?? "unknown",
+    // Stamp the CURRENT racikan/profil so a backfilled (tracking-lost) position
+    // isn't orphaned with active_setup=null and silently dropped from the
+    // racikan-scoped report. This is an ASSUMPTION (the real deploy metadata is
+    // unknown) — the "Backfilled from on-chain" note below keeps that honest and
+    // makes these records queryable later (e.g. excludable from Darwin/evolve
+    // purity via the note if ever needed — NOT now).
+    active_setup: config.activeSetup ?? null,
+    profile: config.profile ?? null,
+  });
+  record.notes.push("Backfilled from on-chain — deploy metadata unknown");
+  state.positions[position_address] = record;
+  save(state);
+  log("state", `Backfilled untracked on-chain position ${position_address.slice(0, 8)}`);
+}

@@ -1,7 +1,7 @@
 # Stage 7.9-A Recon — cron management + exit fields
 
-Status: **CHECKPOINT / STOP — menunggu keputusan owner.** Recon only; tidak ada
-patch runtime, install, transaksi, atau restart.
+Status: **CHECKPOINT DISETUJUI OWNER 2026-07-19.** Recon ini tidak menjalankan
+patch runtime, install, transaksi, atau restart; build dilanjutkan di subfase B–D.
 
 ## 1. Sumber dan kondisi target
 
@@ -40,11 +40,11 @@ patch runtime, install, transaksi, atau restart.
    yang hilang. Close notification, recorded recompute, dan auto-swap sudah hidup
    pada choke point vanilla `executeTool("close_position")` untuk management dan
    poller.
-4. Ada dua hidden dependency yang perlu keputusan owner sebelum build:
-   - Plugin 70 `/closeall` masih memanggil `closePosition` langsung sehingga
-     melewati notif/F9/auto-swap milik `executeTool`.
-   - Return `closePaperPosition` tidak membawa `peak_pnl_pct`, sehingga notif
-     close paper menerima `peakPnlPct: null` meskipun state sudah terisi.
+4. Dua hidden dependency sudah diputuskan owner:
+   - Plugin 70 `/closeall` tetap direct `closePosition`, verbatim desain fork;
+     reroute/mutex menjadi backlog safety post-v1.0.0.
+   - Return `closePaperPosition` mendapat `peak_pnl_pct` sebagai pack-side
+     adaptation agar paper meniru shape live.
 
 ## 3. Tabel hunk `runManagementCycle` fork 471–664
 
@@ -61,7 +61,7 @@ Posisi target mengacu vanilla `5ab14b4`: `executeManagementActions` 161–219 da
 | `exitMap` / hard-exit priority | vanilla 254–271 | SUDAH ADA | Tidak ada | Struktur vanilla setara dan lebih baru |
 | instruction action | vanilla 273–277 | SUDAH ADA | Tidak ada | Dipertahankan |
 | deterministic close rules | vanilla 279–283 | SUDAH ADA | Tidak ada | Dipertahankan |
-| indicator exit 564–570 | setelah deterministic rule, sebelum claim | LAPOR, DROP 7.9 | Patch async loop jika kelak diotorisasi | Config/settings indicator exit dan chart helper sudah ada, tetapi `getIndicatorExitSignal`/management consumer tidak ada; setengah-port lain di luar daftar terkunci |
+| indicator exit 564–570 | setelah deterministic rule, sebelum claim | UTANG EKSPLISIT 7.10/pra-8 | Patch async loop + helper exact pada fase target | Config/settings indicator exit dan chart helper sudah ada, tetapi `getIndicatorExitSignal`/management consumer tidak ada; fitur fork hidup yang belum selesai diekstrak |
 | claim/stay | vanilla 284–290 | SUDAH ADA | Tidak ada | Dipertahankan |
 | fork `buildMgmtReport` | vanilla report builder 292–317 | DROP 7.9 | Tidak ada | Bukan fitur exit unik terkunci |
 | fork memanggil LLM untuk semua action 590–623 | **choke point vanilla** `executeManagementActions` 161–219, call 325–327 | GANTI-OLD / jangan port | Reuse helper vanilla | Vanilla menjalankan CLOSE/CLAIM direct tanpa LLM dan hanya INSTRUCTION ke LLM; inilah fix `e559081` |
@@ -234,12 +234,12 @@ fitur backfill tidak pernah berjalan.
      body `confirmPeak`/`registerExitSignal`.
 2. Patch `tools/dlmm.js` import + call `ensureDeployedAt`.
 3. Patch paper close return `peak_pnl_pct: tracked.peak_pnl_pct ?? null` agar test
-   notif paper sesuai brief. Ini adalah requirement-derived insertion, bukan baris
-   fork (fork paper return juga belum membawanya); owner harus menyetujui deviasi
-   kecil ini.
-4. Jika owner setuju hidden-gap Plugin 70: route `/closeall` lewat `executeTool`.
-   Mutex lintas loop dipisahkan sebagai keputusan eksplisit; jangan diam-diam
-   mengekspor `_managementBusy`.
+   notif paper sesuai brief. Owner mengklasifikasikannya sebagai **pack-side
+   adaptation**: fidelity paper meniru shape live; jalur live nol perubahan.
+4. Plugin 70 `/closeall` **jangan diubah**. Direct `closePosition` + ringkasan PnL
+   adalah desain fork exact `index.js:3327–3351`, terutama komentar 3332–3333.
+   Reroute/mutex dicatat backlog post-v1.0.0 karena merupakan fitur safety baru,
+   bukan ekstraksi.
 5. Tidak ada perubahan ke `index.js` poller/management selain bila golden harness
    butuh seam test non-production. Prefer test source extraction/mocks tanpa seam.
 
@@ -261,18 +261,44 @@ fitur backfill tidak pernah berjalan.
 - Siklus install -> test -> uninstall/migration -> reinstall; seluruh suite hijau.
 - Golden diff + raw diff + push hanya setelah konfirmasi eksplisit owner.
 
-## 10. Pertanyaan checkpoint untuk owner
+## 10. Keputusan owner dan utang ekstraksi
 
-1. Setujui build minimum state + `ensureDeployedAt` call-site, dengan mesin 2-tick
-   dan seluruh poller/index exit tetap untouched?
-2. Setujui deviasi requirement-derived satu baris pada paper close return untuk
-   `peak_pnl_pct`, meski baris itu tidak ada di fork `643e954`?
-3. Untuk Plugin 70, pilih:
-   - minimum: `/closeall` memakai `executeTool` agar D1/D2/F9 konsisten; atau
-   - minimum + mutex core lintas close-all (scope lebih besar); atau
-   - defer Plugin 70 dan terima bahwa `/closeall` tetap bypass post-hook.
-4. Konfirmasi residu fork di luar paket tetap DROP: idle cooldown mechanism,
-   paper pool-memory guard, indicator exit mechanism, `recordRebalance`, dan semua
-   UI/report refactor management.
+- Build minimum state + `ensureDeployedAt` call-site: **YA**.
+- Paper close `peak_pnl_pct`: **YA**, pack-side adaptation.
+- Plugin 70 `/closeall`: **VERBATIM fork, jangan diubah**. Reroute dan mutex adalah
+  backlog safety post-v1.0.0.
+- Mesin 15s, `_pollTriggeredAt`, emergency helper, `recordRebalance`, dan refactor
+  UI/report management di luar paket: **DROP**.
 
-Sampai jawaban owner: **STOP.**
+### Utang 7.10/pra-8 — indicator exit
+
+Bukti fork exact:
+
+- `index.js:564–570`: setelah lima deterministic rules dan sebelum claim, cycle
+  memanggil `await getIndicatorExitSignal(p)`; confirmed signal meng-upgrade
+  STAY/CLAIM menjadi CLOSE.
+- `index.js:1466–1509`: `getDeterministicCloseRule` fork byte-setara dengan vanilla
+  terbaru; tidak ada rule indicator di fungsi ini. Urutan call-site-lah yang menjaga
+  hard rules tetap prioritas.
+- `index.js:1511–1528`: helper default-OFF; guard
+  `config.indicators.enabled && config.indicators.exitEnabled`, memanggil
+  `confirmIndicatorPreset({ mint, side: "exit" })`, dan fail-safe menjadi null.
+- Whitelist/config/UI sudah terpasang melalui patch 27 dan plugin settings, sehingga
+  fitur terlihat dapat diaktifkan tetapi consumer management belum ada.
+
+Target: 7.10 atau sebelum Stage 8. Jangan hilangkan dari radar ekstraksi.
+
+### Utang 7.10/pra-8 — idle screening cooldown
+
+Bukti fork exact:
+
+- `index.js:488–510`: hanya pada cabang zero-position; jika flag ON dan jarak dari
+  `_screeningLastTriggered` kurang dari `idleScreeningCooldownMin`, cycle return
+  tanpa memicu screening. Seluruh guard dibungkus fail-open.
+- `config.js:454–459`: default OFF dan default 20 menit.
+- `index.js:1945–1946` serta `2420/2443–2444`: config display/settings sudah hidup;
+  pack juga sudah membawa schema/config-origin/UI-nya, tetapi call-site cycle belum.
+
+Target: 7.10 atau sebelum Stage 8. Default OFF harus tetap identik factory.
+
+Build B–D dimulai hanya untuk keputusan yang disetujui di atas.

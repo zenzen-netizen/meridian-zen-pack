@@ -1,0 +1,26 @@
+  // Track the lowest PnL% seen while open (trough) — paired with peak_pnl_pct, it
+  // feeds the learning report's movement analysis (how much ran up/down before exit).
+  if (currentPnlPct != null && !pnl_pct_suspicious) {
+    if (pos.trough_pnl_pct == null || currentPnlPct < pos.trough_pnl_pct) {
+      pos.trough_pnl_pct = currentPnlPct;
+      changed = true;
+    }
+  }
+
+  // Track raw PRICE excursion vs entry. Bin movement is an exact price measure in
+  // DLMM (each bin = bin_step/10000 price step), so this needs no extra API call
+  // and no recheck machinery: price_pct = ((1 + step/1e4)^(bin_now − bin_entry) − 1)·100.
+  const binNow = positionData.active_bin;
+  const binEntry = pos.active_bin_at_deploy ?? pos.bin_range?.active ?? null;
+  if (Number.isFinite(binNow) && Number.isFinite(binEntry) && Number.isFinite(pos.bin_step) && pos.bin_step > 0) {
+    const priceMovePct = (Math.pow(1 + pos.bin_step / 10000, binNow - binEntry) - 1) * 100;
+    if (pos.price_peak_pct == null || priceMovePct > pos.price_peak_pct) {
+      pos.price_peak_pct = Math.round(priceMovePct * 100) / 100;
+      changed = true;
+    }
+    if (pos.price_trough_pct == null || priceMovePct < pos.price_trough_pct) {
+      pos.price_trough_pct = Math.round(priceMovePct * 100) / 100;
+      changed = true;
+    }
+  }
+
