@@ -1,0 +1,31 @@
+[zen-pack] hello plugin registered
+[zen-pack] loaded 10 plugins (skipped 0, errors 0)
+[2026-07-19T06:19:46.430Z] [STARTUP] DLMM LP Agent starting...
+[2026-07-19T06:19:46.431Z] [STARTUP] Repo: /home/ubuntu/meridian-lab/fresh-81 | cwd: /home/ubuntu/meridian-lab/fresh-81
+[2026-07-19T06:19:46.431Z] [STARTUP] Mode: DRY RUN
+[2026-07-19T06:19:46.431Z] [STARTUP] Model: hermes-3-405b
+[2026-07-19T06:19:46.432Z] [HIVEMIND] Generated agentId agt_4071f7548d2a5f666cd3ab64
+[2026-07-19T06:19:46.513Z] [STARTUP] Non-TTY mode — starting cron cycles immediately.
+[2026-07-19T06:19:46.586Z] [CRON] Cycles started — management every 10m, screening every 30m, opportunity poll every 45s
+[2026-07-19T06:19:46.587Z] [CRON] Missed briefing detected (last sent: never) — sending now
+[2026-07-19T06:19:46.588Z] [CRON] Starting morning briefing
+[2026-07-19T06:19:46.675Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:19:46.683Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:19:46.683Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:19:46.684Z] [CRON] Computed deploy amount: 0.98 SOL (wallet: 3 SOL, slots left: 3, mode: fixed)
+[2026-07-19T06:19:47.511Z] [SIGNAL_WEIGHTS] Created signal-weights.json with default weights
+[2026-07-19T06:19:47.512Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:19:47.519Z] [AGENT] Step 1/20
+[2026-07-19T06:19:47.567Z] [ERROR] Agent loop error at step 0: 401 Missing Authentication header
+[2026-07-19T06:19:47.567Z] [CRON_ERROR] Screening cycle failed: 401 Missing Authentication header
+[2026-07-19T06:20:00.545Z] [CRON] Starting management cycle
+[2026-07-19T06:20:00.547Z] [CRON] No open positions — triggering screening cycle
+[2026-07-19T06:20:00.548Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:20:00.548Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:20:00.548Z] [CRON] Computed deploy amount: 0.98 SOL (wallet: 3 SOL, slots left: 3, mode: fixed)
+[2026-07-19T06:20:00.904Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:20:00.905Z] [AGENT] Step 1/20
+[2026-07-19T06:20:00.935Z] [ERROR] Agent loop error at step 0: 401 Missing Authentication header
+[2026-07-19T06:20:00.935Z] [CRON_ERROR] Screening cycle failed: 401 Missing Authentication header
+[2026-07-19T06:20:05.938Z] [SHUTDOWN] Received SIGINT. Shutting down...
+[2026-07-19T06:20:05.942Z] [SHUTDOWN] Open positions at shutdown: 0

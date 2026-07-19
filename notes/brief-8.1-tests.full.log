@@ -1,0 +1,579 @@
+===== pack-smoke =====
+
+> meridian-zen-pack@0.1.0 test
+> node tests/smoke-test.js
+
+  ✅ node --check lib/candidate-cache.js
+  ✅ node --check lib/config-migration.js
+  ✅ node --check lib/hooks.js
+  ✅ node --check lib/loader.js
+  ✅ node --check lib/patcher.js
+  ✅ node --check lib/sizing.js
+  ✅ tests/hooks.test.mjs
+     ✅ register + run: handler dipanggil, ctx dikembalikan
+       ✅ run MENUNGGU handler async (await beneran)
+       ✅ priority: angka kecil jalan duluan
+       ✅ cancel (veto): rantai berhenti, handler sisa TIDAK jalan
+       ✅ result: handler bisa mengganti hasil via ctx.result
+       ✅ emitSync: display-mode, tak bisa veto alur core
+       ✅ off / unsubscribe: handler bisa dilepas
+       ✅ event tanpa handler: run aman (tak error)
+
+       HASIL: 8 lulus, 0 gagal
+  ✅ tests/patcher.test.mjs
+     ✅ inject setelah anchor + node --check lolos
+       ✅ idempotent: patch kedua kali -> skipped (tak dobel)
+       ✅ idempotent: inject sudah ada tanpa marker -> skipped via already
+       ✅ anchor tak ketemu -> lapor, file TIDAK berubah
+       ✅ syntax rusak -> AUTO-ROLLBACK ke asli
+       ✅ uninstall: restore + verify == hash asli (CLEAN)
+       ✅ verify MENDETEKSI file yang diubah tangan (MISMATCH)
+       ✅ replace: OLD unik -> replaced
+       ✅ replace: OLD tak ketemu (dan NEW belum ada) -> old-not-found, file utuh
+       ✅ replace: idempotent -> kedua kali skipped
+       ✅ replace: post-patch form skipped via already
+       ✅ replace: NEW diperlakukan literal, bukan replacement pattern ($ aman)
+       ✅ replace: OLD ganda -> old-not-unique, file utuh
+       ✅ replace: NEW bikin syntax rusak -> AUTO-ROLLBACK ke asli
+       ✅ append: blok nempel di EOF dgn marker
+       ✅ append: idempotent -> kedua kali skipped
+       ✅ append: syntax rusak -> AUTO-ROLLBACK ke asli
+
+       HASIL: 17 lulus, 0 gagal
+  ✅ tests/loader.test.mjs
+     ✅ loader: load [ 'a-first.js', 'b-second.js' ] | skip [ 'notaplugin.js' ] | errors 0
+  ✅ inventaris plugins/: 18/18 file, node --check semua lolos
+  ✅ inventaris views/: 12/12 file, node --check semua lolos
+  ✅ inventaris tools-extra/: 1/1 file, node --check semua lolos
+  ✅ inventaris scripts/: 3/3 file, node --check semua lolos
+  ✅ inventaris zenpack-plugins/: 10/10 file, node --check semua lolos
+
+SMOKE v0.2: PASS
+===== agent-constants.test.mjs =====
+  ✅ SCREENER_TOOLS memuat 2 profile-tool (tutup utang exposure)
+  ✅ SCREENER_TOOLS TIDAK memuat 6 tool pre-loaded (slim fork)
+  ✅ intent bilingual: decisions match 'kenapa kamu skip'
+  ✅ intent bilingual: close match 'tutup posisi'
+  ✅ intent bilingual: balance match 'saldo'
+  ✅ intent EN masih jalan: decisions match 'why did you skip'
+[zen-pack] hello plugin registered
+[get_time_profile] ✓ (0ms)
+  ✅ executeTool get_time_profile {} graceful (bukan throw)
+[get_narrative_profile] ✓ (1ms)
+  ✅ executeTool get_narrative_profile {} graceful (bukan throw)
+
+agent-constants: 8 pass, 0 fail
+===== agentloop-ext.test.mjs =====
+  ✅ blok 1a: fallbackClient decl fail-open (env absen = null)
+  ✅ blok 1b: routing activeClient = useFallbackForModel ? fallbackClient : client
+  ✅ blok 1c: request pakai activeClient (bukan client langsung)
+  ✅ blok 1d: failover elif ke fallbackClient dalam error-block
+  ✅ blok 3 dedup: satu Promise per signature dan fan-out per tool_call_id
+  ✅ blok 4 confirm default inert dan hanya menjaga 5 tool mutasi
+  ✅ blok 5 cost always-on fail-open
+  ✅ blok 6 option defaults inert; baseline GENERAL 8192 delta eksplisit
+  ✅ parse: prosa biasa (bukan JSON) → null (bukan dump)
+  ✅ parse: read-only dump dikenali
+  ✅ parse: dump dalam code-fence markdown dikenali
+  ✅ KEAMANAN: read-only dump → SALVAGEABLE (jadi tool call)
+  ✅ KEAMANAN: deploy_position dump → DITOLAK (tak di-salvage, tak dieksekusi)
+  ✅ KEAMANAN: close_position dump → DITOLAK
+  ✅ KEAMANAN: campuran read-only + swap_token → DITOLAK seluruhnya
+  ✅ KEAMANAN: NO_SALVAGE_TOOLS mencakup 4 on-chain write + intent-only
+
+agentloop-ext: 16 passed, 0 failed
+===== briefing-full.test.mjs =====
+[2026-07-19T06:21:00.847Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ generateBriefing DRY_RUN membentuk laporan sintetis
+[2026-07-19T06:21:00.873Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ generatePeriodicBriefing week direct-export aman
+  ✅ buildMilestoneReport direct-export aman
+[2026-07-19T06:21:00.876Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ generateBriefing empty dataset + varian argumen fail-open
+
+BRIEFING-FULL: 4/4 lolos
+===== briefing-orch.test.mjs =====
+[zen-pack] hello plugin registered
+[2026-07-19T06:21:01.304Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ /briefing alltime pins new then unpins previous
+[2026-07-19T06:21:01.311Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ /report setups consumes argument and replies as HTML
+[2026-07-19T06:21:01.312Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ REPL /report uses shared handled hook and stdout reply
+  ✅ weekly/monthly cron definitions are exact UTC fork schedules
+[2026-07-19T06:21:01.314Z] [CRON] Starting week briefing (2026-07-13)
+[2026-07-19T06:21:01.314Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:21:01.317Z] [CRON] Starting month briefing (2026-07)
+[2026-07-19T06:21:01.317Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+  ✅ periodic week/month dry-run persists dedup keys
+  ✅ autoTune OFF is a config no-op
+[2026-07-19T06:21:01.323Z] [CRON] gasReserve auto-tuned 0.2 → 9.8 SOL (burn 0.70000/d × 14d, floor 0.03)
+  ✅ autoTune ON uses 8 real records and persists fork target
+
+BRIEFING-ORCH: 7/7 lolos
+===== config-ext.test.mjs =====
+[zen-pack] hello plugin registered
+loader: loaded 10, skipped 0, errors 0
+  ✅ loader: 10 plugin loaded, 0 skipped, 0 errors
+  ✅ top-level: profile/activeSetup/promptNotes default fork
+  ✅ screening.categories default null
+  ✅ PRA-8 latent gap: complete GMGN config loads at boot
+  ✅ management gasReserveAutoTune/BufferDays/FloorSol + sizingMode + rentPerPositionSol
+  ✅ strategy strategyLock + dualSide*
+  ✅ schedule adaptiveScreening + maxScreeningIntervalMin
+  ✅ llm.generalMaxTokens 8192
+  ✅ learning.evolveEnabled true (blok baru)
+  ✅ jupiter.referralEnabled true
+  ✅ indicators exitEnabled/rejectAlreadyAtBottom/smi*
+  ✅ experiments: 16 flag default fork
+  ✅ reports learningReportEvery/TrendN 10/10
+  ✅ DEVIASI: config.opportunity.enabled === true (poller nyala)
+  ✅ reload: sizingMode/categories/promptNotes/evolveEnabled terupdate via hook
+  ✅ patch 09: dryRun:false di user-config menang atas env DRY_RUN=true
+
+config-ext: 16 pass, 0 fail
+===== config-migration.test.mjs =====
+  ✅ MAIN fixture: split config remains byte-identical
+  ✅ bot3 fixture: gmgnFeeSource maps to canonical feeSource
+  ✅ v3 fixture: no GMGN data is a no-op
+  ✅ canonical values win and nested rules migrate
+  ✅ unknown GMGN names are preserved and reported
+  ✅ corrupt GMGN JSON fails closed before backup or write
+  ✅ second run is byte-idempotent and never overwrites backup
+
+CONFIG-MIGRATION: 7/7 lolos
+===== definitions-ext.test.mjs =====
+  ✅ deploy_position schema: narrative_category enum 8 kategori
+  ✅ deploy_position schema: conviction enum low/medium/high
+  ✅ idempotent: cuma 1 narrative_category + 1 conviction (nol duplikasi)
+  ✅ hunk 1-2 SKIP terverifikasi: get_time_profile + get_narrative_profile schema full via registrar
+
+4 pass, 0 fail
+===== dlmm-paper.test.mjs =====
+  ✅ A0 imports paper + dual-side wallet + existing state + reports
+  ✅ A1 deploy branch restores full fork dual-side range
+  ✅ A2/A3/A4 lifecycle routes are present
+  ✅ reports keeps fork gas constants and estimator
+     before: {"dry_run":true,"would_deploy":{"pool_address":"PoolPaper1111111111111111111111111111111","strategy":"spot","bins_below":35,"bins_above":0,"downside_pct":null,"upside_pct":null,"amount_x":0,"amount_y":0.5,"wide_range":false},"message":"DRY RUN — no transaction sent"}
+     after : {"dry_run":true,"would_deploy":{"pool_address":"PoolPaper1111111111111111111111111111111","strategy":"spot","bins_below":35,"bins_above":0,"downside_pct":null,"upside_pct":null,"amount_x":0,"amount_y":0.5,"wide_range":false},"message":"DRY RUN — no transaction sent"}
+     diff  : []
+     dual   : {"pool_address":"PoolPaper1111111111111111111111111111111","strategy":"spot","bins_below":35,"bins_above":165,"downside_pct":null,"upside_pct":null,"amount_x":0,"amount_y":0.5,"wide_range":true}
+     strategy branch: dualSideStrategy/percentX exact fork (static assert)
+     ZERO-TX: 0
+  ✅ DUAL LAPIS 1 OFF parity + LAPIS 2 ON shape, ZERO-TX
+[2026-07-19T06:21:02.294Z] [STATE] Tracked new position: paper_PoolPape_mrreqbbp in pool PoolPaper1111111111111111111111111111111
+[2026-07-19T06:21:02.294Z] [DEPLOY] [PAPER] tracked virtual position paper_PoolPape_mrreqbbp in PAPER-SOL
+[2026-07-19T06:21:02.295Z] [WALLET] [PAPER] Virtual balance: 3 SOL (override via PAPER_SOL_BALANCE)
+[2026-07-19T06:21:02.297Z] [POSITIONS] [PAPER] 1 virtual position(s) simulated
+[2026-07-19T06:21:02.297Z] [STATE] Position paper_PoolPape_mrreqbbp peak PnL confirmed at 7.50% (1 ticks)
+[2026-07-19T06:21:02.302Z] [STATE] Position paper_PoolPape_mrreqbbp marked closed: paper harness
+[2026-07-19T06:21:02.302Z] [CLOSE] [PAPER] closed paper_PoolPape @ -0.02% net (simulated) — rugi — kalah di ongkos
+[2026-07-19T06:21:02.302Z] [CLOSE] 🧪 Dekomposisi PnL (simulasi):
+  Fee (panen):       +$0.0000
+  IL / harga:        +$0.0000
+  ── Edge sblm ongkos: +$0.0000 (0.00%)
+  Slippage exit:     +$0.0000
+  Gas round-trip:    −$0.0150
+  ── Edge stlh ongkos: −$0.0150 (-0.02%)
+  Sumber: rugi — kalah di ongkos
+  (LLM = ongkos global, lihat /briefing — bukan per-trade)
+     position: paper_PoolPape_mrreqbbp
+     listed  : paper_PoolPape_mrreqbbp
+     close   : {"success":true,"paper":true,"pnl_pct":-0.02,"peak_pnl_pct":7.5}
+     ZERO-TX : 0
+  ✅ LAPIS 2 flag-ON: paper_* hidup + ZERO-TX
+
+DLMM-PAPER: 6/6 lolos
+===== executor-exit.test.mjs =====
+  ✅ import quoteSellPriceImpact dari wallet.js (BUKAN swapBaseToSolWithRetry — blok 6 DEFER)
+  ✅ blok 5 gated config.experiments?.exitLiquidityCheck + guard DRY_RUN + fail-open catch
+  ✅ blok 6 auto-swap fork-variant TETAP ABSENT (DEFER)
+  ✅ LAPIS1: exitLiquidityCheck=false → probe TAK dipanggil, {pass:true} (parity vanilla)
+  ✅ LAPIS1: flag=true TAPI DRY_RUN=true (paper) → probe TAK dipanggil, {pass:true}
+  ✅ LAPIS1: flag=true TAPI base_mint absent → probe TAK dipanggil, {pass:true}
+  ✅ LAPIS2: flag ON + round-trip 15% > maxPct 10% → DIBLOKIR {pass:false}
+  ✅ LAPIS2: flag ON + round-trip 5% <= maxPct 10% → LANJUT {pass:true} (probe jalan)
+  ✅ LAPIS2: flag ON + probe THROW → fail-open {pass:true} + log (deploy lanjut)
+  ✅ LAPIS2: maxPct default 10 saat config absent (round-trip 12 → blokir)
+
+executor-exit: 10 pass, 0 fail
+===== executor-ext.test.mjs =====
+  ✅ import sizing.js (minDeployAmount + applyConvictionSizing) dari zenpack-lib
+  ✅ blok 2 strategyLock override hadir di case deploy
+  ✅ blok 3 conviction: applyConvictionSizing mutasi args.amount_y
+  ✅ blok 4a minDeployAmount() (floor 0.03 fork, bukan Math.max(0.1,...))
+  ✅ blok 4b rentReserve masuk minRequired + rentNote
+  ✅ blok 7 notifyClose bawa peakPnlPct + recorded_pnl fallback + feesUsd
+  ✅ blok 5 exitLiquidityCheck HADIR (aktif 5.7 patch 15)
+  ✅ blok 6 auto-swap fork-variant ABSENT (DEFER — vanilla punya lokal)
+  ✅ urutan: strategyLock & conviction MENDAHULUI const deployAmountY
+  ✅ lock=spot + strategy=curve → override ke spot + log 'overridden'
+  ✅ lock=default + strategy=curve → TAK disentuh, nol log
+  ✅ lock=spot + strategy=spot (sudah cocok) → nol log override
+  ✅ lock=bid_ask + strategy absent → set ke bid_ask, nol log (args.strategy falsy)
+
+executor-ext: 13 pass, 0 fail
+===== executor-sizing.test.mjs =====
+  ✅ minDeployAmount: deployAmountSol=0.5 → 0.5 (di atas floor)
+  ✅ minDeployAmount: deployAmountSol=0.01 → 0.03 (floor fork, BUKAN 0.1 lama)
+  ✅ minDeployAmount: deployAmountSol undefined → 0.03 (fallback ??)
+  ✅ fixed fixture: 2 SOL → vanilla 0.63, slotsRemaining diabaikan
+  ✅ maximize fixture: pilih 3 slot terbesar yang tetap ≥ floor
+  ✅ maximize fixture: 3 slot gagal floor lalu adapt ke 2 slot
+  ✅ maximize modal kurang: satu slot pun di bawah floor → 0
+  ✅ maximize tidak round-up dan clamp maxDeployAmount
+  ✅ conviction OFF (experiments absen) → input unchanged
+  ✅ conviction ON tapi flag false → unchanged
+  ✅ conviction high ON → amt × 1.3 (dalam rail)
+  ✅ conviction low ON → amt × 0.7 (dalam rail)
+  ✅ conviction medium ON → unchanged (mult 1.0)
+  ✅ conviction missing ON → unchanged
+  ✅ CLAMP high: amt dekat ceil, high tak tembus maxDeployAmount
+  ✅ CLAMP low: amt dekat floor, low tak jebol di bawah deployAmountSol
+  ✅ CLAMP fuzz: 200 kasus acak high/low tetap ∈ [floor, ceil]
+  ✅ input non-finite → kembalikan input apa adanya (fail-safe)
+  ✅ input <= 0 → kembalikan input apa adanya
+
+sizing: 19 pass, 0 fail
+===== exit-state.test.mjs =====
+  ✅ golden confirmPeak/registerExitSignal byte-identik vanilla
+  ✅ golden poller 2-tick byte-identik vanilla
+  ✅ mesin 15s/emergency/cooldown tidak kembali
+  ✅ dlmm wires ensureDeployedAt + paper peak shape
+[2026-07-19T06:21:02.560Z] [STATE] Tracked new position: paper_state_79 in pool Pool79
+  ✅ record shape + identity + deployed_at dibuat
+[2026-07-19T06:21:02.564Z] [STATE] Tracked new position: paper_state_79 in pool Pool79
+  ✅ deployed_at tidak pernah reset saat re-track
+  ✅ trough/price excursion terisi; suspicious hanya membekukan trough
+[2026-07-19T06:21:02.567Z] [STATE] Position paper_state_79 peak PnL confirmed at 6.00% (2 ticks)
+[2026-07-19T06:21:02.569Z] [STATE] Position paper_state_79 exit signal "STOP_LOSS" confirmed (2 ticks)
+  ✅ 2-tick behavior persis: tick1 tidak fire, tick2 fire
+[2026-07-19T06:21:02.573Z] [STATE] Backfilled deployed_at for paper_st
+[2026-07-19T06:21:02.575Z] [STATE] Backfilled untracked on-chain position OnChainU
+  ✅ ensureDeployedAt backfill known + untracked idempotent
+
+exit-state: 9 pass, 0 fail
+===== lessons-read.test.mjs =====
+lessons-read: 17 exports, empty/legacy/synthetic + prompt profiles PASS
+===== lessons-write.test.mjs =====
+[2026-07-19T06:21:02.723Z] [LESSONS_WARN] SUSPECT closed PnL recorded (NOT dropped) for FIXTURE-90: pnl_pct=-95.00 reason=manual close — quarantined from auto-learning/stats until verified (rug asli vs bad-data)
+[2026-07-19T06:21:02.726Z] [LESSONS] New lesson [suspect]: FAILED: FIXTURE-90, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -95%, range efficiency 90%. Reason: manual close.
+[2026-07-19T06:21:02.727Z] [LESSONS] New lesson: FAILED: FIXTURE-91, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -95%, range efficiency 90%. Reason: stop loss.
+[2026-07-19T06:21:02.728Z] [LESSONS] New lesson: FAILED: FIXTURE-92, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -50%, range efficiency 90%. Reason: manual close.
+  ✅ suspect: -95 non-stopLoss flagged; stop loss/-50 clean; count reads one
+[2026-07-19T06:21:02.730Z] [LESSONS] New lesson [paper]: PREFER: FIXTURE-0-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.731Z] [LESSONS] New lesson [paper]: PREFER: FIXTURE-1-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.731Z] [LESSONS] New lesson [paper]: PREFER: FIXTURE-2-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.732Z] [LESSONS] New lesson [paper]: FAILED: FIXTURE-3, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -10%, range efficiency 90%. Reason: fixture close.
+[2026-07-19T06:21:02.733Z] [LESSONS] New lesson [paper]: FAILED: FIXTURE-4, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -10%, range efficiency 90%. Reason: fixture close.
+  ✅ evolve LAPIS paper: 5 close leaves config and Darwin bytes unchanged
+[2026-07-19T06:21:02.736Z] [LESSONS] New lesson: PREFER: FIXTURE-0-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.737Z] [LESSONS] New lesson: PREFER: FIXTURE-1-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.737Z] [LESSONS] New lesson: PREFER: FIXTURE-2-type pools (volatility=20, bin_step=100) with strategy="spot" — 90% in-range efficiency, PnL +10%.
+[2026-07-19T06:21:02.739Z] [LESSONS] New lesson: FAILED: FIXTURE-3, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -10%, range efficiency 90%. Reason: fixture close.
+[2026-07-19T06:21:02.740Z] [LESSONS] New lesson: FAILED: FIXTURE-4, strategy=spot, bin_step=100, volatility=80, fee_tvl_ratio=0.01, organic=60, bin_range=35 → PnL -10%, range efficiency 90%. Reason: fixture close.
+[2026-07-19T06:21:02.742Z] [EVOLVE] Auto-evolved thresholds: {"minFeeActiveTvlRatio":0.06,"minOrganic":72}
+[2026-07-19T06:21:02.750Z] [SIGNAL_WEIGHTS] organic_score: 1 -> 1.05 (boosted, lift=1.000)
+[2026-07-19T06:21:02.751Z] [SIGNAL_WEIGHTS] volatility: 1 -> 0.95 (decayed, lift=1.000)
+[2026-07-19T06:21:02.751Z] [SIGNAL_WEIGHTS] Recalculated: 2 weight(s) adjusted from 5 records
+[2026-07-19T06:21:02.752Z] [EVOLVE] Darwin: adjusted 2 signal weight(s)
+  ✅ evolve LAPIS live: close ke-5 moves fork threshold and Darwin
+[2026-07-19T06:21:02.754Z] [LESSONS] Manual lesson added: IDENTICAL FIXTURE RULE
+[2026-07-19T06:21:02.755Z] [LESSONS] Duplicate lesson skipped (refreshed recency): IDENTICAL FIXTURE RULE
+  ✅ dedup identical rule stores one; removeLesson removes by ID
+  ✅ paper prompt: visible DRY_RUN, hidden live default, opt-in visible + 🧪
+
+LESSONS-WRITE: 5/5 lolos
+===== money-commands.test.mjs =====
+  ✅ intent routing 6 kasus deploy/close/setting id+en
+  ✅ history plugin cap 20 verbatim
+  ✅ early ordinary text defers; normal pass handles fallback
+  ✅ handled pending-input from earlier plugin never reaches fallback
+  ✅ confirm accept
+  ✅ confirm deny
+  ✅ confirm timeout edits expired and resolves false
+  ✅ confirm duplicate single-flight sends one prompt
+  ✅ /screen owns cache and /candidates renders it
+  ✅ paper deploy uses fork sizing and ZERO-TX
+  ✅ lone candidate renders JG-3 no-deploy and executes ZERO tools
+  ✅ /closeall renders tree with solMode-aware PnL
+  ✅ /set and /setcfg remain outside plugin 70
+
+money-commands: 13 passed, 0 failed
+===== paths-parity.test.mjs =====
+  ✅ userConfigPath == repoPath("user-config.json")
+  ✅ gmgnConfigPath == repoPath("gmgn-config.json")
+  ✅ statePath == repoPath("state.json")
+  ✅ lessonsPath == repoPath("lessons.json")
+  ✅ hivemindCachePath == repoPath("hivemind-cache.json")
+  ✅ poolMemoryPath == repoPath("pool-memory.json")
+  ✅ smartWalletsPath == repoPath("smart-wallets.json")
+  ✅ tokenBlacklistPath == repoPath("token-blacklist.json")
+  ✅ strategyLibraryPath == repoPath("strategy-library.json")
+  ✅ signalWeightsPath == repoPath("signal-weights.json")
+  ✅ decisionLogPath == repoPath("decision-log.json")
+  ✅ logDir == repoPath("logs")
+
+PARITAS: 12/12 lolos
+===== pre8-golden.test.mjs =====
+PRE8-GOLDEN: handler/definition byte-exact after declared exceptions
+GOLDEN-EXCEPTIONS: marker=1 baseline-keys=13 arrays=4 fail-closed=1 definition-names=3
+===== profile-tools.test.mjs =====
+[zen-pack] hello plugin registered
+loader: loaded 10, skipped 0, errors 0
+  ✅ loader: 10 plugin loaded, 0 skipped, 0 errors
+  ✅ pra-registrasi: 2 tool baru BELUM ada di tools (bukti registrasi runtime, bukan module-load)
+[get_time_profile] ✓ (0ms)
+  ✅ executeTool get_time_profile {} -> hasil valid + graceful data kosong
+[get_narrative_profile] ✓ (0ms)
+  ✅ executeTool get_narrative_profile {} -> hasil valid + graceful data kosong
+  ✅ tools runtime memuat 2 schema baru (jalur agent: agent.js filter array tools per-panggilan)
+  ✅ schema baru lewat mirror transform (additionalProperties false, parameters object)
+[list_strategies] ✓ (0ms)
+  ✅ regresi vanilla: list_strategies masih resolve + jalan (read-only)
+[get_recent_decisions] ✓ (0ms)
+  ✅ regresi vanilla: get_recent_decisions masih resolve + jalan (read-only)
+  ✅ paritas fork: kunci statis toolMap vanilla + 2 runtime = 47 (fork)
+[2026-07-19T06:21:03.752Z] [ERROR] Unknown tool: zenpack_bogus_tool
+  ✅ tool tak dikenal tetap ditolak (executeTool guard utuh)
+
+profile-tools: 10 lulus, 0 gagal
+===== prompt-racikan.test.mjs =====
+  ✅ parity SCREENER [notesFull+convOff]
+  ✅ parity SCREENER [notesEmpty+convOn]
+  ✅ parity MANAGER [notesFull+convOff]
+  ✅ parity MANAGER [notesEmpty+convOn]
+  ✅ parity GENERAL [notesFull+convOff]
+  ✅ parity GENERAL [notesEmpty+convOn]
+[zen-pack:40] anchor miss: T2 screener-job
+[zen-pack:40] anchor miss: T3 top10
+[zen-pack:40] anchor miss: T4 single-candidate-skip
+[zen-pack:40] anchor miss: T1b racikan-screener
+[zen-pack:40] anchor miss: T5 deploy-rules
+[zen-pack:40] anchor miss: T6 convictionHint
+[zen-pack:40] anchor miss: T1a racikan-manager
+[zen-pack:40] anchor miss: T7 intent-disambiguation
+[zen-pack:40] anchor miss: T8 racikan-general
+  ✅ anchor-miss: prompt gadungan kembali utuh + tak crash
+  ✅ non-string prompt → dikembalikan apa adanya
+
+prompt-racikan: 8 pass, 0 fail
+===== reports-smoke.test.mjs =====
+reports-smoke: module + /status,/wallet Realized chain PASS
+===== screening-cycle.test.mjs =====
+[2026-07-19T06:21:04.333Z] [EXPERIMENT] marketRegimeGate: skipping screening — risk-off: SOL -8.1% (24h) < -8% limit
+  ✅ market regime fixture skips risk-off before LLM; ZERO-TX
+[2026-07-19T06:21:04.335Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:04.336Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ candidate momentum fixture reaches prompt; ZERO-TX
+[2026-07-19T06:21:04.656Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:04.656Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ expected yield fixture reaches prompt; ZERO-TX
+[2026-07-19T06:21:04.958Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:04.958Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ smart-wallet momentum fixture reaches prompt; ZERO-TX
+[2026-07-19T06:21:05.260Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:05.260Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ shadow recorders stay alive with all experiments OFF
+[2026-07-19T06:21:05.562Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:05.562Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ GMGN funnel fixture renders stage counts and reasons
+[2026-07-19T06:21:05.563Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:05.563Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+[2026-07-19T06:21:05.865Z] [CRON] Screener drafted DEPLOYED but no deploy executed — overriding report to NO DEPLOY
+  ✅ fake DEPLOYED report is replaced; ZERO-TX
+[2026-07-19T06:21:05.865Z] [CRON] Starting screening cycle [model: openrouter/hunter-alpha]
+[2026-07-19T06:21:05.865Z] [CRON] Computed deploy amount: 0.593 SOL (wallet: 2 SOL, slots left: 3, mode: maximize)
+  ✅ successful deploy callback preserves report without real TX
+[2026-07-19T06:21:06.170Z] [GMGN] Stage1 rank: 1 → 1 pass
+[2026-07-19T06:21:06.170Z] [GMGN] Stage2 info: 1 → 1 pass
+[2026-07-19T06:21:06.171Z] [GMGN] Stage3 pool: 1 → 1 pass
+[2026-07-19T06:21:06.171Z] [GMGN] Stage4 indicators: 1 → 1 pass
+[2026-07-19T06:21:06.173Z] [GMGN] Stage5 final: 1 → 1 candidates
+  ✅ bounded GMGN producer fixture completes five stages
+  ✅ adaptive throttle OFF parity and weak-session stretch
+  ✅ core choke point forbids mid-cycle vanilla fallback
+  ✅ cycle body golden matches fork after lifecycle adapter
+
+screening-cycle: 12 passed, 0 failed · ZERO-TX
+===== screening-ext.test.mjs =====
+[zen-pack] hello plugin registered
+[2026-07-19T06:21:06.669Z] [SCREENING] Multi-category merge [trending, new]: 2 distinct pools
+  ✅ multi-category: fetch per kategori, merge dedupe by pool_address
+[2026-07-19T06:21:06.672Z] [SCREENING] Category "broken" fetch failed: Pool Discovery API error: 503 fixture down
+[2026-07-19T06:21:06.672Z] [SCREENING] Multi-category merge [trending, broken]: 1 distinct pools
+  ✅ multi-category: satu kategori gagal → fail-open kategori lain lanjut
+  ✅ single/null/empty categories: pakai config.screening.category saja
+  ✅ degenScore tetap export + callable; scoreCandidate tidak diekspor
+
+screening-ext: 4 pass, 0 fail
+===== screening-foundations.test.mjs =====
+  ✅ bounded GMGN producer and formatter exports live
+  ✅ getTopCandidates has GMGN dispatch and funnel metadata
+  ✅ Plugin 70 and core source use one shared cache
+
+screening-foundations: 3 passed, 0 failed
+===== settings-menu.test.mjs =====
+[zen-pack] hello plugin registered
+loader: loaded 10, skipped 0, errors 0
+  ✅ /settings renders fn-landing
+[2026-07-19T06:21:07.564Z] [CONFIG] update_config: config.experiments.paperTrading false → true (verify: true)
+[2026-07-19T06:21:07.565Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed paperTrading=true — Telegram settings menu
+[2026-07-19T06:21:07.566Z] [CONFIG] Agent self-tuned: {"paperTrading":true} — Telegram settings menu
+[update_config] ✓ paperTrading (4ms)
+  ✅ toggle non-gmgn persists
+[2026-07-19T06:21:07.570Z] [CONFIG] update_config: config.experiments.idleScreeningCooldownMin 20 → 33 (verify: 33)
+[2026-07-19T06:21:07.571Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed idleScreeningCooldownMin=33 — Telegram input field
+[2026-07-19T06:21:07.571Z] [CONFIG] Agent self-tuned: {"idleScreeningCooldownMin":33} — Telegram input field
+[update_config] ✓ idleScreeningCooldownMin (1ms)
+  ✅ input-field non-gmgn persists
+[2026-07-19T06:21:07.573Z] [CONFIG] update_config: config.gmgn.interval 5m → 1h (verify: 1h)
+[2026-07-19T06:21:07.574Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnInterval=1h — Telegram settings menu
+[2026-07-19T06:21:07.574Z] [CONFIG] Agent self-tuned: {"gmgnInterval":"1h"} — Telegram settings menu
+[update_config] ✓ gmgnInterval (1ms)
+  ✅ gmgn button persists only to gmgn-config
+[2026-07-19T06:21:07.576Z] [CONFIG] update_config: config.gmgn.preferredKolNames  → alice,bob (verify: alice,bob)
+[2026-07-19T06:21:07.577Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnPreferredKolNames=alice,bob — Telegram input field
+[2026-07-19T06:21:07.577Z] [CONFIG] Agent self-tuned: {"gmgnPreferredKolNames":["alice","bob"]} — Telegram input field
+[update_config] ✓ gmgnPreferredKolNames (1ms)
+[2026-07-19T06:21:07.580Z] [CONFIG] update_config: config.gmgn.minMcap 150000 → 345000 (verify: 345000)
+[2026-07-19T06:21:07.581Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnMinMcap=345000 — Telegram input field
+[2026-07-19T06:21:07.581Z] [CONFIG] Agent self-tuned: {"gmgnMinMcap":345000} — Telegram input field
+[update_config] ✓ gmgnMinMcap (2ms)
+  ✅ gmgn preferred/dump pending input parses comma-list only
+
+SETTINGS-MENU(installed): 5/5 lolos
+===== smi-chain.test.mjs =====
+[zen-pack] hello plugin registered
+  ✅ config SMI keys dari config-ext tersedia
+  ✅ evaluateSmi callable dan fixture deterministik confirmed PathB
+  ✅ fetchChartIndicatorsForMint exported dead export, callable via stub
+  ✅ confirmIndicatorPreset supertrend_plus_smi memakai SMI config dan confirms
+
+smi-chain: 4 pass, 0 fail
+===== stage-7.10.test.mjs =====
+  ✅ fork default idle cooldown verbatim false/20
+  ✅ golden idle/helper/call match fork verbatim
+  ✅ indicator helper default-OFF, confirmed, skipped, error
+  ✅ hard rule > indicator > claim precedence
+  ✅ paper indicator close routes once through executeTool; ZERO-TX
+  ✅ idle OFF triggers; ON throttles; expiry/error fail-open
+  ✅ tools/pnl normalized full-file equals fork; PnL math unchanged
+  ✅ vanilla 2-tick poller remains byte-identical
+
+stage-7.10: 8 pass, 0 fail · ZERO-TX
+===== telegram-cmds.test.mjs =====
+[zen-pack] hello plugin registered
+loader: loaded 10, skipped 0, errors 0
+  ✅ /addprofil tanpa nama -> handled + usage
+     isi: .env.template, ECOSYSTEM-SNIPPET.txt, RESTORE.txt, presets, user-config.json
+  ✅ /addprofil sandboxprofil -> handled + scaffold profiles/sandboxprofil/
+     isi exports/: profil_fresh-81_20260719-132108
+  ✅ /export profil -> handled + folder exports/
+  ✅ /export racikan (kosong) -> handled + daftar kosong graceful (jalur 03a)
+  ✅ /status -> handled oleh 30-render-views (views HTML)
+  ✅ /wallet -> handled oleh 30-render-views (batch 2)
+  ✅ /config -> handled oleh 30-render-views (batch 2)
+  ✅ /config core -> handled (sub-cmd plugin-additive)
+  ✅ /config origin -> handled (sub-cmd plugin-additive)
+  ✅ /pool 1 -> handled (no positions -> Invalid number, graceful)
+  ✅ /settings -> handled oleh 60-settings-menu
+  ✅ /help -> handled + systemView fork help
+  ✅ /guide -> handled + renderGuide TOC
+  ✅ /wallet trackstart set/show/off -> handled + sol history restored on exit
+  ✅ /hive -> handled + renderHive
+  ✅ /config bogus -> TIDAK handled (jatuh ke vanilla)
+  ✅ /preset (list kosong) -> handled + graceful
+  ✅ /preset save sandboxset -> handled + presets/sandboxset.json tercipta
+  ✅ /preset show sandboxset -> handled + "identik dengan config saat ini"
+  ✅ /preset use sandboxset -> handled + _backup tercipta + instruksi restart manual (non-pm2, TIDAK exit)
+  ✅ /preset rm sandboxset -> handled + terhapus
+  ✅ /preset xyz (sub tak dikenal) -> handled + usage
+  ✅ /screen -> handled plugin 70 (override keputusan 7.4)
+  ✅ /pause -> TIDAK handled (accepted display delta; vanilla)
+  ✅ /resume -> TIDAK handled (accepted display delta; vanilla)
+  ✅ /report -> handled plugin 80 (utang 7.4 lunas di 7.7)
+
+TELEGRAM-CMDS: 26/26 lolos
+===== telegram-ext.test.mjs =====
+  ✅ sendMessage split >4096: cut newline, tail no leading newline
+  ✅ sendMessage pendek -> 1 chunk utuh
+[2026-07-19T06:21:10.679Z] [TELEGRAM_ERROR] sendMessage 400: can't parse entities
+  ✅ sendHTML parse gagal -> retry plain
+  ✅ notifyClose memakai estimasi gas reports.js
+  ✅ live message labels: smart wallets + active bin
+
+TELEGRAM-EXT: 5/5 lolos
+===== update-config.test.mjs =====
+[zen-pack] hello plugin registered
+  ✅ merged map/schema retain all 181 keys
+[2026-07-19T06:21:11.967Z] [CONFIG] update_config: config.gmgn.interval 5m → 1h (verify: 1h)
+[2026-07-19T06:21:11.968Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnInterval=1h — test
+[2026-07-19T06:21:11.970Z] [HIVEMIND] Generated agentId agt_5c72a0f9d38bd5c3a6352157
+[2026-07-19T06:21:11.971Z] [CONFIG] Agent self-tuned: {"gmgnInterval":"1h"} — test
+[update_config] ✓ gmgnInterval (6ms)
+[2026-07-19T06:21:11.971Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+  ✅ flat key/value writes GMGN only
+[2026-07-19T06:21:11.972Z] [CONFIG] update_config: config.gmgn.indicatorRules.minRsi null → 25
+[2026-07-19T06:21:11.973Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnMinRsi=25 —
+[2026-07-19T06:21:11.974Z] [CONFIG] Agent self-tuned: {"gmgnMinRsi":25} —
+[update_config] ✓ gmgnMinRsi (2ms)
+[2026-07-19T06:21:11.974Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+[2026-07-19T06:21:11.975Z] [CONFIG] update_config: config.gmgn.minMcap 150000 → 222000 (verify: 222000)
+[2026-07-19T06:21:11.976Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnMinMcap=222000 —
+[2026-07-19T06:21:11.976Z] [CONFIG] Agent self-tuned: {"gmgnMinMcap":222000} —
+[update_config] ✓ gmgnMinMcap (2ms)
+[2026-07-19T06:21:11.977Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+[2026-07-19T06:21:11.977Z] [CONFIG] update_config: config.gmgn.indicatorRules.requireBullishSupertrend true → false
+[2026-07-19T06:21:11.978Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnRequireBullishSt=false —
+[2026-07-19T06:21:11.979Z] [CONFIG] Agent self-tuned: {"gmgnRequireBullishSt":false} —
+[update_config] ✓ gmgnRequireBullishSt (2ms)
+[2026-07-19T06:21:11.979Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+[2026-07-19T06:21:11.980Z] [CONFIG] update_config: config.gmgn.platforms Pump.fun,meteora_virtual_curve,pool_meteora → Pump.fun,pool_meteora (verify: Pump.fun,pool_meteora)
+[2026-07-19T06:21:11.980Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnPlatforms=Pump.fun,pool_meteora —
+[2026-07-19T06:21:11.981Z] [CONFIG] Agent self-tuned: {"gmgnPlatforms":["Pump.fun","pool_meteora"]} —
+[update_config] ✓ gmgnPlatforms (2ms)
+[2026-07-19T06:21:11.981Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+  ✅ path, section-nested, bare, and array recovery match fork
+[2026-07-19T06:21:12.386Z] [CONFIG] update_config: config.opportunity.limit 10 → 7 (verify: 7)
+[2026-07-19T06:21:12.386Z] [CONFIG] update_config: config.opportunity.targetLiquidity 20000 → 30000 (verify: 30000)
+[2026-07-19T06:21:12.386Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed opportunityPollLimit=7, degenTargetLiquidity=30000 —
+[2026-07-19T06:21:12.387Z] [CONFIG] Agent self-tuned: {"opportunityPollLimit":7,"degenTargetLiquidity":30000} —
+[update_config] ✓ opportunityPollLimit, degenTargetLiquidity (2ms)
+[2026-07-19T06:21:12.387Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+  ✅ 13-key baseline stays executable and persists to user config
+[2026-07-19T06:21:12.388Z] [CONFIG] update_config: config.gmgn.minVolume 1000 → 1234 (verify: 1234)
+[2026-07-19T06:21:12.388Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed gmgnMinVolume=1234 —
+[2026-07-19T06:21:12.389Z] [CONFIG] update_config rejected invalid values (applied the rest): strategyLock="invalid-lock" (strategyLock harus salah satu dari [default, spot, bid_ask, curve] — bukan "invalid-lock")
+[2026-07-19T06:21:12.389Z] [CONFIG] Agent self-tuned: {"gmgnMinVolume":1234} —
+[update_config] ✓ gmgnMinVolume (2ms)
+[2026-07-19T06:21:12.389Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+  ✅ partial apply preserves valid values and exposes invalid[]
+[2026-07-19T06:21:12.390Z] [CONFIG] update_config: config.screening.minTvl 10000 → 40000 (verify: 40000)
+[2026-07-19T06:21:12.390Z] [CONFIG] update_config: config.gmgn.minHolders 500 → 600 (verify: 600)
+[2026-07-19T06:21:12.390Z] [LESSONS] Manual lesson added: [SELF-TUNED] Changed minTvl=40000, gmgnMinHolders=600 —
+[2026-07-19T06:21:12.390Z] [CONFIG] Agent self-tuned: {"minTvl":40000,"gmgnMinHolders":600} —
+[update_config] ✓ minTvl, gmgnMinHolders (1ms)
+[2026-07-19T06:21:12.391Z] [HIVEMIND_WARN] Lesson push failed: network forbidden in update_config money gate
+  ✅ mixed call writes each config to its canonical file
+  ✅ sensitive values are redacted from result, logs, and lessons
+[update_config] ✗  (2ms)
+  ✅ corrupt existing GMGN JSON fails closed before runtime mutation
+[2026-07-19T06:21:12.397Z] [CONFIG] update_config no-op — already at requested values: gmgnInterval
+[update_config] ✓  (0ms)
+  ✅ scalar no-op is byte-idempotent
+  ✅ definitions use the three executable fork-live names
+ZERO-TX:0
+  ✅ paper update_config performs ZERO-TX
+
+UPDATE-CONFIG: 11/11 lolos
+===== wallet-ext.test.mjs =====
+  ✅ 4 fungsi fork export ADA (quoteSellPriceImpact/getSolMarketRegime/swapBaseToSolWithRetry + normalizeMint)
+  ✅ quoteSellPriceImpact return shape {roundTripLossPct, impactPct, baseAmount, outSol}
+  ✅ quoteSellPriceImpact tolak base==SOL / notional buruk (throw = caller fail-open)
+  ✅ getSolMarketRegime kembalikan {usdPrice, change24hPct, liquidity} (mock Price v3)
+[2026-07-19T06:21:12.624Z] [WALLET_ERROR] getSolMarketRegime failed: price 503
+  ✅ getSolMarketRegime fail-open null saat field hilang / fetch gagal
+  ✅ auto-swap retry failure fail-open (close caller tidak dilempar)
+
+wallet-ext: 6 pass, 0 fail

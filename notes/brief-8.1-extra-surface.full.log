@@ -1,0 +1,26 @@
+[zen-pack] hello plugin registered
+LOADER loaded=10 skipped=0 errors=0
+telegram:command	/positions	handled=true	outputs=1	chars=21
+telegram:command	cfg:page:fn-landing	handled=true	outputs=1	chars=385
+telegram:command	cfg:page:fn-sizing	handled=true	outputs=1	chars=554
+telegram:command	cfg:page:fn-screening	handled=true	outputs=1	chars=1018
+telegram:command	cfg:page:fn-gmgn	handled=true	outputs=1	chars=1326
+telegram:command	cfg:page:fn-exit	handled=true	outputs=1	chars=897
+telegram:command	cfg:page:fn-strategy	handled=true	outputs=1	chars=295
+telegram:command	cfg:page:fn-indik	handled=true	outputs=1	chars=607
+telegram:command	cfg:page:fn-jadwal	handled=true	outputs=1	chars=285
+telegram:command	cfg:page:fn-llm	handled=true	outputs=1	chars=382
+telegram:command	cfg:page:fn-darwin	handled=true	outputs=1	chars=365
+telegram:command	cfg:page:fn-reports	handled=true	outputs=1	chars=284
+telegram:command	cfg:page:fn-exp	handled=true	outputs=1	chars=631
+telegram:command	cfg:page:fn-infra	handled=true	outputs=1	chars=587
+telegram:command	cfg:page:presets	handled=true	outputs=1	chars=319
+repl:command	/guide	handled=true	outputs=1	chars=974
+repl:command	/preset	handled=true	outputs=1	chars=57
+repl:command	/addprofil	handled=true	outputs=1	chars=259
+repl:command	/export racikan	handled=true	outputs=1	chars=482
+[2026-07-19T06:23:06.933Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+repl:command	/report	handled=true	outputs=1	chars=350
+[2026-07-19T06:23:06.937Z] [WALLET] [PAPER] Virtual balance: 2 SOL (override via PAPER_SOL_BALANCE)
+repl:command	/briefing	handled=true	outputs=1	chars=853
+EXTRA-SURFACE: PASS

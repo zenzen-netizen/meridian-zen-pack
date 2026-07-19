@@ -1,0 +1,149 @@
+PACK_BEFORE_STATUS (empty means clean)
+
+GOLDEN_BEFORE_SHA256
+963a5326c465bf58785bd9442916d53ef86f6e620c49168a65298ba7a5e3f54d  config.txt
+a556d8719c36fae8b6b184f3e2c22f89270e43c79394eef9bd97e51a56be62b0  positions.txt
+97c6c8f800dbd1d0c5785b64499a5189e89db942db037a559c5812ab30e20192  settings.txt
+5dfdcef2c3de96c2b4cae935ab6e85b65c04058edda0c22c673f7710d1739822  status.txt
+
+GOLDEN_AFTER_SHA256
+963a5326c465bf58785bd9442916d53ef86f6e620c49168a65298ba7a5e3f54d  config.txt
+a556d8719c36fae8b6b184f3e2c22f89270e43c79394eef9bd97e51a56be62b0  positions.txt
+97c6c8f800dbd1d0c5785b64499a5189e89db942db037a559c5812ab30e20192  settings.txt
+5dfdcef2c3de96c2b4cae935ab6e85b65c04058edda0c22c673f7710d1739822  status.txt
+
+GOLDEN_BEFORE_METADATA
+config.txt 7747 1783756116.5742470630
+positions.txt 18 1783756116.7952478080
+settings.txt 2129 1783756116.5752470660
+status.txt 1233 1783756116.7702477240
+
+GOLDEN_AFTER_METADATA
+config.txt 7747 1783756116.5742470630
+positions.txt 18 1783756116.7952478080
+settings.txt 2129 1783756116.5752470660
+status.txt 1233 1783756116.7702477240
+
+FRESH_HEAD
+5ab14b476e4e8d25c58f989c77b161721e1a505f
+
+FRESH_STATUS
+ M agent.js
+ M briefing.js
+ M config.js
+ M decision-log.js
+ M hivemind.js
+ M index.js
+ M lessons.js
+ M logger.js
+ M package-lock.json
+ M pool-memory.js
+ M signal-weights.js
+ M smart-wallets.js
+ M state.js
+ M strategy-library.js
+ M telegram.js
+ M token-blacklist.js
+ M tools/chart-indicators.js
+ M tools/definitions.js
+ M tools/dlmm.js
+ M tools/executor.js
+ M tools/gmgn.js
+ M tools/pnl.js
+ M tools/screening.js
+ M tools/wallet.js
+?? .zenpack/
+?? SETTINGS-GUIDE.md
+?? addprofil.js
+?? candidate-memory.js
+?? candidate-memory.json
+?? config-origin.js
+?? config-schema.js
+?? exports/
+?? gas-tracker.js
+?? guide.js
+?? llm-cost-tracker.js
+?? openrouter-usage.js
+?? paper-trading.js
+?? paths.js
+?? pnl-tracker.js
+?? preset-manager.js
+?? preset.js
+?? profil-export.js
+?? profiles/
+?? racikan-export.js
+?? reports.js
+?? scripts/backtest-binwidth.js
+?? scripts/backtest-exits.js
+?? scripts/smoke-sizing-v2.1.js
+?? sol-balance-history.json
+?? sol-tracker.js
+?? test-screening.js
+?? tools/smi.js
+?? views/
+?? zenpack-lib/
+?? zenpack-plugins/
+
+FRESH_DIFF_NAME_STATUS
+M	agent.js
+M	briefing.js
+M	config.js
+M	decision-log.js
+M	hivemind.js
+M	index.js
+M	lessons.js
+M	logger.js
+M	package-lock.json
+M	pool-memory.js
+M	signal-weights.js
+M	smart-wallets.js
+M	state.js
+M	strategy-library.js
+M	telegram.js
+M	token-blacklist.js
+M	tools/chart-indicators.js
+M	tools/definitions.js
+M	tools/dlmm.js
+M	tools/executor.js
+M	tools/gmgn.js
+M	tools/pnl.js
+M	tools/screening.js
+M	tools/wallet.js
+
+FRESH_DIFF_STAT
+ agent.js                  | 282 +++++++++++++-----
+ briefing.js               | 549 ++++++++++++++++++++++++++++++++--
+ config.js                 |  36 ++-
+ decision-log.js           |   6 +-
+ hivemind.js               |   8 +-
+ index.js                  | 214 ++++++++++++--
+ lessons.js                | 565 ++++++++++++++++++++++++++++++++---
+ logger.js                 |   6 +-
+ package-lock.json         |  15 +
+ pool-memory.js            |  14 +-
+ signal-weights.js         |   6 +-
+ smart-wallets.js          |   6 +-
+ state.js                  | 177 ++++++++++-
+ strategy-library.js       |   8 +-
+ telegram.js               | 234 +++++++++++----
+ token-blacklist.js        |  11 +-
+ tools/chart-indicators.js |  83 +++++-
+ tools/definitions.js      |  66 ++++-
+ tools/dlmm.js             | 733 ++++++++++++++++++++++++++++++++++++++++++----
+ tools/executor.js         | 435 +++++++++++++++++++++++----
+ tools/gmgn.js             | 663 ++++++++++++++++++++++++++++++++++++++++-
+ tools/pnl.js              |  81 ++++-
+ tools/screening.js        | 125 +++++++-
+ tools/wallet.js           | 133 +++++++++
+ 24 files changed, 4024 insertions(+), 432 deletions(-)
+
+PACK_STATUS_AFTER_NOTES
+## main...origin/main
+?? notes/brief-8.1-fresh-clone-report.md
+
+FORK_STATUS
+## experimental...origin/experimental
+ M package-lock.json
+ M package.json
+ M paper-trading.js
+ M tools/dlmm.js
