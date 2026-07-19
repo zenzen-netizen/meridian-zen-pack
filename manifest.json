@@ -68,7 +68,7 @@
     "root": 18,
     "views": 12,
     "tools": 1,
-    "scripts": 3,
+    "scripts": 4,
     "docs": 1,
     "zenpack_plugins": 10,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
@@ -77,6 +77,116 @@
       ".env.example",
       "gmgn-config.example.json",
       "user-config.example.json"
+    ]
+  },
+  "runtime_data": {
+    "policy": "preserve and report; uninstall never deletes these paths",
+    "matching": "trailing / matches descendants; * matches within one relative path",
+    "entries": [
+      {
+        "path": "user-config.json",
+        "evidence": ["plugins/paths.js:8", "plugins/preset-manager.js:119", "core-patches/snip27/update-config-NEW.txt:431"]
+      },
+      {
+        "path": "presets/",
+        "evidence": ["plugins/paths.js:15", "plugins/preset-manager.js:31", "plugins/preset-manager.js:120"]
+      },
+      {
+        "path": "gmgn-config.json",
+        "evidence": ["plugins/paths.js:16", "core-patches/snip27/update-config-NEW.txt:435", "lib/config-migration.js:141"]
+      },
+      {
+        "path": "state.json",
+        "evidence": ["plugins/paths.js:17", "core-patches/02-paths-routing.mjs:13", "upstream@5ab14b4:state.js:51"]
+      },
+      {
+        "path": "lessons.json",
+        "evidence": ["plugins/paths.js:18", "core-patches/02-paths-routing.mjs:17", "upstream@5ab14b4:lessons.js:71"]
+      },
+      {
+        "path": "lessons-archive-pre-mainzen_v2.json",
+        "evidence": ["plugins/paths.js:19", "core-patches/snip21/read-NEW.txt:84"]
+      },
+      {
+        "path": "pool-memory.json",
+        "evidence": ["plugins/paths.js:20", "core-patches/02-paths-routing.mjs:29", "upstream@5ab14b4:pool-memory.js:42"]
+      },
+      {
+        "path": "decision-log.json",
+        "evidence": ["plugins/paths.js:21", "core-patches/02-paths-routing.mjs:44", "upstream@5ab14b4:decision-log.js:25"]
+      },
+      {
+        "path": "hivemind-cache.json",
+        "evidence": ["plugins/paths.js:22", "core-patches/02-paths-routing.mjs:21", "upstream@5ab14b4:hivemind.js:69"]
+      },
+      {
+        "path": "candidate-memory.json",
+        "evidence": ["plugins/paths.js:23", "plugins/candidate-memory.js:19", "plugins/candidate-memory.js:43"]
+      },
+      {
+        "path": "signal-weights.json",
+        "evidence": ["plugins/paths.js:24", "core-patches/02-paths-routing.mjs:41", "upstream@5ab14b4:signal-weights.js:88"]
+      },
+      {
+        "path": "smart-wallets.json",
+        "evidence": ["plugins/paths.js:25", "core-patches/02-paths-routing.mjs:32", "upstream@5ab14b4:smart-wallets.js:21"]
+      },
+      {
+        "path": "token-blacklist.json",
+        "evidence": ["plugins/paths.js:26", "core-patches/02-paths-routing.mjs:35", "upstream@5ab14b4:token-blacklist.js:28"]
+      },
+      {
+        "path": "strategy-library.json",
+        "evidence": ["plugins/paths.js:27", "core-patches/02-paths-routing.mjs:38", "upstream@5ab14b4:strategy-library.js:29"]
+      },
+      {
+        "path": "sol-balance-history.json",
+        "evidence": ["plugins/paths.js:28", "plugins/sol-tracker.js:23", "plugins/sol-tracker.js:40"]
+      },
+      {
+        "path": "llm-cost-log.json",
+        "evidence": ["plugins/paths.js:29", "plugins/llm-cost-tracker.js:16", "plugins/llm-cost-tracker.js:26"]
+      },
+      {
+        "path": "gas-log.json",
+        "evidence": ["plugins/paths.js:30", "plugins/gas-tracker.js:18", "plugins/gas-tracker.js:26"]
+      },
+      {
+        "path": "logs/",
+        "evidence": ["plugins/paths.js:31", "core-patches/02-paths-routing.mjs:47", "upstream@5ab14b4:logger.js:39"]
+      },
+      {
+        "path": "exports/",
+        "evidence": ["plugins/profil-export.js:47", "plugins/profil-export.js:48", "plugins/racikan-export.js:79"]
+      },
+      {
+        "path": "profiles/",
+        "evidence": ["plugins/addprofil.js:15", "plugins/addprofil.js:139", "plugins/addprofil.js:152"]
+      },
+      {
+        "path": "user-config.json.pre-zenpack-pra8.bak",
+        "evidence": ["lib/config-migration.js:11", "lib/config-migration.js:96", "lib/config-migration.js:98"]
+      },
+      {
+        "path": "gmgn-config.json.pre-zenpack-pra8.bak",
+        "evidence": ["lib/config-migration.js:11", "lib/config-migration.js:96", "lib/config-migration.js:138"]
+      },
+      {
+        "path": "user-config.json.zenpack-pra8-*.tmp",
+        "evidence": ["lib/config-migration.js:106", "lib/config-migration.js:108"]
+      },
+      {
+        "path": "gmgn-config.json.zenpack-pra8-*.tmp",
+        "evidence": ["lib/config-migration.js:106", "lib/config-migration.js:108"]
+      },
+      {
+        "path": "dev-blocklist.json",
+        "evidence": ["core-patches/02-paths-routing.mjs:4", "upstream@5ab14b4:dev-blocklist.js:26"]
+      },
+      {
+        "path": "discord-signals.json",
+        "evidence": ["upstream@5ab14b4:discord-listener/index.js:27", "upstream@5ab14b4:discord-listener/index.js:54"]
+      }
     ]
   },
   "notes": "PRA-8 update_config is complete on the locked vanilla 5ab14b4 basis: Patch 27 now owns the full split-persistence handler, Plugin 50 owns migration plus GMGN boot/reload, and Plugin 60's temporary GMGN gate is removed.",

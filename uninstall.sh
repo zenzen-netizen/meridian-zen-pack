@@ -33,9 +33,15 @@ rm -rf "$TARGET/.zenpack"
 PORCELAIN="$(git -C "$TARGET" status --porcelain)"
 if [[ -z "$PORCELAIN" ]]; then
   echo "git status --porcelain: KOSONG (vanilla murni pulih)"
+elif node "$PACK_DIR/scripts/runtime-data.mjs" check "$TARGET"; then
+  echo "git status --porcelain: HANYA runtime_data whitelist"
 else
   echo "git status --porcelain: MASIH ADA SISA:"
   echo "$PORCELAIN"
+  echo "UNINSTALL v0 FAIL"
+  echo "left runtime data: $(node "$PACK_DIR/scripts/runtime-data.mjs" existing "$TARGET")"
+  exit 1
 fi
 
 echo "UNINSTALL v0 OK"
+echo "left runtime data: $(node "$PACK_DIR/scripts/runtime-data.mjs" existing "$TARGET")"

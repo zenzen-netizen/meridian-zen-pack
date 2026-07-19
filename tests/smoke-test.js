@@ -32,7 +32,7 @@ for (const f of readdirSync(join(ROOT, "lib")).filter((x) => x.endsWith(".js")))
 }
 
 // 2. Sub-test: hooks (8/8), patcher (6/6), loader (fixture testplugins/)
-for (const t of ["hooks.test.mjs", "patcher.test.mjs", "loader.test.mjs"]) {
+for (const t of ["hooks.test.mjs", "patcher.test.mjs", "loader.test.mjs", "runtime-data.test.mjs"]) {
   try {
     const out = execFileSync("node", [join(ROOT, "tests", t)], { stdio: "pipe", encoding: "utf8" });
     console.log("  ✅ tests/" + t);
@@ -55,7 +55,7 @@ const dirs = [
   ["zenpack-plugins", "zenpack_plugins"],
 ];
 for (const [dir, key] of dirs) {
-  const files = readdirSync(join(ROOT, dir)).filter((x) => x.endsWith(".js"));
+  const files = readdirSync(join(ROOT, dir)).filter((x) => /\.m?js$/.test(x));
   if (files.length !== expect[key]) {
     failures.push(`inventaris ${dir}/: ${files.length} file, manifest bilang ${expect[key]}`);
     console.log(`  ❌ inventaris ${dir}/: ${files.length} != ${expect[key]}`);
