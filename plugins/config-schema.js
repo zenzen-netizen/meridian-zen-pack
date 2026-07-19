@@ -71,9 +71,12 @@ export const CONFIG_SCHEMA = {
   minTokenAgeHours: num(),  // nullable (light num allows null)
   maxTokenAgeHours: num(),
   minFeePerTvl24h: num(),
+  loneCandidateMinDegen: num(),
   // management
   minClaimAmount: num(),
   autoSwapAfterClaim: bool(),
+  autoSwapRetryAttempts: num(),
+  autoSwapRetryDelayMs: num(),
   outOfRangeBinsToClose: num(),
   outOfRangeWaitMinutes: num(),
   oorCooldownTriggerCount: num(),
@@ -139,6 +142,17 @@ export const CONFIG_SCHEMA = {
   pnlRpcUrl: str(),
   pnlPollIntervalSec: num(),
   pnlDepositCacheTtlSec: num(),
+  pnlConfirmTicks: num(),
+  // vanilla opportunity poller / Degen Score (locked baseline delta #1/#2)
+  opportunityPollEnabled: bool(),
+  opportunityPollIntervalSec: num(),
+  opportunityPollLimit: num(),
+  opportunityMinScore: num(),
+  opportunitySmartWalletBonus: num(),
+  degenTargetVolRatio: num(),
+  degenTargetLpCount: num(),
+  degenTargetFeeRatio: num(),
+  degenTargetLiquidity: num(),
   // GMGN screening
   gmgnFeeSource: enumOf("gmgn", "jupiter"),
   gmgnApiKey: str(),

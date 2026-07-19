@@ -14,16 +14,24 @@ process.chdir(target);
 
 const ucPath = join(target, "user-config.json");
 const bkPath = join(target, "user-config.json.zenpack-cfgext-bak");
+const gmgnPath = join(target, "gmgn-config.json");
+const gmgnBkPath = join(target, "gmgn-config.json.zenpack-cfgext-bak");
 const hadUC = existsSync(ucPath);
+const hadGmgn = existsSync(gmgnPath);
 if (hadUC) copyFileSync(ucPath, bkPath);
+if (hadGmgn) copyFileSync(gmgnPath, gmgnBkPath);
 function restore() {
   if (hadUC) copyFileSync(bkPath, ucPath);
   else if (existsSync(ucPath)) unlinkSync(ucPath);
+  if (hadGmgn) copyFileSync(gmgnBkPath, gmgnPath);
+  else if (existsSync(gmgnPath)) unlinkSync(gmgnPath);
   if (existsSync(bkPath)) unlinkSync(bkPath);
+  if (existsSync(gmgnBkPath)) unlinkSync(gmgnBkPath);
 }
 
 // user-config KOSONG → semua key custom ambil DEFAULT fork.
 writeFileSync(ucPath, "{}");
+writeFileSync(gmgnPath, JSON.stringify({ minMcap: 222000, indicatorRules: { requireBullishSupertrend: false } }));
 
 const { config, reloadScreeningThresholds } = await import(pathToFileURL(join(target, "config.js")).href);
 const hooks = await import(pathToFileURL(join(target, "zenpack-lib/hooks.js")).href);
@@ -51,6 +59,14 @@ await t("top-level: profile/activeSetup/promptNotes default fork", () => {
 
 await t("screening.categories default null", () => {
   assert.strictEqual(config.screening.categories, null);
+});
+
+await t("PRA-8 latent gap: complete GMGN config loads at boot", () => {
+  assert.strictEqual(config.gmgn.minMcap, 222000);
+  assert.strictEqual(config.gmgn.requireKol, true);
+  assert.strictEqual(config.gmgn.requestDelayMs, 350);
+  assert.strictEqual(config.gmgn.indicatorRules.requireBullishSupertrend, false);
+  assert.deepStrictEqual(config.gmgn.filters, ["renounced", "frozen", "not_wash_trading"]);
 });
 
 await t("management gasReserveAutoTune/BufferDays/FloorSol + sizingMode + rentPerPositionSol", () => {
@@ -138,12 +154,15 @@ await t("reload: sizingMode/categories/promptNotes/evolveEnabled terupdate via h
     evolveEnabled: false,
     rentPerPositionSol: 0.057,
   }));
+  writeFileSync(gmgnPath, JSON.stringify({ minMcap: 333000, indicatorRules: { minRsi: 25 } }));
   reloadScreeningThresholds();
   assert.strictEqual(config.management.sizingMode, "maximize");
   assert.deepStrictEqual(config.screening.categories, ["trending", "new"]);
   assert.deepStrictEqual(config.promptNotes, { screener: ["be aggressive"], manager: [], general: [] });
   assert.strictEqual(config.learning.evolveEnabled, false);
   assert.strictEqual(config.management.rentPerPositionSol, 0.057);
+  assert.strictEqual(config.gmgn.minMcap, 333000);
+  assert.strictEqual(config.gmgn.indicatorRules.minRsi, 25);
 });
 
 // Patch 09: user-config dryRun MENANG atas env DRY_RUN (subprocess — env+singleton).

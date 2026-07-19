@@ -1,10 +1,19 @@
-// Patch 27: extend vanilla update_config CONFIG_MAP with custom non-GMGN keys only.
-// Owner decision 7.2: GMGN keys stay out of executor whitelist until update_config
-// split-persistence block lands; plugin 60 gates GMGN menu actions before executeTool.
-export default {
+// Patch 27 compatibility bootstrap. PRA-8 supersedes the old additive whitelist
+// with the complete handler below. Keeping this first step lets both a pristine
+// target and a target carrying the old Patch 27 converge on one exact OLD block.
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const snip = (name) => readFileSync(join(here, "snip27", name), "utf8");
+const FULL_ALREADY = "// [zen-pack:27-full] Patch 27 whitelist superseded";
+
+const legacyWhitelist = {
   file: "tools/executor.js",
   marker: "zen-pack:27-executor-config-map",
   anchor: `      loneCandidateMinDegen: ["screening", "loneCandidateMinDegen"],`,
+  already: FULL_ALREADY,
   inject: [
     `      // custom non-GMGN config keys (fork CONFIG_MAP @643e954)`,
     `      screeningSource: ["screening", "source"],`,
@@ -44,3 +53,61 @@ export default {
     `      evolveEnabled: ["learning", "evolveEnabled"],`,
   ].join("\n"),
 };
+
+const REDACTION_HELPERS = `const SENSITIVE_CONFIG_KEYS = new Set([
+  "gmgnApiKey",
+  "hiveMindApiKey",
+  "publicApiKey",
+]);
+
+function redactConfigValue(key, value) {
+  if (!SENSITIVE_CONFIG_KEYS.has(key)) return value;
+  return typeof value === "string" && value ? "***redacted***" : value;
+}
+
+function redactAppliedConfig(applied) {
+  return Object.fromEntries(
+    Object.entries(applied || {}).map(([key, value]) => [key, redactConfigValue(key, value)]),
+  );
+}`;
+
+export default [
+  legacyWhitelist,
+  {
+    file: "tools/executor.js",
+    marker: "zen-pack:27-config-schema-import",
+    anchor: `import { minDeployAmount, applyConvictionSizing } from "../zenpack-lib/sizing.js";`,
+    inject: `import { validateConfigValue } from "../config-schema.js";`,
+    already: `import { validateConfigValue } from "../config-schema.js";`,
+  },
+  {
+    file: "tools/executor.js",
+    replaces: [{
+      old: `const USER_CONFIG_PATH = paths.userConfigPath;`,
+      new: `const USER_CONFIG_PATH = paths.userConfigPath;\nconst GMGN_CONFIG_PATH = paths.gmgnConfigPath;`,
+    }],
+  },
+  {
+    file: "tools/executor.js",
+    marker: "zen-pack:27-config-redaction",
+    anchor: `import { notifyDeploy, notifyClose, notifySwap } from "../telegram.js";`,
+    inject: REDACTION_HELPERS,
+    already: `const SENSITIVE_CONFIG_KEYS = new Set([`,
+  },
+  {
+    file: "tools/executor.js",
+    replaces: [{
+      old: snip("update-config-OLD.txt"),
+      new: snip("update-config-NEW.txt"),
+      already: FULL_ALREADY,
+    }],
+  },
+  {
+    file: "tools/definitions.js",
+    replaces: [{
+      old: snip("definition-OLD.txt"),
+      new: snip("definition-NEW.txt"),
+      already: `Non-GMGN changes persist to user-config.json; GMGN tuning persists to gmgn-config.json.`,
+    }],
+  },
+];

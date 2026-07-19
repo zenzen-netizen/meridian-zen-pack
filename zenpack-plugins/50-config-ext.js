@@ -12,16 +12,15 @@
 // FAIL-LOUD (gaya plugin 40): user-config gagal dibaca → console.warn + degrade
 // (u = {} → key custom pakai default fork), JANGAN crash boot.
 //
-// DI LUAR SCOPE (FASE A.3, vonis no-op di vanilla — NOL konsumen):
-//   - screening.source (screeningSource) — tak dibaca vanilla mana pun.
-//   - gmgn SUPERSET ~40 key fork — vanilla tools/gmgn.js cuma baca 5 key gmgn yg
-//     vanilla config.js sudah punya. Tak ditambah (orphan, sama seperti brief
-//     item-2: maxBundlePct/athFilterPct).
+// PRA-8: Stage 7 made tools/gmgn.js fork-complete, exposing a latent boot gap:
+// vanilla config.js still loads only five GMGN fields. This plugin now owns the
+// complete fork GMGN load/reload path plus profile-aware legacy migration.
 // DEFER 5.2: fungsi sizing export fork (minDeployAmount/computeDeployAmount mode
 //   maximize/applyConvictionSizing/persistConfigChange) — konsumen belum diport.
 import fs from "node:fs";
 import { config } from "../config.js";
 import { paths } from "../paths.js";
+import { migrateLegacyGmgnConfig } from "../zenpack-lib/config-migration.js";
 
 // Port VERBATIM fork-ref config.js:77-86.
 function normalizePromptNotes(raw) {
@@ -48,6 +47,90 @@ function readUserConfig() {
     console.warn(`[zen-pack:50] user-config unreadable, key custom pakai default: ${e.message}`);
     return {};
   }
+}
+
+function readGmgnConfig() {
+  try {
+    if (!fs.existsSync(paths.gmgnConfigPath)) return {};
+    return JSON.parse(fs.readFileSync(paths.gmgnConfigPath, "utf8"));
+  } catch (e) {
+    throw new Error(`gmgn-config.json tidak valid: ${e.message}`);
+  }
+}
+
+function nonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
+  }
+  return null;
+}
+
+function injectGmgnKeys(u, gmgnUserConfig) {
+  const gmgnValue = (key, legacyKey, fallback) => gmgnUserConfig[key] ?? u[legacyKey] ?? fallback;
+  const gmgnArray = (key, legacyKey, fallback) => {
+    if (Array.isArray(gmgnUserConfig[key])) return gmgnUserConfig[key];
+    if (Array.isArray(u[legacyKey])) return u[legacyKey];
+    return fallback;
+  };
+
+  // Verbatim fork config.js:159-214, adapted only to plugin-owned inputs.
+  config.gmgn = {
+    apiKey: nonEmptyString(gmgnUserConfig.apiKey, u.gmgnApiKey, process.env.GMGN_API_KEY),
+    baseUrl: nonEmptyString(gmgnUserConfig.baseUrl, u.gmgnBaseUrl, "https://openapi.gmgn.ai"),
+    feeSource: nonEmptyString(gmgnUserConfig.feeSource, u.gmgnFeeSource, "gmgn"),
+    interval: gmgnValue("interval", "gmgnInterval", "5m"),
+    orderBy: gmgnValue("orderBy", "gmgnOrderBy", "default"),
+    direction: gmgnValue("direction", "gmgnDirection", "desc"),
+    limit: gmgnValue("limit", "gmgnLimit", 100),
+    enrichLimit: gmgnValue("enrichLimit", "gmgnEnrichLimit", 20),
+    requestDelayMs: gmgnValue("requestDelayMs", "gmgnRequestDelayMs", 350),
+    maxRetries: gmgnValue("maxRetries", "gmgnMaxRetries", 2),
+    holdersLimit: gmgnValue("holdersLimit", "gmgnHoldersLimit", 100),
+    klineResolution: gmgnValue("klineResolution", "gmgnKlineResolution", "5m"),
+    klineLookbackMinutes: gmgnValue("klineLookbackMinutes", "gmgnKlineLookbackMinutes", 60),
+    filters: gmgnArray("filters", "gmgnFilters", ["renounced", "frozen", "not_wash_trading"]),
+    platforms: gmgnArray("platforms", "gmgnPlatforms", ["Pump.fun", "meteora_virtual_curve", "pool_meteora"]),
+    minMcap: gmgnValue("minMcap", "gmgnMinMcap", u.minMcap ?? 150_000),
+    maxMcap: gmgnValue("maxMcap", "gmgnMaxMcap", u.maxMcap ?? 10_000_000),
+    minTvl: gmgnValue("minTvl", "gmgnMinTvl", u.minTvl ?? 10_000),
+    minVolume: gmgnValue("minVolume", "gmgnMinVolume", 1000),
+    minHolders: gmgnValue("minHolders", "gmgnMinHolders", u.minHolders ?? 500),
+    minTokenAgeHours: gmgnValue("minTokenAgeHours", "gmgnMinTokenAgeHours", 2),
+    maxTokenAgeHours: gmgnValue("maxTokenAgeHours", "gmgnMaxTokenAgeHours", 24 * 7),
+    minSmartDegenCount: gmgnValue("minSmartDegenCount", "gmgnMinSmartDegenCount", 1),
+    requireKol: gmgnValue("requireKol", "gmgnRequireKol", true),
+    minKolCount: gmgnValue("minKolCount", "gmgnMinKolCount", 1),
+    maxRugRatio: gmgnValue("maxRugRatio", "gmgnMaxRugRatio", 0.3),
+    maxTop10HolderRate: gmgnValue("maxTop10HolderRate", "gmgnMaxTop10HolderRate", 0.5),
+    maxBundlerRate: gmgnValue("maxBundlerRate", "gmgnMaxBundlerRate", 0.5),
+    maxRatTraderRate: gmgnValue("maxRatTraderRate", "gmgnMaxRatTraderRate", 0.2),
+    maxFreshWalletRate: gmgnValue("maxFreshWalletRate", "gmgnMaxFreshWalletRate", 0.2),
+    maxDevTeamHoldRate: gmgnValue("maxDevTeamHoldRate", "gmgnMaxDevTeamHoldRate", 0.02),
+    preferredKolMinHoldPct: gmgnValue("preferredKolMinHoldPct", "gmgnPreferredKolMinHoldPct", 1),
+    dumpKolMinHoldPct: gmgnValue("dumpKolMinHoldPct", "gmgnDumpKolMinHoldPct", 0.5),
+    maxBotDegenRate: gmgnValue("maxBotDegenRate", "gmgnMaxBotDegenRate", 0.4),
+    maxSniperCount: gmgnValue("maxSniperCount", "gmgnMaxSniperCount", 20),
+    maxSniperHoldRate: gmgnValue("maxSniperHoldRate", "gmgnMaxSniperHoldRate", 0.3),
+    minTotalFeeSol: gmgnValue("minTotalFeeSol", "gmgnMinTotalFeeSol", 30),
+    athFilterPct: gmgnValue("athFilterPct", "gmgnAthFilterPct", null),
+    preferredKolNames: gmgnArray("preferredKolNames", "gmgnPreferredKolNames", []),
+    dumpKolNames: gmgnArray("dumpKolNames", "gmgnDumpKolNames", []),
+    indicatorFilter: gmgnValue("indicatorFilter", "gmgnIndicatorFilter", true),
+    indicatorInterval: gmgnValue("indicatorInterval", "gmgnIndicatorInterval", "15_MINUTE"),
+    indicatorRules: (() => {
+      const r = gmgnUserConfig.indicatorRules || {};
+      return {
+        requireBullishSupertrend: r.requireBullishSupertrend ?? true,
+        rejectAlreadyAtBottom: r.rejectAlreadyAtBottom ?? true,
+        requireAboveSupertrend: r.requireAboveSupertrend ?? false,
+        minRsi: r.minRsi ?? null,
+        maxRsi: r.maxRsi ?? null,
+        requireBbPosition: r.requireBbPosition ?? null,
+      };
+    })(),
+  };
 }
 
 // Suntik semua key custom (default fork) ke config. Idempotent (re-assign nilai sama).
@@ -148,11 +231,24 @@ function onConfigReload(ctx) {
     const rv = numericConfig(fresh.rentPerPositionSol);
     if (rv != null) config.management.rentPerPositionSol = rv;
   }
+  injectGmgnKeys(fresh, readGmgnConfig());
 }
 
 export const manifest = { name: "zenpack-config-ext", priority: 50 };
 
 export function register(hooks) {
-  injectCustomKeys(readUserConfig());
+  const migration = migrateLegacyGmgnConfig({
+    userConfigPath: paths.userConfigPath,
+    gmgnConfigPath: paths.gmgnConfigPath,
+  });
+  if (migration.migrated.length) {
+    console.log(`[zen-pack:50] migrasi GMGN: ${migration.migrated.join(", ")}`);
+  }
+  if (migration.preservedUnknown.length) {
+    console.warn(`[zen-pack:50] legacy GMGN tidak dikenal dipertahankan: ${migration.preservedUnknown.join(", ")}`);
+  }
+  const u = readUserConfig();
+  injectCustomKeys(u);
+  injectGmgnKeys(u, readGmgnConfig());
   hooks.on("config:reload", onConfigReload);
 }

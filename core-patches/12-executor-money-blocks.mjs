@@ -37,7 +37,8 @@ export default [
     file: "tools/executor.js",
     marker: M,
     replaces: [
-      { old: IMPORT_OLD, new: IMPORT_NEW },                       // import sizing.js
+      { old: IMPORT_OLD, new: IMPORT_NEW,
+        already: `import { minDeployAmount, applyConvictionSizing } from "../zenpack-lib/sizing.js";` }, // import sizing.js; PRA-8 may insert another import between both lines
       { old: B2_OLD, new: snip("2-strategylock-NEW.txt") },       // blok 2 strategyLock override
       { old: B3_OLD, new: snip("3-conviction-NEW.txt") },         // blok 3 applyConvictionSizing
       { old: B4A_OLD, new: B4A_NEW },                             // blok 4a minDeployAmount()
