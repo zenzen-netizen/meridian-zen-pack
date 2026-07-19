@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
@@ -47,7 +48,7 @@ globalThis.fetch = async (input) => {
 };
 
 const url = (file) => pathToFileURL(join(target, file)).href;
-const { config } = await import(url("config.js"));
+const { config, reloadScreeningThresholds } = await import(url("config.js"));
 const hooks = await import(url("zenpack-lib/hooks.js"));
 const { loadPlugins } = await import(url("zenpack-lib/loader.js"));
 const loaded = await loadPlugins(join(target, "zenpack-plugins"), hooks);
@@ -92,6 +93,30 @@ await t("path, section-nested, bare, and array recovery match fork", async () =>
   assert.equal(gmgn.indicatorRules.requireBullishSupertrend, false);
   assert.equal(gmgn.minMcap, 222000);
   assert.deepEqual(gmgn.platforms, ["Pump.fun", "pool_meteora"]);
+
+  reloadScreeningThresholds();
+  assert.deepEqual(config.gmgn.platforms, ["Pump.fun", "pool_meteora"], "array survives reload");
+
+  const restartScript = `
+    import { join } from "node:path";
+    import { pathToFileURL } from "node:url";
+    const root = process.argv[1];
+    const url = (file) => pathToFileURL(join(root, file)).href;
+    const { config } = await import(url("config.js"));
+    const hooks = await import(url("zenpack-lib/hooks.js"));
+    const { loadPlugins } = await import(url("zenpack-lib/loader.js"));
+    const loaded = await loadPlugins(join(root, "zenpack-plugins"), hooks);
+    if (loaded.errors.length) throw new Error(JSON.stringify(loaded.errors));
+    console.log("PRA8_RESTART=" + JSON.stringify(config.gmgn.platforms));
+    process.exit(0);
+  `;
+  const restartOut = execFileSync(process.execPath, ["--input-type=module", "-e", restartScript, target], {
+    cwd: target,
+    encoding: "utf8",
+    env: { ...process.env, DRY_RUN: "true" },
+  });
+  const marker = restartOut.split("\n").find((line) => line.startsWith("PRA8_RESTART="));
+  assert.deepEqual(JSON.parse(marker.slice("PRA8_RESTART=".length)), ["Pump.fun", "pool_meteora"], "array survives restart");
 });
 
 await t("13-key baseline stays executable and persists to user config", async () => {

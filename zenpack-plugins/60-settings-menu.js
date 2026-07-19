@@ -7,9 +7,8 @@
 //   pending text input for cfg:input / preset save
 //
 // Adaptasi minimal owner-locked:
-// - GMGN update_config split persistence is not ported yet. All gmgn* menu edit
-//   actions are gated here with a toast/message and never call executeTool.
-//   Recovery path: remove this gate when update_config block 1 lands.
+// - PRA-8 split persistence is live; GMGN edits share executeTool(update_config)
+//   and persist only to gmgn-config.json.
 // - requestActionConfirmation/requestConfirmation stay out of scope 7.2.
 // - buildConfigRowMap/formatFullConfig are reused from plugin 30 to avoid
 //   duplicating the same display helper already ported there.
@@ -56,8 +55,7 @@ export const manifest = { name: "zenpack-settings-menu", priority: 100 };
 let _pendingInput = null; // { key, page, menuMsgId } or { action:"presetSave", menuMsgId }
 let _settingsView = "main";
 
-const GMGN_GATE_TEXT = "⏳ setelan gmgn belum aktif (menunggu port update_config blok 1)";
-const isGmgnKey = (key) => String(key || "").toLowerCase().startsWith("gmgn");
+const GMGN_NAME_LIST_KEYS = new Set(["gmgnPreferredKolNames", "gmgnDumpKolNames"]);
 
 // Render one subgroup's rows: fork index.js:1960-1990.
 function renderSubclusterRows(keys, rowMap) {
@@ -436,10 +434,6 @@ function normalizeMenuValue(key, raw) {
   return parseConfigValue(raw);
 }
 
-async function gateGmgnCallback(msg) {
-  await answerCallbackQuery(msg.callbackQueryId, GMGN_GATE_TEXT);
-}
-
 async function applySettingsMenuCallback(msg) {
   const data = msg.callbackData || msg.text || "";
   const parts = data.split(":");
@@ -452,15 +446,14 @@ async function applySettingsMenuCallback(msg) {
   }
   if (action === "input") {
     const inputKey = parts[2];
-    if (isGmgnKey(inputKey)) {
-      await gateGmgnCallback(msg);
-      return;
-    }
     const currentVal = settingValue(inputKey);
     const inputPage = returnTokenForKey(inputKey);
     _pendingInput = { key: inputKey, page: inputPage, menuMsgId: msg.messageId };
     await answerCallbackQuery(msg.callbackQueryId);
-    await sendMessage(`Enter new value for ${inputKey} (current: ${currentVal ?? "off"}):\nSend a number, or "off" to clear.`);
+    const hint = GMGN_NAME_LIST_KEYS.has(inputKey)
+      ? 'Send comma-separated names, or "off" to clear.'
+      : 'Send a number, or "off" to clear.';
+    await sendMessage(`Enter new value for ${inputKey} (current: ${currentVal ?? "off"}):\n${hint}`);
     return;
   }
   if (action === "close") {
@@ -569,10 +562,6 @@ async function applySettingsMenuCallback(msg) {
   }
 
   const key = parts[2];
-  if (isGmgnKey(key)) {
-    await gateGmgnCallback(msg);
-    return;
-  }
   let value;
   if (action === "toggle") {
     value = !Boolean(settingValue(key));
@@ -629,14 +618,11 @@ async function consumePendingInput(msg, text) {
     return;
   }
   const { key, page, menuMsgId } = pending;
-  if (isGmgnKey(key)) {
-    await sendMessage(GMGN_GATE_TEXT);
-    await showSettingsMenu({ messageId: menuMsgId, page });
-    return;
-  }
   let value;
   if (text.toLowerCase() === "off" || text.toLowerCase() === "null") {
     value = null;
+  } else if (GMGN_NAME_LIST_KEYS.has(key)) {
+    value = text.split(",").map((name) => name.trim()).filter(Boolean);
   } else {
     value = Number(text);
     if (!Number.isFinite(value)) {
@@ -684,5 +670,4 @@ export const __test = {
   showSettingsMenu,
   consumePendingInput,
   getConfigValue,
-  isGmgnKey,
 };

@@ -39,7 +39,7 @@ process.env.OPENROUTER_API_KEY ||= "dummy";
 process.env.WALLET_PRIVATE_KEY ||= "11111111111111111111111111111111";
 process.env.RPC_URL ||= "http://127.0.0.1:8899";
 
-const files = ["user-config.json", "lessons.json"];
+const files = ["user-config.json", "gmgn-config.json", "lessons.json"];
 const tmp = mkdtempSync(join(tmpdir(), "zenpack-settings-"));
 const states = files.map((file) => ({ file, had: existsSync(file), backup: join(tmp, file) }));
 for (const s of states) if (s.had) copyFileSync(s.file, s.backup);
@@ -79,6 +79,7 @@ function takeCalls() {
 }
 
 const readUserConfig = () => existsSync("user-config.json") ? JSON.parse(readFileSync("user-config.json", "utf8")) : {};
+const readGmgnConfig = () => existsSync("gmgn-config.json") ? JSON.parse(readFileSync("gmgn-config.json", "utf8")) : {};
 
 await t("/settings renders fn-landing", async () => {
   const ctx = await fire("/settings");
@@ -117,8 +118,8 @@ await t("input-field non-gmgn persists", async () => {
   assert.strictEqual(saved.idleScreeningCooldownMin, 33);
 });
 
-await t("gmgn button gates and does not mutate config", async () => {
-  const before = JSON.stringify(readUserConfig());
+await t("gmgn button persists only to gmgn-config", async () => {
+  const userBefore = JSON.stringify(readUserConfig());
   const ctx = await fire("cfg:set:gmgnInterval:1h", {
     isCallback: true,
     callbackData: "cfg:set:gmgnInterval:1h",
@@ -126,10 +127,33 @@ await t("gmgn button gates and does not mutate config", async () => {
     messageId: 12,
   });
   const out = takeCalls();
-  const after = JSON.stringify(readUserConfig());
   assert.strictEqual(ctx.handled, true);
-  assert.strictEqual(after, before, "user-config unchanged");
-  assert.ok(out.some((c) => c.method === "answerCallbackQuery" && c.body.text === "⏳ setelan gmgn belum aktif (menunggu port update_config blok 1)"));
+  assert.strictEqual(JSON.stringify(readUserConfig()), userBefore, "user-config unchanged");
+  assert.strictEqual(readGmgnConfig().interval, "1h");
+  assert.ok(out.some((c) => c.method === "answerCallbackQuery" && String(c.body.text || "").includes("Updated gmgnInterval")));
+});
+
+await t("gmgn preferred/dump pending input parses comma-list only", async () => {
+  await fire("cfg:input:gmgnPreferredKolNames", {
+    isCallback: true,
+    callbackData: "cfg:input:gmgnPreferredKolNames",
+    callbackQueryId: "cb-gmgn-list",
+    messageId: 13,
+  });
+  takeCalls();
+  await fire("alice, bob");
+  assert.deepStrictEqual(readGmgnConfig().preferredKolNames, ["alice", "bob"]);
+
+  await fire("cfg:input:gmgnMinMcap", {
+    isCallback: true,
+    callbackData: "cfg:input:gmgnMinMcap",
+    callbackQueryId: "cb-gmgn-number",
+    messageId: 14,
+  });
+  takeCalls();
+  await fire("345000");
+  assert.strictEqual(readGmgnConfig().minMcap, 345000, "numeric GMGN parsing unchanged");
+  assert.ok(!JSON.stringify(readUserConfig()).includes("gmgnPreferredKolNames"));
 });
 
 console.log(`\nSETTINGS-MENU(${mode}): ${pass}/${pass + fail} lolos`);
