@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.9-D",
+  "stage": "7.10-C",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -47,7 +47,9 @@
     "30-briefing-wiring",
     "31-screening-foundations",
     "32-screening-cycle-wiring",
-    "33-exit-state-fields"
+    "33-exit-state-fields",
+    "34-index-residue",
+    "35-pnl-jupiter-display"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -396,6 +398,19 @@
     "golden": "Installed confirmPeak, registerExitSignal, and the complete fast PnL poller are byte-identical to pristine vanilla backups; tick-one/tick-two behavior is functionally locked.",
     "raw_diff_audit": "All 23 backups equal vanilla HEAD, all 50 manifest drop-ins equal pack sources, git diff --check is clean, and forbidden 15s/emergency/cooldown symbols are absent.",
     "gate": "All 29 test files and npm smoke PASS; paper two-layer lifecycle reports ZERO-TX and peak_pnl_pct; auto-swap failure is fail-open; uninstall restores exact 5ab14b4; repeat install skips Patch 19c 1/1, Patch 20e 9/9, and Patch 33 6/6; DRY_RUN boot loads 10 plugins with 0 errors.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_10_C": {
+    "summary": "Stage 7 closes with the bounded indicator-exit, idle-screening cooldown, and Jupiter display residues installed through Patches 34/35; every remaining fork delta has an explicit port, baseline-deviation, drop, adaptation, or pre-8 debt status.",
+    "patch_34": "Ports fork-verbatim indicator-exit import/helper/management call-site and the zero-position idle cooldown. Hard deterministic rules retain precedence over indicator exit, which retains precedence over CLAIM. Fork defaults remain false/20; both features fail open on helper/config errors.",
+    "patch_35": "Ports all four remaining tools/pnl.js Jupiter symbol/display hunks verbatim. The installed file normalizes to fork after removing patch markers, while PnL arithmetic is unchanged from the pre-install backup.",
+    "locked_drops": "The /set and /setcfg fork delta is display-only and dropped because both write paths already work. Executor block 6 is dropped because management and the fast poller both route CLOSE through executeTool(close_position), whose local D1 retry already covers close and claim.",
+    "pre_8_debt": "Executor block 1 update_config is one coupled Stage 8 workstream with GMGN split persistence, paths Batch-2, flat definitions schema, redaction/migration, and removal of Plugin 60's GMGN edit gate. tools/study transport remains a Stage 8 decision-basis item.",
+    "deviation_owner_locked_4": "KEEP vanilla dev-blocklist.js fail-closed. MANDATORY Stage 8.4 validation on a live receh deployment must exercise blocklist fetch/read failure visibility; until observed, fail-closed may prevent deployment and must not be declared safe.",
+    "golden": "Fork defaults and Patch 34 idle/helper/call snippets are exact; installed tools/pnl.js normalizes full-file exact to fork; PnL math and the complete vanilla two-tick poller remain exact to their pre-install backups.",
+    "raw_diff_audit": "Fresh uninstall restored exact 5ab14b4 with empty porcelain, then fresh install regenerated the full registered patch diff and repeat install was idempotent. All 23 backups equal vanilla HEAD, all 50 manifest drop-ins equal pack sources, git diff --check is clean, and no manual/wild residue exists.",
+    "gate": "All 30 tests/*.test.mjs and npm smoke PASS. Stage 7.10 harness is 8/8 with paper two-layer indicator close and ZERO-TX, idle OFF/ON/boundary/error checks, and golden PnL display. DRY_RUN boot loads 10 plugins with 0 skipped/errors and shuts down with 0 positions; dummy-auth 401 is expected.",
+    "handoff": "The single final inventory for Stage 8 is notes/zen-pack-progress-7.10.md.",
     "nol_sentuh_bot_live": true
   }
 }
