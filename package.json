@@ -1,2 +1,2 @@
-{ "name": "meridian-zen-pack", "version": "0.1.0", "type": "module", "private": true,
+{ "name": "meridian-zen-pack", "version": "1.0.0", "type": "module", "private": true,
   "scripts": { "test": "node tests/smoke-test.js" } }

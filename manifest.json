@@ -1,8 +1,9 @@
 {
   "name": "meridian-zen-pack",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "pre-8-update-config-D",
+  "tested_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
+  "stage": "8.3-release",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
