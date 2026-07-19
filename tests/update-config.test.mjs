@@ -194,3 +194,4 @@ await t("paper update_config performs ZERO-TX", () => {
 });
 
 console.log(`\nUPDATE-CONFIG: ${pass}/${pass} lolos`);
+process.exit(0); // Loaded runtime plugins keep background timers alive.

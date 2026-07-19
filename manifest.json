@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.10-C",
+  "stage": "pre-8-update-config-D",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -64,6 +64,7 @@
     "90-screening-cycle"
   ],
   "drop_ins": {
+    "lib": 6,
     "root": 18,
     "views": 12,
     "tools": 1,
@@ -78,7 +79,11 @@
       "user-config.example.json"
     ]
   },
-  "notes": "infra + drop-in pure-add layout A+ + patch 01-hook-bus; loader baca zenpack-plugins/. Stage 7.3 extends plugin 30 render views only: index-local display helpers moved into plugin and prior DEFER fields for held rent, SOL price, OpenRouter lines, condensed insight, racikan disclosure, and pool range-efficiency are live fail-open.",
+  "notes": "PRA-8 update_config is complete on the locked vanilla 5ab14b4 basis: Patch 27 now owns the full split-persistence handler, Plugin 50 owns migration plus GMGN boot/reload, and Plugin 60's temporary GMGN gate is removed.",
+  "conscious_fixes": [
+    "Fork latent array bug: gmgnFilters, gmgnPlatforms, gmgnPreferredKolNames, and gmgnDumpKolNames are normalized through ARRAY_KEYS so schema-accepted comma strings persist as arrays and survive reload/restart.",
+    "Fork dead definition names are corrected to the executable handler/schema names gmgnRequireBullishSt, gmgnRejectAtBottom, and gmgnRequireAboveSt; no dead aliases were added."
+  ],
   "stage_5_1": {
     "summary": "config.js bag 1: key custom fork -> plugin 50-config-ext (mutasi objek config live saat register()) + patch 08 hook config:reload + patch 09 DRY_RUN user-config-wins.",
     "deviation_owner_decision_2026-07-13": "opportunity poller vanilla DIBIARKAN AKTIF (config.opportunity.enabled default true) — fork tidak punya fitur ini, adopsi sadar. VALIDASI WAJIB di Stage 8.4.",
@@ -303,6 +308,7 @@
       "requestActionConfirmation/requestConfirmation remain out of scope 7.2."
     ],
     "gate": "settings-menu installed 4/4, telegram-cmds 19/19 after /settings expectation update; full final gate recorded in notes/zen-pack-progress.md Stage 7.2.",
+    "pra_8_superseded": "Patch 27's old additive 35-key whitelist and Plugin 60's GMGN gate are superseded. The same patch ID now upgrades either pristine vanilla or the legacy installed form to the complete 181-key handler through explicit already compatibility.",
     "nol_sentuh_bot_live": true
   },
   "stage_7_3": {
@@ -405,12 +411,24 @@
     "patch_34": "Ports fork-verbatim indicator-exit import/helper/management call-site and the zero-position idle cooldown. Hard deterministic rules retain precedence over indicator exit, which retains precedence over CLAIM. Fork defaults remain false/20; both features fail open on helper/config errors.",
     "patch_35": "Ports all four remaining tools/pnl.js Jupiter symbol/display hunks verbatim. The installed file normalizes to fork after removing patch markers, while PnL arithmetic is unchanged from the pre-install backup.",
     "locked_drops": "The /set and /setcfg fork delta is display-only and dropped because both write paths already work. Executor block 6 is dropped because management and the fast poller both route CLOSE through executeTool(close_position), whose local D1 retry already covers close and claim.",
-    "pre_8_debt": "Executor block 1 update_config is one coupled Stage 8 workstream with GMGN split persistence, paths Batch-2, flat definitions schema, redaction/migration, and removal of Plugin 60's GMGN edit gate. tools/study transport remains a Stage 8 decision-basis item.",
+    "pre_8_debt": "PAID by pre_8_update_config: full handler, GMGN split persistence, paths routing, flat definitions/schema, redaction, migration, boot/reload, and Plugin 60 gate removal are complete. tools/study transport was separately locked to vanilla routing in Stage 8.0.",
     "deviation_owner_locked_4": "KEEP vanilla dev-blocklist.js fail-closed. MANDATORY Stage 8.4 validation on a live receh deployment must exercise blocklist fetch/read failure visibility; until observed, fail-closed may prevent deployment and must not be declared safe.",
     "golden": "Fork defaults and Patch 34 idle/helper/call snippets are exact; installed tools/pnl.js normalizes full-file exact to fork; PnL math and the complete vanilla two-tick poller remain exact to their pre-install backups.",
     "raw_diff_audit": "Fresh uninstall restored exact 5ab14b4 with empty porcelain, then fresh install regenerated the full registered patch diff and repeat install was idempotent. All 23 backups equal vanilla HEAD, all 50 manifest drop-ins equal pack sources, git diff --check is clean, and no manual/wild residue exists.",
     "gate": "All 30 tests/*.test.mjs and npm smoke PASS. Stage 7.10 harness is 8/8 with paper two-layer indicator close and ZERO-TX, idle OFF/ON/boundary/error checks, and golden PnL display. DRY_RUN boot loads 10 plugins with 0 skipped/errors and shuts down with 0 positions; dummy-auth 401 is expected.",
     "handoff": "The single final inventory for Stage 8 is notes/zen-pack-progress-7.10.md.",
+    "nol_sentuh_bot_live": true
+  },
+  "pre_8_update_config": {
+    "summary": "Executor block 1 landed as one coupled workstream. Patch 27 is superseded in place by the complete 181-key handler; non-GMGN values persist to user-config.json, GMGN values to gmgn-config.json, with partial-apply invalid[] visibility and sensitive-value redaction.",
+    "patch_27_superseded": "The legacy additive 35-key Patch 27 remains only as an upgrade bootstrap. A pristine install and a target already carrying old Patch 27 converge on the exact same full handler; reinstall skips all operations and uninstall restores exact vanilla 5ab14b4.",
+    "migration": "Plugin 50 performs profile-local one-shot migration at boot, parses both files before writes, creates stable exact-byte backups, maps gmgnFeeSource to feeSource, preserves and reports unknown legacy GMGN keys, lets canonical split values win, writes GMGN first atomically, and is byte-idempotent on rerun. Live migration is deferred to 8.4/8.5.",
+    "gmgn_boot_reload": "Plugin 50 now loads the complete fork GMGN surface from paths.gmgnConfigPath on boot and config:reload, closing a latent Stage 7 producer/loader gap.",
+    "deviation_owner_locked_5": "Existing corrupt gmgn-config.json is fail-closed before runtime mutation or file write, unlike fork 643e954 which silently falls back to {}. MANDATORY Stage 8.4 live-receh validation must prove the error is visible and deployment is safely held.",
+    "conscious_fix_contract": "Four GMGN array keys are normalized before validation/persistence and two KOL pending inputs parse comma lists; all other numeric menu inputs retain numeric parsing. The three definition-only dead names are corrected to handler-live names.",
+    "golden": "Installed handler and definition equal their committed NEW snippets byte-for-byte. Against fork 643e954, normalized diff is limited to marker=1, retained baseline keys=13, GMGN arrays=4, fail-closed block=1, and definition names=3.",
+    "raw_diff_audit": "All 23 backups equal vanilla HEAD, all 51 manifest-owned drop-ins equal pack sources, and pack/target git diff --check pass.",
+    "gate": "All 33 tests/*.test.mjs and npm smoke pass. Migration fixtures are 7/7; update_config is 11/11 with ZERO-TX:0; settings menu is 5/5; config boot/reload is 16/16. DRY_RUN boot loads 10 plugins with 0 skipped/errors. Uninstall restores exact 5ab14b4 with empty porcelain; fresh install plus repeat install are idempotent; legacy Patch 27 upgrade converges and uninstalls cleanly.",
     "nol_sentuh_bot_live": true
   }
 }

@@ -1,6 +1,7 @@
 # PRA-8 Recon — executor block 1 `update_config`
 
-Status: **CHECKPOINT OWNER — no runtime change yet**. Source of truth is
+Status: **CHECKPOINT APPROVED; IMPLEMENTATION CLOSED**. Final result and gates
+are recorded in `notes/pre-8-update-config-closure.md`. Source of truth remains
 `git show 643e954`; the fork worktree is not used because it has local changes.
 
 ## 1. Full handler map
