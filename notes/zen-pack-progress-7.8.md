@@ -269,3 +269,21 @@ STOP. Await owner decision; 7.8-B/C/D have not started.
   fields are live; unrelated GMGN work remains debt.
 - Foundation fixture 3/3 and money command regression 13/13 pass. Installed
   GMGN file and `getTopCandidates` function pass fork golden comparison.
+
+## 7.8-C — whole-cycle override and throttle
+
+- Plugin 90 owns all 25 decision hunks. Its function matches the 501-line fork
+  golden after only documented lifecycle/test adapters: core owns busy and
+  last-trigger state, `ctx.markStarted()` replaces the local timer write, and
+  core owns queue cleanup.
+- Patch 32 adds one choke point after the synchronous core lock. Handler-started
+  errors become a failed tick and return; they can never enter vanilla. With no
+  handler, the unchanged vanilla body remains the uninstall fallback.
+- Fork throttle helpers and cron wrapper are installed verbatim. Only scheduled
+  ticks are gated; management, CLI, and opportunity calls bypass it.
+- Opportunity poller, `degenScore`, its interval cleanup, and its silent cycle
+  call remain present.
+- Screening fixtures pass 12/12 with `ZERO-TX`: market regime, candidate
+  momentum, yield, smart-wallet momentum, shadow recording, GMGN funnel,
+  anti-hallucination, simulated successful deploy callback, five-stage GMGN
+  producer, adaptive throttle, choke semantics, and full cycle golden.

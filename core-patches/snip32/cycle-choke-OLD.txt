@@ -1,0 +1,4 @@
+  _screeningBusy = true; // set immediately — prevents TOCTOU race with concurrent callers
+  _screeningLastTriggered = Date.now();
+
+  // Hard guards — don't even run the agent if preconditions aren't met

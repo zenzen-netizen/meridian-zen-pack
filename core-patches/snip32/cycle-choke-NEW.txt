@@ -1,0 +1,32 @@
+  _screeningBusy = true; // set immediately — prevents TOCTOU race with concurrent callers
+  _screeningLastTriggered = Date.now();
+
+  // [zen-pack:32-screening-cycle] Plugin owns the enhanced cycle; this core
+  // lock/timer bridge keeps pollers and queue coordination on one authority.
+  const zpScreenCtx = {
+    silent,
+    handled: false,
+    started: false,
+    markStarted: () => { timers.screeningLastRun = Date.now(); },
+  };
+  try {
+    await __zenpackHooks.run("screening:cycle", zpScreenCtx);
+  } catch (error) {
+    if (!zpScreenCtx.started) {
+      _screeningBusy = false;
+      throw error;
+    }
+    // Once the plugin begins, never fall through into vanilla: it may already
+    // have deployed. Fail this tick instead of risking a duplicate deploy.
+    log("cron_error", `Screening plugin cycle failed: ${error.message}`);
+    zpScreenCtx.handled = true;
+    zpScreenCtx.result = `Screening cycle failed: ${error.message}`;
+  }
+  if (zpScreenCtx.handled) {
+    _screeningBusy = false;
+    drainTelegramQueue().catch(() => {});
+    return zpScreenCtx.result;
+  }
+
+  // No plugin handler (uninstalled): continue into the untouched vanilla body.
+  // Hard guards — don't even run the agent if preconditions aren't met

@@ -1,0 +1,7 @@
+  const screenTask = cron.schedule(`*/${Math.max(1, config.schedule.screeningIntervalMin)} * * * *`, async () => {
+    if (!shouldRunScheduledScreening()) {
+      log("cron", `Screening tick skipped — adaptive throttle (session ${currentWibSession().label}, effective ${effectiveScreeningIntervalMin()}m)`);
+      return;
+    }
+    await runScreeningCycle();
+  });

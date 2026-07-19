@@ -2,7 +2,7 @@
   "name": "meridian-zen-pack",
   "version": "0.1.0",
   "target_upstream_sha": "5ab14b476e4e8d25c58f989c77b161721e1a505f",
-  "stage": "7.8-B",
+  "stage": "7.8-C",
   "patches": [
     "01-hook-bus",
     "02-paths-routing",
@@ -45,7 +45,8 @@
     "28-telegram-settings-hook",
     "29-agentloop-money",
     "30-briefing-wiring",
-    "31-screening-foundations"
+    "31-screening-foundations",
+    "32-screening-cycle-wiring"
   ],
   "plugins": [
     "00-zenpack-hello",
@@ -56,7 +57,8 @@
     "50-config-ext",
     "60-settings-menu",
     "70-money-commands",
-    "80-briefing-orch"
+    "80-briefing-orch",
+    "90-screening-cycle"
   ],
   "drop_ins": {
     "root": 18,
@@ -64,7 +66,7 @@
     "tools": 1,
     "scripts": 3,
     "docs": 1,
-    "zenpack_plugins": 9,
+    "zenpack_plugins": 10,
     "layout": "A+ mirror fork: plugins/->root, views/->views/, tools-extra/->tools/, scripts/->scripts/",
     "deferred_modified_docs": [
       "CLAUDE.md",
@@ -374,6 +376,15 @@
     "gmgn_debt": "Fase gmgn debt paid partially: discovery, prompt formatter, source dispatch, and cycle funnel metadata are live. Non-cycle GMGN work remains debt.",
     "golden": "Installed tools/gmgn.js equals fork 643e954 byte-for-byte; installed getTopCandidates equals the fork function byte-for-byte. Chart-indicator dead export is now consumed.",
     "gate": "Syntax PASS; screening-foundations 3/3 and money-commands 13/13 PASS; GMGN and screening-dispatch golden checks PASS. Full lifecycle gate deferred to 7.8-D.",
+    "nol_sentuh_bot_live": true
+  },
+  "stage_7_8_C": {
+    "summary": "Plugin 90 owns the 25-hunk fork screening decision body; Patch 32 wires one core lifecycle choke point and adaptive scheduled throttle with the vanilla body retained as uninstall/handler-absent fallback.",
+    "plugin_90": "Fork runScreeningCycle is golden-identical after documented adapters: core busy/last-trigger ownership removed, timer write becomes ctx.markStarted, and core queue/busy cleanup remains in the choke point. Runtime injection is test-only; production binds real imports.",
+    "patch_32": "Core sets _screeningBusy and _screeningLastTriggered before awaiting screening:cycle. Handler-started errors log and return a failed tick without entering vanilla. No handler continues into the untouched vanilla body. effectiveScreeningIntervalMin, shouldRunScheduledScreening, and screenTask wrapper are fork-verbatim.",
+    "poller_contract": "Only scheduled screenTask is throttled. Post-management, cli.js, and the preserved vanilla opportunity poller all call the exported choke point directly. degenScore and opportunity shutdown cleanup remain present.",
+    "golden": "The full 501-line fork cycle source normalizes exactly to Plugin 90 after only lifecycle/test adapters; throttle helpers and cron strings are fork-verbatim.",
+    "gate": "screening-cycle fixture 12/12 PASS with market regime, candidate momentum, expected yield, smart-wallet momentum, shadow recorders, funnel, fake deploy guard, paper success callback, five-stage GMGN producer, throttle, choke semantics, and golden. All fixtures report ZERO-TX.",
     "nol_sentuh_bot_live": true
   }
 }
