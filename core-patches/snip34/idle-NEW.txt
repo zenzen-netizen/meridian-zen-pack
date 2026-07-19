@@ -1,0 +1,22 @@
+      // 🧪 Idle-screening cooldown (experiment, default OFF = factory: always trigger).
+      // When ON, throttle the idle (0-position) screening trigger so we don't fire a
+      // screening LLM call on EVERY management tick during a long dry spell. Shares
+      // _screeningLastTriggered with scheduled/freed-slot screening, so the scheduled
+      // cron still runs underneath. Fail-open: any error → fall through to triggering.
+      let idleOnCooldown = false;
+      try {
+        if (config.experiments?.idleScreeningCooldown) {
+          const cooldownMs = Math.max(0, Number(config.experiments.idleScreeningCooldownMin ?? 20)) * 60 * 1000;
+          if (cooldownMs > 0 && Date.now() - _screeningLastTriggered < cooldownMs) idleOnCooldown = true;
+        }
+      } catch { idleOnCooldown = false; }
+      if (idleOnCooldown) {
+        const waitedMin = Math.round((Date.now() - _screeningLastTriggered) / 60000);
+        log("cron", `No open positions — idle screening on cooldown (${waitedMin}m < ${config.experiments.idleScreeningCooldownMin}m), skipping`);
+        mgmtReport = "💤 No open positions — idle screening on cooldown.";
+        return mgmtReport;
+      }
+      log("cron", "No open positions — triggering screening cycle");
+      mgmtReport = "🔍 No open positions — triggering screening.";
+      runScreeningCycle().catch((e) => log("cron_error", `Triggered screening failed: ${e.message}`));
+      return mgmtReport;

@@ -1,0 +1,18 @@
+// Indicator-driven exit (opt-in). Default OFF — when indicators.exitEnabled is
+// false this returns null and exits are governed only by the deterministic rules
+// above (factory behavior). When on, a CONFIRMED exitPreset signal upgrades a
+// would-be STAY/CLAIM into a CLOSE. Fail-safe: API error or "skipped" → no close.
+async function getIndicatorExitSignal(position) {
+  if (!config.indicators.enabled || !config.indicators.exitEnabled) return null;
+  const mint = position.base_mint;
+  if (!mint) return null;
+  try {
+    const confirmation = await confirmIndicatorPreset({ mint, side: "exit" });
+    if (confirmation?.enabled && confirmation.confirmed && !confirmation.skipped) {
+      return { action: "CLOSE", rule: "indicator", reason: confirmation.reason || "exit preset confirmed" };
+    }
+  } catch (error) {
+    log("indicators_warn", `Exit indicator check failed for ${position.pair}: ${error.message}`);
+  }
+  return null;
+}

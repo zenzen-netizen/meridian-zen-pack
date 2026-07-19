@@ -1,0 +1,22 @@
+// ─── Jupiter prices + symbols (never cached) ────────────────────
+// The asset-search endpoint already returns `symbol` per asset, so we harvest
+// it here at zero extra cost — used only to heal unresolved DISPLAY names (F6).
+async function getJupiterPrices(mints) {
+  const list = unique(mints.map((m) => String(m).trim()));
+  if (!list.length) return { prices: {}, symbols: {} };
+  try {
+    const res = await fetch(`${JUP_SEARCH}?query=${list.join(",")}`, { headers: { accept: "application/json" } });
+    if (!res.ok) throw new Error(`Jupiter ${res.status}`);
+    const assets = await res.json();
+    const prices = {};
+    const symbols = {};
+    for (const a of assets) {
+      prices[a.id] = maybeNum(a.usdPrice);
+      if (a.symbol) symbols[a.id] = a.symbol;
+    }
+    return { prices, symbols };
+  } catch (e) {
+    log("pnl_price", `Jupiter price fetch failed: ${e.message}`);
+    return { prices: {}, symbols: {} };
+  }
+}
