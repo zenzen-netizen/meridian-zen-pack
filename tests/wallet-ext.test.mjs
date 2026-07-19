@@ -5,6 +5,7 @@
 // module-local (tak ter-export) diuji tak-langsung via quoteSellPriceImpact.
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { readFile } from "node:fs/promises";
 import assert from "node:assert";
 
 const target = process.argv[2];
@@ -71,6 +72,26 @@ await t("getSolMarketRegime fail-open null saat field hilang / fetch gagal", asy
   assert.strictEqual(await w.getSolMarketRegime(), null, "entry hilang -> null");
   queueFetch({ ok: false, status: 503, body: {} }); // http error
   assert.strictEqual(await w.getSolMarketRegime(), null, "http gagal -> null (fail-open)");
+});
+
+await t("auto-swap retry failure fail-open (close caller tidak dilempar)", async () => {
+  const executorSrc = await readFile(join(target, "tools", "executor.js"), "utf8");
+  const start = executorSrc.indexOf("async function swapBaseToSolWithRetry(baseMint, label)");
+  const end = executorSrc.indexOf("\n}\n\n/**\n * Execute a tool call", start) + 2;
+  assert.ok(start >= 0 && end > start, "helper retry vanilla hilang");
+  const helper = executorSrc.slice(start, end);
+  let swapCalls = 0;
+  const config = { management: { autoSwapRetryAttempts: 3, autoSwapRetryDelayMs: 0 } };
+  const getWalletBalances = async () => ({ tokens: [{ mint: BASE, symbol: "BASE", usd: 5, balance: 10 }] });
+  const swapToken = async () => { swapCalls++; throw new Error("no route"); };
+  const logs = [];
+  const log = (tag, msg) => logs.push(`${tag}:${msg}`);
+  const sleep = async () => {};
+  const run = new Function("config", "getWalletBalances", "swapToken", "log", "sleep", `${helper}; return swapBaseToSolWithRetry;`)(config, getWalletBalances, swapToken, log, sleep);
+  const result = await run(BASE, "after close");
+  assert.deepStrictEqual(result, { swapped: false, result: null, token: null });
+  assert.strictEqual(swapCalls, 3);
+  assert.ok(logs.some((line) => line.includes("failed after 3 attempts")));
 });
 
 console.log(`\nwallet-ext: ${pass} pass, ${fail} fail`);

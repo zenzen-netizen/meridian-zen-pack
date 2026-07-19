@@ -106,6 +106,7 @@ try {
   process.env.DRY_RUN = "true";
 
   const { config } = await import(pathToFileURL(join(target, "config.js")).href);
+  const stateApi = await import(pathToFileURL(join(target, "state.js")).href);
   const baseline = await import(`${pathToFileURL(runtimeBaselinePath).href}?t=${Date.now()}`);
   const patched = await import(`${pathToFileURL(runtimePatchedPath).href}?t=${Date.now()}`);
   const args = {
@@ -153,14 +154,35 @@ try {
     assert.match(deployed.position, /^paper_/);
     const listed = await patched.getMyPositions({ force: true });
     assert.ok(listed.positions.some((p) => p.position === deployed.position));
+    let tracked = stateApi.getTrackedPosition(deployed.position);
+    assert.ok(tracked.deployed_at, "paper deploy harus punya deployed_at");
+    assert.strictEqual(tracked.trough_pnl_pct, 0);
+    assert.strictEqual(tracked.price_peak_pct, 0);
+    assert.strictEqual(tracked.price_trough_pct, 0);
+
+    stateApi.confirmPeak(deployed.position, 7.5, 1);
+    stateApi.updatePnlAndCheckExits(deployed.position, {
+      pnl_pct: -2.5,
+      pnl_pct_suspicious: false,
+      in_range: true,
+      active_bin: 99,
+      fee_per_tvl_24h: 10,
+      age_minutes: 1,
+    }, { ...config.management, trailingTakeProfit: false, minFeePerTvl24h: null });
+    tracked = stateApi.getTrackedPosition(deployed.position);
+    assert.strictEqual(tracked.peak_pnl_pct, 7.5);
+    assert.strictEqual(tracked.trough_pnl_pct, -2.5);
+    assert.ok(tracked.price_trough_pct < 0);
+
     const pnl = await patched.getPositionPnl({ pool_address: args.pool_address, position_address: deployed.position });
     assert.strictEqual(pnl.paper, true);
     const closed = await patched.closePosition({ position_address: deployed.position, reason: "paper harness" });
     assert.strictEqual(closed.paper, true);
+    assert.strictEqual(closed.peak_pnl_pct, 7.5, "paper close shape harus bawa peakPnl");
     assert.strictEqual(globalThis.__paperHarness.txCount, 0);
     console.log("     position:", deployed.position);
     console.log("     listed  :", listed.positions.map((p) => p.position).join(","));
-    console.log("     close   :", JSON.stringify({ success: closed.success, paper: closed.paper, pnl_pct: closed.pnl_pct }));
+    console.log("     close   :", JSON.stringify({ success: closed.success, paper: closed.paper, pnl_pct: closed.pnl_pct, peak_pnl_pct: closed.peak_pnl_pct }));
     console.log("     ZERO-TX :", globalThis.__paperHarness.txCount);
   });
 } finally {
