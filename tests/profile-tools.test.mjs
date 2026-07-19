@@ -27,8 +27,8 @@ for (const e of res.errors) console.error("  plugin error:", e.file, e.err);
 let pass = 0, fail = 0;
 async function t(name, fn) { try { await fn(); console.log("  ✅", name); pass++; } catch (e) { console.log("  ❌", name, "→", e.message); fail++; } }
 
-await t("loader: 9 plugin loaded, 0 skipped, 0 errors", async () => {
-  assert.strictEqual(res.loaded.length, 9); // +80-briefing-orch (Stage 7.7)
+await t("loader: 10 plugin loaded, 0 skipped, 0 errors", async () => {
+  assert.strictEqual(res.loaded.length, 10); // +90-screening-cycle (Stage 7.8)
   assert.strictEqual(res.skipped.length, 0);
   assert.strictEqual(res.errors.length, 0);
 });

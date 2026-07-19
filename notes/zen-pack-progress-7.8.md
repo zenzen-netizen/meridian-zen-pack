@@ -287,3 +287,31 @@ STOP. Await owner decision; 7.8-B/C/D have not started.
   momentum, yield, smart-wallet momentum, shadow recording, GMGN funnel,
   anti-hallucination, simulated successful deploy callback, five-stage GMGN
   producer, adaptive throttle, choke semantics, and full cycle golden.
+
+## 7.8-D — money gate closure
+
+- Syntax and the complete regression harness pass after a fresh reinstall;
+  loader reports 10 loaded plugins, 0 skipped, and 0 errors. Pack smoke v0.2
+  passes, including all 10 screening plugins.
+- Paper gate passes both layers: experiment OFF produces `diff: []`; experiment
+  ON completes the virtual `paper_*` deploy/list/PnL/close lifecycle. Both the
+  DLMM harness and screening fixtures report `ZERO-TX: 0`.
+- Lifecycle gate passes: uninstall restores pristine vanilla `5ab14b4` with
+  byte-clean tracked state; vanilla settings/Telegram parity pass 2/2; fresh
+  install passes; the next install skips all seven Patch 31 and four Patch 32
+  operations as idempotent.
+- Golden gate passes exact comparisons for the full GMGN module,
+  `getTopCandidates`, throttle helpers, cron wrapper, GMGN funnel, lone-candidate
+  helper, and installed Plugin 90. The normalized 501-line whole-cycle body
+  matches fork after the documented lifecycle adapter only.
+- Raw-diff audit is complete: exactly 23 modified tracked files have backups
+  byte-identical to vanilla HEAD, and all 50 manifest-owned drop-ins are
+  byte-identical to pack sources. `git diff --check` is clean. The vanilla
+  opportunity poller, `_opportunityPollInterval`, and `degenScore` remain; 7.9
+  emergency/exit symbols are absent from the 7.8 files.
+- Dummy DRY-RUN boot loads 10 plugins with 0 errors, starts scheduled screening,
+  and shuts down on SIGTERM with 0 open positions. No live restart or live
+  transaction was performed.
+- GMGN debt status remains **paid partially**: the cycle-consumed producer,
+  formatter, source dispatch, and funnel are live; unrelated GMGN work remains
+  explicitly deferred.
